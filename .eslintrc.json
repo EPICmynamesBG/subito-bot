@@ -1,0 +1,30 @@
+{
+  "rules": {
+    "comma-dangle": [2, "never"],
+    "complexity": [2, 12],
+    "func-names": [0],
+    "handle-callback-err": [2],
+    "indent": [2,2],
+    "max-depth": [2, 4],
+    "max-len": [2, 120, 2],
+    "max-nested-callbacks": [2, 4],
+    "max-statements": ["error", 50, { "ignoreTopLevelFunctions": false }],
+    "object-shorthand": [2, "never"],
+    "no-param-reassign": [2],
+    "no-plusplus": [0],
+    "no-underscore-dangle": [0],
+    "new-cap": [0],
+    "no-empty-label": [0],
+    "space-before-keywords": [0],
+    "space-after-keywords": [0],
+    "space-return-throw-case": [0],
+    "strict": [0]
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "browser": true,
+    "mocha": true
+  },
+  "extends": ["eslint:recommended", "airbnb"]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "subito",
+  "version": "1.0.0",
+  "private": false,
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EPICmynamesBG/subito-bot.git"
+  },
+  "author": "Brandon Groff",
+  "license": "MIT",
+  "main": "app.js",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "express": "^4.12.3",
+    "htmlparser": "^1.7.7",
+    "request": "^2.81.0",
+    "slack-node": "^0.1.8",
+    "swagger-express-mw": "^0.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.4.0",
+    "eslint-ignore": "^1.0.0",
+    "should": "^7.1.0",
+    "supertest": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "swagger project test"
+  },
+  "bugs": {
+    "url": "https://github.com/EPICmynamesBG/subito-bot/issues"
+  },
+  "homepage": "https://github.com/EPICmynamesBG/subito-bot#readme"
+}

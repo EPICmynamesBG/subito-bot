@@ -1,0 +1,7 @@
+node_modules/*
+*.rmd
+*.json
+*.yaml
+Procfile
+coverage/
+bower_components/*
