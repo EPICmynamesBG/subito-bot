@@ -11,9 +11,11 @@
   "license": "MIT",
   "main": "app.js",
   "dependencies": {
+    "async": "^2.5.0",
     "dotenv": "^4.0.0",
     "express": "^4.12.3",
-    "htmlparser": "^1.7.7",
+    "lodash": "^4.17.4",
+    "node-html-parser": "^1.1.5",
     "request": "^2.81.0",
     "slack-node": "^0.1.8",
     "swagger-express-mw": "^0.1.0"

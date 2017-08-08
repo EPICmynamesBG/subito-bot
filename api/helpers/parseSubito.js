@@ -1,8 +1,10 @@
 'use strict';
 
 const request = require('request');
-const htmlParser = require('htmlparser');
+const htmlParser = require('node-html-parser');
 const fs = require('fs');
+const async = require('async');
+const lodash = require('lodash');
 
 const subitoUrl = 'http://www.subitosoups.com';
 const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
@@ -23,31 +25,75 @@ function _fetchSoupPage(callback) {
     .pipe(stream);
 }
 
-function _parse(rawHtml, callback) {
-  const handler = new htmlParser.DefaultHandler((err, dom) => {
-    if (err) {
-      callback(err);
-      return;
+function recursivelySearchForElement(searchElement, htmlObj) {
+  if (htmlObj.tagName === searchElement) {
+    return htmlObj;
+  } else {
+    if (htmlObj.childNodes) {
+      let found;
+      htmlObj.childNodes.forEach((element) => {
+        if (!found) {
+          found = recursivelySearchForElement(searchElement, element);
+        }
+      });
+      return found;
+    } else {
+      return false;
     }
-    callback(null, dom);
+  }
+}
+
+function _getElementsWithClasses(classList, htmlObj) {
+  let returnVals = [];
+  htmlObj.childNodes.forEach((element) => {
+    if (lodash.isEqual(classList, element.classNames) && element.tagName === 'div') {
+      returnVals.push(element);
+    }
+    if (element.childNodes) {
+      returnVals.push(_getElementsWithClasses(classList, element));
+    }
   });
-  const parser = new htmlParser.Parser(handler);
-  parser.parseComplete(rawHtml);
+  return lodash.flattenDeep(returnVals);
+}
+
+function getCalendarElements(htmlBody) {
+  const classes = "element-children-container";
+  return _getElementsWithClasses(classes.split(' '), htmlBody, 3);
 }
 
 function fetchCalendar(callback) {
-  _fetchSoupPage((err, res) => {
-    fs.readFile(savePath, 'utf8', (err2, data) => {
-        if (err2) {
-          callback('Unable to load Subito soup calendar');
+  async.autoInject({
+    fetchSoupPage: (cb) => {
+      _fetchSoupPage((err, res) => {
+        if (err) {
+          cb(null, new Error('Unable to load Subito soup calendar'));
           return;
-        } else if ((err || res.statusCode !== 200) && !err2) {
-          console.warn('Using last loaded subito schedule');
         }
-        _parse(data, (err3, parsedHtml) => {
-          console.log(err3, parsedHtml);
-        });
-    });
+        cb(null, res);
+      });
+    },
+    savedHtml: (fetchSoupPage, cb) => {
+      fs.readFile(savePath, 'utf8', cb);
+    },
+    pluckDates: (savedHtml, cb) => {
+      const parsedHtml = htmlParser.parse(savedHtml);
+      const body = recursivelySearchForElement('body', parsedHtml);
+      cb(null, getCalendarElements(body));
+    },
+    filterPlucked: (pluckDates, cb) => {
+      let flattened = lodash.flatMapDeep(pluckDates, (element) => {
+        return element.childNodes;
+      });
+
+      flattened.forEach((element) => {
+        if (element instanceof htmlParser.TextNode) {
+          console.log(element);
+        }
+      });
+      cb(null, flattened);
+    }
+  }, (err, res) => {
+    callback(null, res.pluckDates);
   });
 }
 
