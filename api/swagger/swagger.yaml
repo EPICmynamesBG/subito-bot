@@ -20,24 +20,47 @@ produces:
 paths:
   /subito:
     # binds a127 app logic to a route
-    x-swagger-router-controller: subitoController
+    x-swagger-router-controller: soupCalendarController
     post:
-      description: Does a thing
+      description: get the soups for a day
       # used as the method name of the controller
       operationId: getSoupsForDay
       parameters:
-        - name: name
-          in: query
-          description: The name of the person to whom to say hello
+        - name: body
+          in: body
+          description: the day to get soups for
           required: false
-          type: string
+          schema:
+            properties:
+              day:
+                type: string
+                format: date
+                example: 'MM/DD/YYYY'
+              token:
+                type: string
       responses:
         "200":
           description: Success
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/HelloWorldResponse"
+            $ref: "#/definitions/SoupCalendarViewObject"
         # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /subito/all:
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: Gets the fully stored soup calendar
+      operationId: getAllSoups
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/SoupCalendarViewObject"
         default:
           description: Error
           schema:
@@ -46,11 +69,20 @@ paths:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
-  HelloWorldResponse:
+  SoupCalendarViewObject:
+    type: object
     required:
-      - message
+      - day
+      - soups
     properties:
-      message:
+      day:
+        type: string
+        format: date
+      soups:
+        type: array
+        items:
+          type: string
+      soupsStr:
         type: string
   ErrorResponse:
     required:

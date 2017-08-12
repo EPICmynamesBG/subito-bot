@@ -12,13 +12,19 @@
   "main": "app.js",
   "dependencies": {
     "async": "^2.5.0",
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "express": "^4.12.3",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "mysql": "^2.14.1",
+    "node-cron": "^1.2.1",
     "node-html-parser": "^1.1.5",
     "request": "^2.81.0",
     "slack-node": "^0.1.8",
-    "swagger-express-mw": "^0.1.0"
+    "swagger-express-mw": "^0.1.0",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "eslint": "^4.4.0",
