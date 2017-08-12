@@ -86,7 +86,7 @@ definitions:
         type: string
   ErrorResponse:
     required:
-      - message
+      - text
     properties:
-      message:
+      text:
         type: string
