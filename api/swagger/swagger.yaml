@@ -74,10 +74,9 @@ paths:
 definitions:
   SoupCalendarViewObject:
     type: object
-    required:
-      - day
-      - soups
     properties:
+      text:
+        type: string
       day:
         type: string
         format: date
