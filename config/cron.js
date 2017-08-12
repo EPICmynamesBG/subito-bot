@@ -7,10 +7,10 @@ require('dotenv').config({
 const cron = require('node-cron');
 const mysql = require('mysql');
 const moment = require('moment');
-const config = require('./config/config');
-const logger = require('./api/helpers/logger');
-const parseSubito = require('./api/helpers/parseSubito');
-const soupCalendarService = require('./api/services/soupCalendarService');
+const config = require('./config');
+const logger = require('../api/helpers/logger');
+const parseSubito = require('../api/helpers/parseSubito');
+const soupCalendarService = require('../api/services/soupCalendarService');
 
 const cronJob = (db) => {
   if (!db) {
