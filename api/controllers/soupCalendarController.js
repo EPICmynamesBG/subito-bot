@@ -20,20 +20,20 @@ function _slackValidation(req) {
 function getSoupsForDay(req, res) {
   logger.debug(JSON.stringify(req.body));
   if (!_slackValidation(req)) {
-    res.status(403).json({ message: 'Invalid Slack token' });
+    res.status(403).json({ text: 'Invalid Slack token' });
     return;
   }
   let date = lodash.get(req.swagger.params, 'body.value.day', new Date());
   soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       logger.error(err);
-      res.status(500).json({ message: 'An unexpected server error occured' });
+      res.status(500).json({ text: 'An unexpected server error occured' });
       return;
     }
     if (!soupDay) {
       const message = `Soups for ${moment(date).format('YYYY-MM-DD')} not found`;
       logger.warn(404, message);
-      res.status(404).json({ message: message });
+      res.status(404).json({ text: message });
       return;
     }
     res.json(soupDay);
@@ -44,7 +44,7 @@ function getAllSoups(req, res) {
   soupCalendarService.getAllSoups(req.db, (err, soups) => {
     if (err) {
       logger.error(err);
-      res.status(500).json({ message: 'An unexpected server error occured' });
+      res.status(500).json({ text: 'An unexpected server error occured' });
       return;
     }
     res.json(soups);
