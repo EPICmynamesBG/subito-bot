@@ -24,15 +24,6 @@ function getSoupsForDay(req, res) {
     });
     return;
   }
-  let slackPayload = {
-    team_id: req.body.team_id,
-    team_domain: req.body.team_domain,
-    channel_id: req.body.channel_id,
-    channel_name: req.body.channel_name,
-    user_id: req.body.user_id,
-    user_name: req.body.user_name,
-    command: req.body.command
-  };
   let text = lodash.get(req.swagger.params, 'body.value.text', null);
   let date;
 
@@ -46,21 +37,21 @@ function getSoupsForDay(req, res) {
   soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       logger.error(err);
-      res.status(500).json(lodash.merge({
+      res.status(500).json({
         text: 'An unexpected server error occured'
-      }, slackPayload));
+      });
       return;
     }
     if (!soupDay) {
       const message = `Soups for ${moment(date).format('YYYY-MM-DD')} not found`;
-      logger.warn(404, message);
-      res.status(404).json(lodash.merge({
+      logger.warn(200, message);
+      res.status(200).json({
         text: message
-      }, slackPayload));
+      });
       return;
     }
 
-    res.json(lodash.merge(soupDay, slackPayload));
+    res.json(soupDay);
   });
 }
 
