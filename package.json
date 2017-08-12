@@ -2,7 +2,7 @@
   "name": "subito",
   "version": "1.0.0",
   "private": false,
-  "description": "",
+  "description": "A slack slach bot for getting Subito soups",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EPICmynamesBG/subito-bot.git"
