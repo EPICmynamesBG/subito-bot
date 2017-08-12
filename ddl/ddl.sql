@@ -1,5 +1,7 @@
 CREATE DATABASE IF NOT EXISTS subito;
 
+USE subito;
+
 CREATE TABLE IF NOT EXISTS soup_calendar (
   id              INT UNSIGNED    NOT NULL  AUTO_INCREMENT,
   day             DATE            NOT NULL,
