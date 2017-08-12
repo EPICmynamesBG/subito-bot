@@ -36,6 +36,8 @@ paths:
                 type: string
                 format: date
                 example: 'MM/DD/YYYY'
+              text:
+                type: string
               token:
                 type: string
       responses:

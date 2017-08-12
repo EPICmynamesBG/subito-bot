@@ -12,9 +12,8 @@ function _slackValidation(req) {
     return true;
   } else if (token === config.SLACK_SLASH_TOKEN) {
     return true;
-  } else {
-    
   }
+  return false;
 }
 
 function getSoupsForDay(req, res) {
@@ -23,7 +22,15 @@ function getSoupsForDay(req, res) {
     res.status(403).json({ text: 'Invalid Slack token' });
     return;
   }
-  let date = lodash.get(req.swagger.params, 'body.value.day', new Date());
+  let text = lodash.get(req.swagger.params, 'body.value.text', null);
+  let date;
+  if (text && moment(text).isValid()) {
+    date = text;
+  } else if (text && text.toLowerCase() === 'tomorrow') {
+    date = moment().add(1, 'd').toDate();
+  } else {
+    date = lodash.get(req.swagger.params, 'body.value.day', new Date());
+  }
   soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       logger.error(err);
