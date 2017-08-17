@@ -1,15 +1,20 @@
 'use strict';
 
 require('dotenv').config({ silent: true });
-const util = require('util');
 
+const util = require('util');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mysql = require('mysql');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
 const config = require('./config/config');
-const cron = require('./config/cron');
+
+if (config.NODE_ENV === 'development' ||
+   config.NODE_ENV === 'test') {
+  require('pretty-error').start();
+}
+
+const db = require('./config/db');
 
 const app = express();
 // will support such content type application/json at same time
@@ -19,18 +24,12 @@ app.use(bodyParser.json({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ maxAge: 600 }));
 
-const db = mysql.createConnection(config.DATABASE_URI);
-db.connect((err) => { if (!err) console.log('DB connected')});
-
 app.use((paramReq, res, next) => {
   const req = paramReq;
   req.app = app;
   req.db = db; // add db to request
   next();
 });
-
-cron.initialize(db);
-cron.runNow(db);
 
 var seConfig = { appRoot: __dirname };
 
