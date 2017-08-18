@@ -2,6 +2,7 @@
 
 const lodash = require('lodash');
 const logger = require('../helpers/logger');
+const utils = require('../helpers/utils');
 const moment = require('moment');
 const config = require('../../config/config');
 const soupCalendarService = require('../services/soupCalendarService');
@@ -27,10 +28,8 @@ function getSoupsForDay(req, res) {
   let text = lodash.get(req.swagger.params, 'body.value.text', null);
   let date;
 
-  if (text && text.toLowerCase() === 'tomorrow') {
-    date = moment().add(1, 'd').format();
-  } else if (text && moment(text).isValid()) {
-    date = text;
+  if (text) {
+    date = utils.dateForText(text);
   } else {
     date = lodash.get(req.swagger.params, 'body.value.day', new Date());
   }
@@ -43,7 +42,7 @@ function getSoupsForDay(req, res) {
       return;
     }
     if (!soupDay) {
-      const message = `Soups for ${moment(date).format('YYYY-MM-DD')} not found`;
+      const message = `Soups for ${utils.textForDate(date)} not found`;
       logger.warn(200, message);
       res.status(200).json({
         text: message
