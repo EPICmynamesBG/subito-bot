@@ -57,7 +57,11 @@ function massUpdate(db, soupDays, callback) {
         db.query(insertQry, [day, soupDay.soups[0], day, soupDay.soups[1]], cb);
       }
     }, (autoErr, autoRes) => {
-      updatedCount += parseInt(autoRes.insert[0].affectedRows || 0);
+      if (autoErr) {
+        eachCb(autoErr);
+        return;
+      }
+      updatedCount += parseInt(autoRes.insert.affectedRows || 0);
       eachCb(autoErr, autoRes);
     });
   }, (err, res) => {

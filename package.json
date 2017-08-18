@@ -29,6 +29,7 @@
   "devDependencies": {
     "eslint": "^4.4.0",
     "eslint-ignore": "^1.0.0",
+    "pretty-error": "^2.1.1",
     "should": "^7.1.0",
     "supertest": "^1.0.0"
   },
