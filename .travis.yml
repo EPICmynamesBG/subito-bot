@@ -6,12 +6,14 @@ services:
   - mysql
 env:
   global:
-    - PORT=8080
-    - ROOT_URL=http://dev.brandongroff.com/subito
+    - PORT=3000
+    - DATABASE_HOST=localhost
+    - DATABASE_USER=root
+    - DATABASE_NAME=subito_test
 addons:
   mysql: "5.7.19"
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS subito;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS subito_test;'
 install:
   - npm install
 before_script:

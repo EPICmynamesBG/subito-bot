@@ -1,0 +1,7 @@
+module.exports = {
+  LOGGING_LEVEL: 'fatal',
+  DATABASE_HOST: process.env.TEST_DATABASE_HOST,
+  DATABASE_USER: process.env.TEST_DATABASE_USER,
+  DATABASE_PASSWORD: process.env.TEST_DATABASE_PASSWORD,
+  DATABASE_NAME: process.env.TEST_DATABASE_NAME
+};

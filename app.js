@@ -7,13 +7,18 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
-const config = require('./config/config');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
   require('pretty-error').start();
 }
 
+if (process.env.NODE_ENV === 'test') {
+  // eslint-disable-next-line global-require
+  Object.assign(require('./config/config'), require('./config/test'));
+}
+
+const config = require('./config/config');
 const db = require('./config/db');
 
 const app = express();
