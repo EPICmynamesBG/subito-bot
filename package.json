@@ -15,6 +15,7 @@
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
+    "eslint-changes": "^0.1.2",
     "express": "^4.12.3",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
@@ -27,7 +28,7 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
-    "eslint": "^4.4.0",
+    "eslint": "^4.4.1",
     "eslint-ignore": "^1.0.0",
     "pretty-error": "^2.1.1",
     "should": "^7.1.0",

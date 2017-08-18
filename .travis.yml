@@ -16,8 +16,9 @@ before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS subito_test;'
 install:
   - npm install
+  - npm install -g swagger
 before_script:
   - mysql -D subito_test < ddl/ddl.sql
 script:
-#  - ./node_modules/.bin/eslint-changes
+  - ./node_modules/.bin/eslint-changes
   - npm run test
