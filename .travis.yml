@@ -17,7 +17,7 @@ before_install:
 install:
   - npm install
 before_script:
-  - mysql -D subito < ddl/ddl.sql
+  - mysql -D subito_test < ddl/ddl.sql
 script:
 #  - ./node_modules/.bin/eslint-changes
   - npm run test
