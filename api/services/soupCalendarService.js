@@ -4,12 +4,11 @@ const async = require('async');
 const mysql = require('mysql');
 const moment = require('moment');
 const logger = require('../helpers/logger');
+const utils = require('../helpers/utils');
 
 function _textForSlack(row) {
   let soups = row.soups.split(';');
-  let dayText = moment(row.day).diff(moment(), 'd') === 0 ?
-      '_Today_' : `_${moment(row.day).format('dddd, MMM D')}_`
-  return `Here are the soups for ${dayText}: \n>${soups[0]}\n>${soups[1]}`;
+  return `Here are the soups for _${utils.textForDate(row.day)}_: \n>${soups[0]}\n>${soups[1]}`;
 }
 
 function _parseViewRow(row) {
