@@ -10,21 +10,25 @@ function trimChar(str, char) {
 function textForDate(date) {
   let dayText = moment(date).format('dddd, MMM D');
   if (moment(date).isSame(moment(), 'day')) {
-    dayText = 'Today';
-  } else if (moment(date).isSame(moment().add(1, 'd')), 'day') {
-    dayText = 'Tomorrow';
-  } else if (moment(date).isSame(moment().subtract(1, 'd')), 'day') {
-    dayText = 'Yesterday';
+    dayText = 'today';
+  } else if (moment(date).isSame(moment().add(1, 'days'), 'day')) {
+    dayText = 'tomorrow';
+  } else if (moment(date).isSame(moment().subtract(1, 'days'), 'day')) {
+    dayText = 'yesterday';
   }
   return dayText;
 }
 
 function dateForText(text) {
-  let date = moment(text);.isValid() ? moment(text) : moment();
+  if (!text || typeof (text) !== 'string') return moment().toDate();
+
+  let date;
   if (text.toLowerCase() === 'tomorrow') {
     date = moment().add(1, 'd');
   } else if (text.toLowerCase() === 'yesterday') {
     date = moment().subtract(1, 'd');
+  } else {
+    date = moment(text).isValid() ? moment(text) : moment();
   }
   return date.toDate();
 }
