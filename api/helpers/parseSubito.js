@@ -14,7 +14,7 @@ const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
 
 const savePath = 'pipe/soups.html';
 
-function _fetchSoupPage(callback) {
+function fetchSoupPage(callback) {
   const stream = fs.createWriteStream(savePath);
   let res;
   stream.on('finish', () => {
@@ -97,9 +97,9 @@ function _filterDatesToPairs(dates) {
 function fetchCalendar(callback) {
   async.autoInject({
     fetchSoupPage: (cb) => {
-      _fetchSoupPage((err, res) => {
+      module.exports.private.fetchSoupPage((err, res) => {
         if (err) {
-          logger.error('Unable to load Subito soup calendar');
+          logger.error('Unable to load Subito soup calendar', err);
           cb(null, null);
           return;
         }
@@ -137,5 +137,8 @@ function fetchCalendar(callback) {
 }
 
 module.exports = {
+  private: {
+    fetchSoupPage: fetchSoupPage
+  },
   fetchCalendar: fetchCalendar
 }

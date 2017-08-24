@@ -1,6 +1,7 @@
 'use strict';
 
 const moment = require('moment');
+const lodash = require('lodash');
 
 function trimChar(str, char) {
   let regx = new RegExp('^'+ char + '+|' + char + '+$', 'g');
@@ -33,8 +34,18 @@ function dateForText(text) {
   return date.toDate();
 }
 
+function getSwaggerParams(req) {
+  const raw = lodash.get(req, 'swagger.params', {});
+  let params = {};
+  lodash.forEach(raw, (val, key) => {
+    params[key] = lodash.get(val, 'value', null);
+  });
+  return params;
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
-  dateForText: dateForText
-}
+  dateForText: dateForText,
+  getSwaggerParams: getSwaggerParams
+};
