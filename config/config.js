@@ -9,6 +9,14 @@ module.exports = {
   
   DATABASE_NAME: process.env.DATABASE_NAME || '',
   
+  TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost',
+  
+  TEST_DATABASE_USER: process.env.TEST_DATABASE_USER || '',
+  
+  TEST_DATABASE_PASSWORD: process.env.TEST_DATABASE_PASSWORD || '',
+  
+  TEST_DATABASE_NAME: process.env.TEST_DATABASE_NAME || '',
+  
   SLACK_SLASH_TOKEN: process.env.SLACK_SLASH_TOKEN || '',
 
   SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',

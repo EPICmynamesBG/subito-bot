@@ -18,7 +18,7 @@ function _slackValidation(req) {
 function getSoupsForDay(req, res) {
   const params = utils.getSwaggerParams(req);
   logger.debug(req.url, params);
-  const date = lodash.get(params, 'date', new Date());
+  const date = utils.dateForText(params.day);
   soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       logger.error(err);
