@@ -1,7 +1,8 @@
 # subito-bot
 [![Build Status](https://travis-ci.org/EPICmynamesBG/subito-bot.svg?branch=master)](https://travis-ci.org/EPICmynamesBG/subito-bot)
+[![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)
 
-A slash command Slack bot for getting the daily soup selection from Indianapolis' _Subito_
+A slash command Slack bot for getting the daily soup selection from Indianapolis' [_Subito_](http://www.subitosoups.com/)
 
 ## Usage
 ```text
@@ -25,6 +26,12 @@ _In Development Commands_
 /subito subscribe
 ```
 
+## Docs
+
+[Localhost Docs](http://localhost:3000/docs)
+
+[Online Docs](http://dev.brandongroff.com:8080/docs)
+
 ## Development
 
 ### Requirements
@@ -32,14 +39,14 @@ _In Development Commands_
  - mysql
  - node/npm (recommend using nvm)
  
- _Setup_
+#### Setup
 
 - `mysql -e "CREATE DATABASE IF NOT EXISTS subito;" -u root -p`
 - `mysql -e "CREATE USER '[username]'@'localhost' IDENTIFIED BY '[password]';" -u root -p`
 - `mysql -e "GRANT ALL PRIVILEGES ON subito . * TO '[username]'@'localhost';" -u root -p`
 - `mysql -D subito < ddl/ddl.sql -u root -p`
 
-_Environment_
+#### Environment
 
 While defaults exist, many things (like connecting to a database) will not work unless
 you've set up a local environment (.env) file in the project's root directory. Below is an
@@ -66,7 +73,7 @@ NODE_ENV=development
 
 ### Testing
 
-_Setup_
+#### Setup
 
 - `mysql -e "CREATE DATABASE IF NOT EXISTS subito_test;" -u root -p`
 - `mysql -e "CREATE USER 'test'@'localhost' IDENTIFIED BY '[password]';" -u root -p`

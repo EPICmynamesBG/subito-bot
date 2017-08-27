@@ -1,7 +1,8 @@
 swagger: "2.0"
 info:
-  version: "0.0.1"
+  version: "1.2.0"
   title: Subito Slash Service
+  description: a service for getting soup data from [Subito](http://www.subitosoups.com/) in Indianapolis
 # during dev, should point to your local machine
 host: localhost:3000
 # basePath prefixes all resource paths 
