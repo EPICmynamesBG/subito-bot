@@ -41,6 +41,8 @@ var seConfig = { appRoot: __dirname };
 SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   if (err) { throw err; }
 
+  const swaggerUi = require('swagger-tools/middleware/swagger-ui');
+  app.use(swaggerUi(swaggerExpress.runner.swagger));
   // install middleware
   swaggerExpress.register(app);
 

@@ -25,6 +25,7 @@
     "request": "^2.81.0",
     "slack-node": "^0.1.8",
     "swagger-express-mw": "^0.1.0",
+    "swagger-tools": "^0.10.1",
     "winston": "^2.3.1"
   },
   "devDependencies": {

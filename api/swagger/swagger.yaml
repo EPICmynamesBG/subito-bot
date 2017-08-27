@@ -24,6 +24,8 @@ paths:
     post:
       description: handles and pipes all Slack slash commands
       operationId: handleSlack
+      tags:
+        - Slack
       parameters:
         - name: body
           in: body
@@ -71,6 +73,8 @@ paths:
       description: get the soups for today
       # used as the method name of the controller
       operationId: getSoupsForToday
+      tags:
+        - SoupCalendar
       responses:
         "200":
           description: Success
@@ -89,6 +93,8 @@ paths:
       description: get the soups for a day
       # used as the method name of the controller
       operationId: getSoupsForDay
+      tags:
+        - SoupCalendar
       parameters:
         - name: day
           in: path
@@ -111,6 +117,8 @@ paths:
     get:
       description: Gets the fully stored soup calendar
       operationId: getAllSoups
+      tags:
+        - SoupCalendar
       responses:
         "200":
           description: Success
@@ -147,9 +155,11 @@ definitions:
     properties:
       text:
         type: string
+        description: a Slack formatted message string
   ErrorResponse:
     required:
       - text
     properties:
       text:
         type: string
+        description: a Slack formatted message string
