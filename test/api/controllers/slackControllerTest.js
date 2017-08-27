@@ -202,7 +202,7 @@ describe('slackController', () => {
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
-        .expect(400)
+        .expect(200)
         .end((err, res) => {
           should.not.exist(err);
           assert(res.body.text.includes("Whoops, I don't recognize that command. Try one of these instead!"));
