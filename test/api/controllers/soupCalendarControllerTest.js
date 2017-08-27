@@ -11,7 +11,7 @@ const soupCalendarService = require('../../../api/services/soupCalendarService')
 
 describe('soupCalendarController', () => {
   before(testHelper.resetData);
-
+  after(testHelper.clearData);
   describe('GET /subito/day', () => {
     it('should get todays soup', (done) => {
       const expectedSoups = [
