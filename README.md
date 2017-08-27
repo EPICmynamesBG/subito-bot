@@ -10,9 +10,20 @@ A slash command Slack bot for getting the daily soup selection from Indianapolis
 [![screnshot1](./assets/screenshots/screenshot_1.png)](./assets/screenshots/screenshot_1.png)
 
 ```text
-/subito [tomorrow | yesterday | YYYY-MM-DD] - what's on the menu for some other day
+/subito [today | tomorrow | yesterday | YYYY-MM-DD] - what's on the menu for some day
+
+OR
+
+/subito day [today | tomorrow | yesterday | YYYY-MM-DD]
 ```
 [![screnshot2](./assets/screenshots/screenshot_2.png)](./assets/screenshots/screenshot_2.png)
+
+_In Development Commands_
+```text
+/subito search [soup name/type (ex: gouda)]
+
+/subito subscribe
+```
 
 ## Development
 
