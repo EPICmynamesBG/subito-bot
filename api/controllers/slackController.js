@@ -44,7 +44,7 @@ function handleSlack(req, res) {
     default:
       logger.warn('Unsupported command', action.command);
       let message = "Whoops, I don't recognize that command. Try one of these instead!";
-      SUPPORTED_COMMANDS.forEach((cmd) => message += `>${cmd} ${CMD_USAGE[cmd]}`);
+      SUPPORTED_COMMANDS.forEach((cmd) => message += `\n>${cmd} ${CMD_USAGE[cmd]}`);
       res.status(400).json({
         text: message
       });
