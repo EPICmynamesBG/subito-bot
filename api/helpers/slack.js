@@ -53,11 +53,11 @@ function parseRequestCommand(params) {
   const cmdArr = text.split(" ");
   const possibleCommand = cmdArr[0].toLowerCase();
   cmdArr.splice(0, 1);
-  logger.debug('TEXT', text, moment(text).isValid());
   if (SLACK_CONSTS.SUPPORTED_COMMANDS.includes(possibleCommand)) {
     template.command = possibleCommand;
     template.params = _parseRequestParams(template.command, cmdArr);
-  } else if (moment(text).isValid()) {
+  } else if (moment(text).isValid() || text.toLowerCase() === 'tomorrow' ||
+            text.toLowerCase() === 'today' || text.toLowerCase() === 'yesterday') {
     template.command = 'day';
     template.params.day = text;
   } else {

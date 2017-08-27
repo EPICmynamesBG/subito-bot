@@ -52,10 +52,14 @@ describe('slack helper', () => {
 
       it('should default to "day" with a param value', () => {
         const text = 'August 23, 2017';
-        const output = slack.utils.parseRequestCommand(text);
-        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        let output = slack.utils.parseRequestCommand(text);
+        let expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
         expected.command = 'day';
         expected.params.day = text;
+        assert.deepEqual(output, expected);
+        
+        output = slack.utils.parseRequestCommand('tomorrow');
+        expected.params.day = 'tomorrow';
         assert.deepEqual(output, expected);
       });
 

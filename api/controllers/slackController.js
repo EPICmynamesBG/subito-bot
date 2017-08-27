@@ -11,10 +11,7 @@ const CMD_USAGE = require('../../config/constants').SLACK_CONSTS.CMD_USAGE;
 const soupCalendarController = require('./soupCalendarController');
 
 function _slackValidation(params) {
-  if (params.body.token === config.SLACK_SLASH_TOKEN) {
-    return true;
-  }
-  return false;
+  return params.body.token === config.SLACK_SLASH_TOKEN;
 }
 
 function handleSlack(req, res) {
@@ -22,7 +19,7 @@ function handleSlack(req, res) {
   logger.debug(req.url, params);
 
   if (!_slackValidation(params)) {
-    logger.error('403: Invalid Slack token');
+    logger.info('403: Invalid Slack token', params.token);
     res.status(403).json({
       text: 'Invalid Slack token'
     });
@@ -33,11 +30,11 @@ function handleSlack(req, res) {
   switch (action.command) {
     case 'subscribe':
       logger.info('Subscribe requested', action.params);
-      req.json({ text: 'Whoa there eager beaver, this function is still in development! '});
+      res.json({ text: 'Whoa there eager beaver, this function is still in development!' });
       break;
     case 'search':
       logger.info('Search requested', action.params);
-      req.json({ text: 'Whoa there eager beaver, this function is still in development! '});
+      res.json({ text: 'Whoa there eager beaver, this function is still in development!' });
       break;
     case 'day':
       logger.debug('slackHelper -> getSoupsForDay');

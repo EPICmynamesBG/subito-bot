@@ -1,3 +1,5 @@
+'use strict';
+
 const should = require('should');
 const request = require('supertest');
 const moment = require('moment');
