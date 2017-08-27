@@ -5,6 +5,7 @@ const lodash = require('lodash');
 const moment = require('moment');
 const logger = require('./logger');
 const config = require('../../config/config');
+const SLACK_CONSTS = require('../../config/constants').SLACK_CONSTS;
 
 const slack = new Slack();
 
@@ -32,18 +33,50 @@ function messageUser(user, message, callback) {
 }
 
 function parseRequestCommand(params) {
-  const template = {
-    command: null,
-    params: {}
-  };
-  let text = lodash.get(params, 'body.text', null);
+  let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+  let text = params;
+  if (typeof params === 'object') {
+    text = lodash.get(params, 'body.text', null);
+  }
+
   if (!text || text.trim().length === 0) {
-    return template;
+    return SLACK_CONSTS.CMD_TEMPLATE_DEFAULT;
   }
   text = text.trim();
   const cmdArr = text.split(" ");
-  logger.warn('parseRequestCommand TODO');
+  const possibleCommand = cmdArr[0].toLowerCase();
+  cmdArr.splice(0, 1);
+  if (SLACK_CONSTS.SUPPORTED_COMMANDS.includes(possibleCommand)) {
+    template.command = possibleCommand;
+    template.params = _parseRequestParams(template.command, cmdArr);
+  } else {
+    logger.warn('Unsupported command. Falling back to default "day" command.', possibleCommand, cmdArr);
+    template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE_DEFAULT);
+    template.params.day = text;
+  }
+  template.params.user = {
+    id: lodash.get(params, 'body.user_id', null),
+    username: lodash.get(params, 'body.user_name', null)
+  };
   return template;
+}
+
+function _parseRequestParams(command, givenParams) {
+  const paramObj = {};
+  const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
+
+  if (supportedParams.length === 1) {
+    paramObj[supportedParams[0]] = givenParams.join(' ');
+  } else {
+    if (supportedParams.length !== givenParams.length) {
+      logger.warn('Slack param mapping likely to fail. ', supportedParams, givenParams);
+    }
+    supportedParams.forEach((param, index) => {
+      paramObj[param] = givenParams[index];
+    });
+  }
+
+  return paramObj;
 }
 
 module.exports = {

@@ -32,9 +32,10 @@ function handleSlack(req, res) {
     case 'test':
       // do stuff
       break;
+    case 'day':
     default:
       logger.debug('slackHelper -> getSoupsForDay');
-      lodash.set(req, 'swagger.params.day.value', action.params.date);
+      lodash.set(req, 'swagger.params.day.value', action.params.day);
       soupCalendarController.getSoupsForDay(req, res);
   }
 }

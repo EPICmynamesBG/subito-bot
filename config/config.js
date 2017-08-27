@@ -17,6 +17,9 @@ module.exports = {
   
   TEST_DATABASE_NAME: process.env.TEST_DATABASE_NAME || '',
   
+  TEST_CONSOLE_LOGGING: process.env.TEST_CONSOLE_LOGGING && 
+    process.env.TEST_CONSOLE_LOGGING.toLowerCase() === 'true' ? true : false,
+  
   SLACK_SLASH_TOKEN: process.env.SLACK_SLASH_TOKEN || '',
 
   SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',
@@ -25,7 +28,7 @@ module.exports = {
   
   NODE_ENV: process.env.NODE_ENV || 'development',
 
-  LOGGING_LEVEL: 'debug',
+  LOGGING_LEVEL: process.env.LOGGING_LEVEL || 'debug',
 
   LOG_DIR: './logs',
 }
