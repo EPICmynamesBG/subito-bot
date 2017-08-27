@@ -7,7 +7,7 @@ module.exports = {
     SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe']),
     
     CMD_USAGE: {
-      day: '[today | tomorrow | yesterday| [YYYY-MM-DD]]',
+      day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       search: '[soup name/type (example: gouda | gf)]',
       subscribe: ''
     },
