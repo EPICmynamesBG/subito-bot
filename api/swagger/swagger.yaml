@@ -1,11 +1,12 @@
 swagger: "2.0"
 info:
-  version: "0.0.1"
+  version: "1.2.0"
   title: Subito Slash Service
+  description: a service for getting soup data from [Subito](http://www.subitosoups.com/) in Indianapolis
 # during dev, should point to your local machine
 host: localhost:3000
 # basePath prefixes all resource paths 
-basePath: /
+basePath: /subito/
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -19,28 +20,62 @@ consumes:
 produces:
   - application/json
 paths:
-  /subito:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: soupCalendarController
+  /slack:
+    x-swagger-router-controller: slackController
     post:
-      description: get the soups for a day
-      # used as the method name of the controller
-      operationId: getSoupsForDay
+      description: handles and pipes all Slack slash commands
+      operationId: handleSlack
+      tags:
+        - Slack
       parameters:
         - name: body
           in: body
-          description: the day to get soups for
-          required: false
+          description: a generic Slack post body
+          required: true
           schema:
+            required:
+              - text
+              - token
             properties:
-              day:
-                type: string
-                format: date
-                example: 'MM/DD/YYYY'
-              text:
-                type: string
               token:
                 type: string
+                description: a Slack integration token to be validated against
+              text:
+                type: string
+              team_id:
+                type: string
+              team_domain:
+                type: string
+              channel_id:
+                type: string
+              channel_name:
+                type: string
+              user_id:
+                type: string
+              user_name:
+                type: string
+              command:
+                type: string
+              response_url:
+                type: string 
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SlackResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /day:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: get the soups for today
+      # used as the method name of the controller
+      operationId: getSoupsForToday
+      tags:
+        - SoupCalendar
       responses:
         "200":
           description: Success
@@ -52,11 +87,39 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /subito/all:
+  /day/{day}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: get the soups for a day
+      # used as the method name of the controller
+      operationId: getSoupsForDay
+      tags:
+        - SoupCalendar
+      parameters:
+        - name: day
+          in: path
+          description: "the day to get soups for :: example - tomorrow | 12-08-2017"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SoupCalendarViewObject"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /all:
     x-swagger-router-controller: soupCalendarController
     get:
       description: Gets the fully stored soup calendar
       operationId: getAllSoups
+      tags:
+        - SoupCalendar
       responses:
         "200":
           description: Success
@@ -86,9 +149,18 @@ definitions:
           type: string
       soupsStr:
         type: string
+  SlackResponse:
+    type: object
+    required:
+      - text
+    properties:
+      text:
+        type: string
+        description: a Slack formatted message string
   ErrorResponse:
     required:
       - text
     properties:
       text:
         type: string
+        description: a Slack formatted message string

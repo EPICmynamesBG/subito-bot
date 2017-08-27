@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
+const config = require('./config/config');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
@@ -18,7 +19,6 @@ if (process.env.NODE_ENV === 'test') {
   Object.assign(require('./config/config'), require('./config/test'));
 }
 
-const config = require('./config/config');
 const db = require('./config/db');
 
 const app = express();
@@ -41,6 +41,8 @@ var seConfig = { appRoot: __dirname };
 SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   if (err) { throw err; }
 
+  const swaggerUi = require('swagger-tools/middleware/swagger-ui');
+  app.use(swaggerUi(swaggerExpress.runner.swagger));
   // install middleware
   swaggerExpress.register(app);
 

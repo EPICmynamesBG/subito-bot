@@ -8,31 +8,17 @@ const config = require('../../config/config');
 const soupCalendarService = require('../services/soupCalendarService');
 
 function _slackValidation(req) {
-  let token = lodash.get(req.swagger.params, 'body.value.token', null);
-  if (!token) {
-    return true;
-  } else if (token === config.SLACK_SLASH_TOKEN) {
+  const params = utils.getSwaggerParams(req);
+  if (params.body.token === config.SLACK_SLASH_TOKEN) {
     return true;
   }
   return false;
 }
 
 function getSoupsForDay(req, res) {
-  logger.debug(JSON.stringify(req.body));
-  if (!_slackValidation(req)) {
-    res.status(403).json({
-      text: 'Invalid Slack token'
-    });
-    return;
-  }
-  let text = lodash.get(req.swagger.params, 'body.value.text', null);
-  let date;
-
-  if (text) {
-    date = utils.dateForText(text);
-  } else {
-    date = lodash.get(req.swagger.params, 'body.value.day', new Date());
-  }
+  const params = utils.getSwaggerParams(req);
+  logger.debug(req.url, params);
+  const date = utils.dateForText(params.day);
   soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       logger.error(err);
@@ -55,6 +41,7 @@ function getSoupsForDay(req, res) {
 }
 
 function getAllSoups(req, res) {
+  logger.debug(req.url);
   soupCalendarService.getAllSoups(req.db, (err, soups) => {
     if (err) {
       logger.error(err);
@@ -68,6 +55,7 @@ function getAllSoups(req, res) {
 }
 
 module.exports = {
+  getSoupsForToday: getSoupsForDay,
   getSoupsForDay: getSoupsForDay,
   getAllSoups: getAllSoups
 };

@@ -5,6 +5,22 @@ const moment = require('moment');
 const utils = require('../../../api/helpers/utils');
 
 describe('utils', () => {
+  describe('trimChar', () => {
+    it('should trim the given character from a string', () => {
+      let testString = '\nhello world\n\n';
+      let output = utils.trimChar(testString, '\\n');
+      assert.equal(output, 'hello world');
+
+      testString = '~~ Hello ~~';
+      output = utils.trimChar(testString, '~');
+      assert.equal(output, ' Hello ');
+
+      testString = 'abbababacaaa';
+      output = utils.trimChar(testString, 'a');
+      assert.equal(output, 'bbababac');
+    });
+  });
+
   describe('textForDate', () => {
     it('should parse a date/moment to text', () => {
       let input = moment().toDate(); // Today
@@ -52,11 +68,7 @@ describe('utils', () => {
       let output;
       const expected = moment().toDate();
       output = utils.dateForText(input);
-      assert(moment(output).isSame(expected), 'should be todays Date');
-
-      input = 22;
-      output = utils.dateForText(input);
-      assert(moment(output).isSame(expected), 'should be todays Date');
+      assert(moment(output).isSame(expected, 'day'), 'should be todays Date');
     });
   });
 });
