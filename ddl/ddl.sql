@@ -21,3 +21,10 @@ CREATE TABLE IF NOT EXISTS subscribers (
 );
 
 ALTER TABLE subscribers AUTO_INCREMENT=1001;
+
+CREATE TABLE IF NOT EXISTS migrations (
+  id              INT UNSIGNED    NOT NULL,
+  name            VARCHAR(250)    NOT NULL,
+  created_at      TIMESTAMP       DEFAULT current_timestamp,
+  PRIMARY KEY (id)
+);
