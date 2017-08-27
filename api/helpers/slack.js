@@ -40,19 +40,30 @@ function parseRequestCommand(params) {
   }
 
   if (!text || text.trim().length === 0) {
-    return SLACK_CONSTS.CMD_TEMPLATE_DEFAULT;
+    template.command = 'day';
+    template.params.day = null;
+    template.params.user = {
+      id: lodash.get(params, 'body.user_id', null),
+      username: lodash.get(params, 'body.user_name', null)
+    };
+    return template;
   }
+
   text = text.trim();
   const cmdArr = text.split(" ");
   const possibleCommand = cmdArr[0].toLowerCase();
   cmdArr.splice(0, 1);
+  logger.debug('TEXT', text, moment(text).isValid());
   if (SLACK_CONSTS.SUPPORTED_COMMANDS.includes(possibleCommand)) {
     template.command = possibleCommand;
     template.params = _parseRequestParams(template.command, cmdArr);
-  } else {
-    logger.warn('Unsupported command. Falling back to default "day" command.', possibleCommand, cmdArr);
-    template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE_DEFAULT);
+  } else if (moment(text).isValid()) {
+    template.command = 'day';
     template.params.day = text;
+  } else {
+    logger.warn('Unsupported command.', possibleCommand, cmdArr);
+    template.command = possibleCommand;
+    template.params.unknown = cmdArr.join(' ');
   }
   template.params.user = {
     id: lodash.get(params, 'body.user_id', null),

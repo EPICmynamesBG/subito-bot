@@ -5,6 +5,8 @@ const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const slackUtils = require('../helpers/slack').utils;
 const config = require('../../config/config');
+const SUPPORTED_COMMANDS = require('../../config/constants').SLACK_CONSTS.SUPPORTED_COMMANDS;
+const CMD_USAGE = require('../../config/constants').SLACK_CONSTS.CMD_USAGE;
 
 const soupCalendarController = require('./soupCalendarController');
 
@@ -29,14 +31,26 @@ function handleSlack(req, res) {
 
   const action = slackUtils.parseRequestCommand(params);
   switch (action.command) {
-    case 'test':
-      // do stuff
+    case 'subscribe':
+      logger.info('Subscribe requested', action.params);
+      req.json({ text: 'Whoa there eager beaver, this function is still in development! '});
+      break;
+    case 'search':
+      logger.info('Search requested', action.params);
+      req.json({ text: 'Whoa there eager beaver, this function is still in development! '});
       break;
     case 'day':
-    default:
       logger.debug('slackHelper -> getSoupsForDay');
       lodash.set(req, 'swagger.params.day.value', action.params.day);
       soupCalendarController.getSoupsForDay(req, res);
+      break;
+    default:
+      logger.warn('Unsupported command', action.command);
+      let message = "Whoops, I don't recognize that command. Try one of these instead!";
+      SUPPORTED_COMMANDS.forEach((cmd) => message += `>${cmd} ${CMD_USAGE[cmd]}`);
+      res.status(400).json({
+        text: message
+      });
   }
 }
 

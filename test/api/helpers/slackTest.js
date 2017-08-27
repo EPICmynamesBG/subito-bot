@@ -23,7 +23,8 @@ describe('slack helper', () => {
           }
         };
         let output = slack.utils.parseRequestCommand(input);
-        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE_DEFAULT);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'day';
         expected.params.day = 'August 23, 2017';
         expected.params.user = {
           id: 'ABC123',
@@ -43,14 +44,17 @@ describe('slack helper', () => {
       it('should support default to a day lookup', () => {
         const text = '';
         const output = slack.utils.parseRequestCommand(text);
-        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE_DEFAULT);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'day';
+        expected.params.day = null;
         assert.deepEqual(output, expected);
       });
 
       it('should default to "day" with a param value', () => {
         const text = 'August 23, 2017';
         const output = slack.utils.parseRequestCommand(text);
-        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE_DEFAULT);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'day';
         expected.params.day = text;
         assert.deepEqual(output, expected);
       });
@@ -97,6 +101,15 @@ describe('slack helper', () => {
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
         expected.command = 'day';
         expected.params.day = 'August 23, 2017';
+        assert.deepEqual(output, expected);
+      });
+
+      it('should return command with params.unknown when unsupported', () => {
+        const text = 'hello bob barker';
+        const output = slack.utils.parseRequestCommand(text);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'hello';
+        expected.params.unknown = 'bob barker';
         assert.deepEqual(output, expected);
       });
     });
