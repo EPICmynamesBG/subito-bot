@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1001,
+    "slack_user_id": "ABC_123",
+    "slack_username": "benjamin"
+  },
+  {
+    "id": 1002,
+    "slack_user_id": "ABC_XYZ",
+    "slack_username": "bennyboy"
+  },
+  {
+    "id": 1003,
+    "slack_user_id": "BBQHJZ",
+    "slack_username": "bobbarker"
+  }
+]

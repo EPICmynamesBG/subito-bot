@@ -8,21 +8,22 @@ const moment = require('moment');
 const async = require('async');
 const config = require('../../config/config');
 const logger = require('../../api/helpers/logger');
-//const parseSubito = require('./api/helpers/parseSubito');
-//const soupCalendarService = require('./api/services/soupCalendarService');
 
 const db = require('../../config/db');
 
 const TABLES = [
-  'soup_calendar'
+  'soup_calendar',
+  'subscribers'
 ];
 
 const TABLE_COLUMN_MAP = {
-  soup_calendar: ['id', 'day', 'soup']
+  soup_calendar: ['id', 'day', 'soup'],
+  subscribers: ['id', 'slack_user_id', 'slack_username']
 };
 
 const TABLE_DATA = {
-  soup_calendar: require('../data/SoupCalendar.json')
+  soup_calendar: require('../data/SoupCalendar.json'),
+  subscribers: require('../data/Subscribers.json')
 };
 
 function clearData(callback) {
