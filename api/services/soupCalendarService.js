@@ -5,6 +5,7 @@ const mysql = require('mysql');
 const moment = require('moment');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
+const queryHelper = require('../helpers/queryHelper');
 
 function _textForSlack(row) {
   let soups = row.soups.split(';');
@@ -12,6 +13,9 @@ function _textForSlack(row) {
 }
 
 function _parseViewRow(row) {
+  if (!row) {
+    return row;
+  }
   return {
     text: _textForSlack(row),
     day: moment(row.day).format('YYYY-MM-DD'),
@@ -21,18 +25,16 @@ function _parseViewRow(row) {
 }
 
 function getAllSoups(db, callback) {
-  const qry = 'SELECT * FROM soup_calendar_view';
-  db.query(qry, (err, rows) => {
+  queryHelper.select(db, 'soup_calendar_view', null, (err, rows) => {
     callback(err, rows.map(_parseViewRow));
   });
 }
 
 function getSoupsForDay(db, day, callback) {
-  const qry = 'SELECT * FROM soup_calendar_view WHERE day = ?';
-  const date = moment(day).format('YYYY/MM/DD');
-  db.query(qry, [date], (err, rows) => {
-    callback(err, rows.map(_parseViewRow)[0]);
-  });
+  queryHelper.selectOne(db, 'soup_calendar_view', { day: moment(day).format('YYYY/MM/DD') },
+    (err, row) => {
+      callback(err, _parseViewRow(row));
+    });
 }
 
 function massUpdate(db, soupDays, callback) {
@@ -48,12 +50,18 @@ function massUpdate(db, soupDays, callback) {
     if (updatedRange.end === null || moment(updatedRange.end) < moment(soupDay.date)) {
       updatedRange.end = moment(soupDay.date);
     }
+    const insertArr = soupDay.soups.map((soup) => {
+      return {
+        day: day,
+        soup: soup
+      };
+    });
     async.autoInject({
       deleteAction: (cb) => {
-        db.query(deleteQry, [day], cb);
+        queryHelper.delete(db, 'soup_calendar', { day: day }, cb);
       },
       insert: (deleteAction, cb) => {
-        db.query(insertQry, [day, soupDay.soups[0], day, soupDay.soups[1]], cb);
+        queryHelper.insert(db, 'soup_calendar', insertArr, cb);
       }
     }, (autoErr, autoRes) => {
       if (autoErr) {
