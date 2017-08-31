@@ -27,11 +27,11 @@ const TABLE_DATA = {
 };
 
 function clearData(callback) {
-  const deleteQry = 'DELETE FROM ?';
+  const deleteQry = 'TRUNCATE TABLE ??';
   async.each(TABLES, (table, eachCb) => {
     db.query(deleteQry, [table], eachCb);
   }, (err) => {
-    if (err) logger.error(err);
+    if (err) logger.error('clearData', err);
     callback();
   });
 }
@@ -40,7 +40,7 @@ function resetData(callback) {
   if (typeof callback !== 'function') {
     logger.error('No callback provided');
   }
-  const deleteQry = 'DELETE FROM ??';
+  const deleteQry = 'TRUNCATE TABLE ??';
   const insertQry = 'INSERT INTO ?? (??) VALUES ?';
   async.waterfall([
     (cb) => {
@@ -66,7 +66,7 @@ function resetData(callback) {
       }, cb);
     }
   ], (err) => {
-    if (err) logger.error(err);
+    if (err) logger.error('resetData', err);
     callback();
   });
 }

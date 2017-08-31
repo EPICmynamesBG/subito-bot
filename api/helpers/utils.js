@@ -43,9 +43,18 @@ function getSwaggerParams(req) {
   return params;
 }
 
+function pluralize(str) {
+  const lastChar = str.charAt(str.length - 1);
+  if (lastChar.toLowerCase() === 's') {
+    return str;
+  }
+  return str.concat('s');
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
   dateForText: dateForText,
-  getSwaggerParams: getSwaggerParams
+  getSwaggerParams: getSwaggerParams,
+  pluralize: pluralize
 };
