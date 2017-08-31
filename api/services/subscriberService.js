@@ -8,9 +8,13 @@ const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
 function addSubscriber(db, user, callback) {
+  const mappedUser = {
+    slack_user_id: lodash.get(user, 'slackUserId', null),
+    slack_username: lodash.get(user, 'slackUsername', null)
+  }
   async.waterfall([
     (cb) => {
-      queryHelper.insert(db, 'subscribers', user, cb);
+      queryHelper.insert(db, 'subscribers', mappedUser, cb);
     },
     (inserted, cb) => {
       module.exports.getSubscriberById(db, inserted.insertId, cb)

@@ -7,14 +7,6 @@ const moment = require('moment');
 const config = require('../../config/config');
 const soupCalendarService = require('../services/soupCalendarService');
 
-function _slackValidation(req) {
-  const params = utils.getSwaggerParams(req);
-  if (params.body.token === config.SLACK_SLASH_TOKEN) {
-    return true;
-  }
-  return false;
-}
-
 function getSoupsForDay(req, res) {
   const params = utils.getSwaggerParams(req);
   logger.debug(req.url, params);
