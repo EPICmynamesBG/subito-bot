@@ -6,7 +6,7 @@ info:
 # during dev, should point to your local machine
 host: localhost:3000
 # basePath prefixes all resource paths 
-basePath: /subito/
+basePath: /subito
 # 
 schemes:
   # tip: remove http to make production-grade

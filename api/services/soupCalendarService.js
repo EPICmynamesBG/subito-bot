@@ -38,8 +38,6 @@ function getSoupsForDay(db, day, callback) {
 }
 
 function massUpdate(db, soupDays, callback) {
-  const deleteQry = 'DELETE FROM soup_calendar WHERE day = ?';
-  const insertQry = 'INSERT INTO soup_calendar (day, soup) VALUES (?, ?), (?, ?)';
   let updatedCount = 0;
   let updatedRange = { start: null, end: null };
   async.each(soupDays, (soupDay, eachCb) => {

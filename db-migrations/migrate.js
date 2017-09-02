@@ -73,6 +73,21 @@ function determineChanges(migrationList, migrateDirection, callback) {
   });
 }
 
+function query(db, queryStr, callback) {
+  if (typeof callback !== 'function') {
+    callback = (err) => {
+      logger.error('Callback is not a function!', err);
+    };
+  }
+  const qryArr = queryStr.trim().split(/\n{2,}/g);
+  async.eachSeries(qryArr, (queryTodo, cb) => {
+    logger.info(queryTodo);
+    db.query(queryTodo, [], cb);
+  }, (err) => {
+    callback(err);
+  });
+};
+
 function migrateUp() {
   const insertQry = 'INSERT INTO migrations (id, name) VALUES (?, ?)';
   async.autoInject({
@@ -83,7 +98,7 @@ function migrateUp() {
       determineChanges(migrationFiles, 'up', cb);
     },
     applyMigrations: (getCurrentAppliedMigrations, cb) => {
-      async.each(getCurrentAppliedMigrations, (migration, cb2) => {
+      async.eachSeries(getCurrentAppliedMigrations, (migration, cb2) => {
         if (migration.applied) {
           return cb2();
         } else {
@@ -92,10 +107,9 @@ function migrateUp() {
               fs.readFile(path.join(`./db-migrations/sql/${migration.filename}`), 'utf8', cb3);
           },
             (fileQuery, cb3) => {
-              logger.info(fileQuery);
-              db.query(fileQuery, [], cb3);
+              query(db, fileQuery, cb3);
           },
-            (lastQuery, cb3) => {
+            (cb3) => {
               db.query(insertQry, [migration.id, migration.name], cb3);
           }
         ], cb2);
@@ -138,10 +152,9 @@ function migrateDown() {
           fs.readFile(path.join(`./db-migrations/sql/${lastMigration.filename}`), 'utf8', cb2);
           },
         (fileQuery, cb2) => {
-          logger.info(fileQuery);
-          db.query(fileQuery, [], cb2);
+          query(db, fileQuery, cb2);
           },
-        (lastQuery, cb2) => {
+        (cb2) => {
           db.query(deleteQry, [lastMigration.id], cb2);
       }], (err) => {
         cb(err, lastMigration);

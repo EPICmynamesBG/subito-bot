@@ -11,7 +11,7 @@ function addSubscriber(db, user, callback) {
   const mappedUser = {
     slack_user_id: lodash.get(user, 'slackUserId', null),
     slack_username: lodash.get(user, 'slackUsername', null)
-  }
+  };
   async.waterfall([
     (cb) => {
       queryHelper.insert(db, 'subscribers', mappedUser, cb);
@@ -19,7 +19,16 @@ function addSubscriber(db, user, callback) {
     (inserted, cb) => {
       module.exports.getSubscriberById(db, inserted.insertId, cb)
     }
-  ], callback);
+  ], (err, subscriber) => {
+    if (err && err.code === 'ER_DUP_ENTRY') {
+      const msg = { text: "You're already subscribed :+1:" };
+      return callback(null, Object.assign({}, subscriber, msg));
+    } else if (err) {
+      return callback(err);
+    }
+    const success = { text: "You're subscribed!" };
+    callback(err, Object.assign({}, subscriber, success));
+  });
 }
 
 function getSubscribers(db, callback) {
@@ -56,5 +65,7 @@ module.exports = {
   getSubscriberById: getSubscriberById,
   getSubscriberBySlackUserId: getSubscriberBySlackUserId,
   getSubscriberBySlackUsername: getSubscriberBySlackUsername,
-  deleteSubscriberById: deleteSubscriberById
+  deleteSubscriberById: deleteSubscriberById,
+  deleteSubscriberBySlackUserId: deleteSubscriberBySlackUserId,
+  deleteSubscriberBySlackUsername: deleteSubscriberBySlackUsername
 };

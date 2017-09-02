@@ -1,6 +1,7 @@
 'use strict';
 
 const lodash = require('lodash');
+const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const slackUtils = require('../helpers/slack').utils;
@@ -9,45 +10,51 @@ const SUPPORTED_COMMANDS = require('../../config/constants').SLACK_CONSTS.SUPPOR
 const CMD_USAGE = require('../../config/constants').SLACK_CONSTS.CMD_USAGE;
 
 const soupCalendarController = require('./soupCalendarController');
+const subscriberController = require('./subscriberController');
 
 function _slackValidation(params) {
-  return params.body.token === config.SLACK_SLASH_TOKEN;
+  return params.token === config.SLACK_SLASH_TOKEN;
 }
 
 function handleSlack(req, res) {
-  const params = utils.getSwaggerParams(req);
-  logger.debug(req.url, params);
-
+  const params = req.body;
   if (!_slackValidation(params)) {
-    logger.info('403: Invalid Slack token', params.token);
-    res.status(403).json({
-      text: 'Invalid Slack token'
-    });
+    utils.processResponse(new errors.HttpStatusError(403, 'Invalid Slack token'), null, res);
     return;
   }
 
   const action = slackUtils.parseRequestCommand(params);
   switch (action.command) {
     case 'subscribe':
-      logger.info('Subscribe requested', action.params);
-      res.json({ text: 'Whoa there eager beaver, this function is still in development!' });
+      logger.debug('slackHelper -> subscribe');
+      lodash.set(req, 'fromSlack', true);
+      lodash.set(req, 'body.slackUserId', action.params.user.id);
+      lodash.set(req, 'body.slackUsername', action.params.user.username);
+      subscriberController.subscribe(req, res);
+      break;
+    case 'unsubscribe':
+      logger.debug('slackHelper -> subscribe');
+      lodash.set(req, 'fromSlack', true);
+      lodash.set(req, 'body.slackUserId', action.params.user.id);
+      lodash.set(req, 'body.slackUsername', action.params.user.username);
+      subscriberController.unsubscribe(req, res);
       break;
     case 'search':
       logger.info('Search requested', action.params);
-      res.json({ text: 'Whoa there eager beaver, this function is still in development!' });
+      lodash.set(req, 'fromSlack', true);
+      utils.processResponse(null, { text: 'Whoa there eager beaver, this function is still in development!' }, res);
       break;
     case 'day':
       logger.debug('slackHelper -> getSoupsForDay');
       lodash.set(req, 'swagger.params.day.value', action.params.day);
+      lodash.set(req, 'fromSlack', true);
       soupCalendarController.getSoupsForDay(req, res);
       break;
     default:
       logger.warn('Unsupported command', action.command);
       let message = "Whoops, I don't recognize that command. Try one of these instead!";
       SUPPORTED_COMMANDS.forEach((cmd) => message += `\n>${cmd} ${CMD_USAGE[cmd]}`);
-      res.json({
-        text: message
-      });
+      utils.processResponse(null, { text: message }, res);
   }
 }
 

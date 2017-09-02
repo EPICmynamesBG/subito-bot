@@ -1,6 +1,7 @@
 'use strict';
 
 const lodash = require('lodash');
+const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const moment = require('moment');
@@ -8,47 +9,35 @@ const config = require('../../config/config');
 const subscriberService = require('../services/subscriberService');
 
 function subscribe(req, res) {
-  const params = utils.getSwaggerParams(req);
-  logger.debug(req.url, params);
-  
-  subscriberService.addSubscriber(req.db, params, (err, res) => {
-    if (err) {
-      logger.error(err);
-      res.status(500).json({
-        text: 'An unexpected server error occured'
-      });
-      return;
-    }
-    res.json({ text: res.text });
+  const params = req.body;
+  subscriberService.addSubscriber(req.db, params, (err, results) => {
+    utils.processResponse(err, results, res);
   });
 }
 
 function unsubscribe(req, res) {
-  const params = utils.getSwaggerParams(req);
-  logger.debug(req.url, params);
-  
-  const handleResponse = function(err, res) {
-    if (err) {
-      logger.error(err);
-      res.status(500).json({
-        text: 'An unexpected server error occured'
-      });
+  const params = req.body;
+  const handleResponse = function(err, results) {
+    if (!err && req.fromSlack) {
+      if (results.affectedRows === 0) {
+        utils.processResponse(err, { text: "Please subscribe to unsubscribe :thinking_face:" }, res);
+        return;
+      }
+      utils.processResponse(err, { text: "You've been unsubscribed :disappointed:" }, res);
       return;
     }
-    res.json({ text: res.text });
+    utils.processResponse(err, { text: results.text }, res);
   };
   
   if (params.id) {
     subscriberService.deleteSubscriberById(req.db, params.id, handleResponse);
   } else if (params.slackUserId) {
-    subscriberService.deleteSubscriberById(req.db, params.slackUserId, handleResponse);
+    subscriberService.deleteSubscriberBySlackUserId(req.db, params.slackUserId, handleResponse);
   } else if (params.slackUsername) {
-    subscriberService.deleteSubscriberById(req.db, params.slackUsername, handleResponse);
+    subscriberService.deleteSubscriberBySlackUsername(req.db, params.slackUsername, handleResponse);
   } else {
-    logger.debug(404, 'Missing one of required: id, slackUserId, slackUsername');
-    res.status(400).json({
-      text: 'Missing one of required: id, slackUserId, slackUsername'
-    });
+    const msg = 'Missing one of required: id, slackUserId, slackUsername';
+    utils.processResponse(new errors.HttpStatusError(400, msg), null, res);
   }
 }
 

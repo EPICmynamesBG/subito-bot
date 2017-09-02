@@ -12,15 +12,13 @@ const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;
 
 describe('slack helper', () => {
-  describe('utils', () =>{
+  describe('utils', () => {
     describe('parseRequestCommand', () => {
       it('should support param as string or object', () => {
         let input = {
-          body: {
-            text: 'August 23, 2017',
-            user_id: 'ABC123',
-            user_name: 'bobbyboy'
-          }
+          text: 'August 23, 2017',
+          userId: 'ABC123',
+          userName: 'bobbyboy'
         };
         let output = slack.utils.parseRequestCommand(input);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -57,7 +55,7 @@ describe('slack helper', () => {
         expected.command = 'day';
         expected.params.day = text;
         assert.deepEqual(output, expected);
-        
+
         output = slack.utils.parseRequestCommand('tomorrow');
         expected.params.day = 'tomorrow';
         assert.deepEqual(output, expected);
@@ -83,11 +81,9 @@ describe('slack helper', () => {
 
       it('should support "subscribe" command', () => {
         let input = {
-          body: {
-            text: 'subscribe',
-            user_id: 'ABC123',
-            user_name: 'bobbyboy'
-          }
+          text: 'subscribe',
+          user_id: 'ABC123',
+          user_name: 'bobbyboy'
         };
         const output = slack.utils.parseRequestCommand(input);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);

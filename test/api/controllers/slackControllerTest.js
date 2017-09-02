@@ -12,6 +12,7 @@ const async = require('async');
 
 describe('slackController', () => {
   before(testHelper.resetData);
+  after(testHelper.clearData);
 
   describe('POST /subito/slack', () => {
     const url = '/subito/slack';

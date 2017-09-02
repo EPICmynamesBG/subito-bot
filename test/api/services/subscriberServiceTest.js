@@ -17,14 +17,27 @@ describe('subscriberService', () => {
   describe('addSubscriber', () => {
     it('should return the created subscriber', (done) => {
       const user = {
-        slack_user_id: 'ABCXYZ123',
-        slack_username: 'bobby'
+        slackUserId: 'ABCXYZ123',
+        slackUsername: 'bobby'
       };
       subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
         should.not.exist(err);
         subscriber.should.have.property('id');
-        subscriber.should.have.property('slack_user_id', user.slack_user_id);
-        subscriber.should.have.property('slack_username', user.slack_username);
+        subscriber.should.have.property('slack_user_id', user.slackUserId);
+        subscriber.should.have.property('slack_username', user.slackUsername);
+        subscriber.should.have.property('text', "You're subscribed!");
+        done();
+      });
+    });
+
+    it('should respond user already subscribed', (done) => {
+      const user = {
+        slackUserId: 'ABCXYZ123',
+        slackUsername: 'bobby'
+      };
+      subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
+        should.not.exist(err);
+        subscriber.should.have.property('text', "You're already subscribed :+1:");
         done();
       });
     });

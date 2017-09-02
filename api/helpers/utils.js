@@ -2,6 +2,8 @@
 
 const moment = require('moment');
 const lodash = require('lodash');
+const errors = require('common-errors');
+const logger = require('./logger');
 
 function trimChar(str, char) {
   let regx = new RegExp('^'+ char + '+|' + char + '+$', 'g');
@@ -51,10 +53,76 @@ function pluralize(str) {
   return str.concat('s');
 }
 
+function camelCaseKeys(collection) {
+  // camelCase the keys of plain objects as well as objects with "anonymous"
+  // constructor, which are returned by massive-js.
+  if (lodash.isPlainObject(collection) ||
+    (lodash.isObject(collection) && collection.constructor && collection.constructor.name === 'anonymous')) {
+    return lodash.fromPairs(lodash.map(collection, (value, key) => (
+      [lodash.camelCase(key), camelCaseKeys(value)]
+    )));
+  } else if (lodash.isArray(collection)) {
+    return collection.map(camelCaseKeys);
+  }
+  return collection;
+}
+
+function snakeCaseKeys(collection) {
+  if (lodash.isPlainObject(collection)) {
+    return lodash.fromPairs(lodash.map(collection, (value, key) => (
+      [lodash.snakeCase(key), snakeCaseKeys(value)]
+    )));
+  } else if (lodash.isArray(collection)) {
+    return collection.map(snakeCaseKeys);
+  }
+  return collection;
+}
+
+function handleDatabaseError(err) {
+  let httpError = null;
+  if (!err) {
+    return httpError;
+  } else if (lodash.includes(['23505', '22P02', '23502'], err.code)) {
+    // postgres error codes https://www.postgresql.org/docs/current/static/errcodes-appendix.html
+    // 23505 = unique_violation 22P02 = invalid_text_representation 23502 = not_null_violation
+    httpError = new errors.HttpStatusError(400, err.message);
+  } else if (err.name === 'HttpStatusError') {
+    httpError = err;
+  } else if (err.statusCode && err.message) {
+    httpError = new errors.HttpStatusError(err.statusCode, err.message);
+  } else {
+    httpError = err;
+  }
+
+  return httpError;
+}
+
+function processResponse(paramErr, result, response) {
+  let err = paramErr;
+  if (!err && result) {
+    logger.debug('request.status.200', camelCaseKeys(result));
+    response.status(200).json(camelCaseKeys(result)).end();
+  } else {
+    err = handleDatabaseError(err);
+    const statusCode = err && err.statusCode ? err.statusCode : 500;
+    let message = err && err.message ? err.message : 'Whoops, something unexpected happened...';
+    if (statusCode === 500 && err && err.code) {
+      message = 'Whoops, something unexpected happened...';
+    }
+
+    logger.debug(`request.status.${statusCode}`);
+    response.status(statusCode).json({ text: message }).end();
+  }
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
   dateForText: dateForText,
+  pluralize: pluralize,
+  camelCase: camelCaseKeys,
+  snakeCase: snakeCaseKeys,
   getSwaggerParams: getSwaggerParams,
-  pluralize: pluralize
+  handleDatabaseError: handleDatabaseError,
+  processResponse: processResponse
 };

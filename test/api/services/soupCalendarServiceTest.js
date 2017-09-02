@@ -53,7 +53,7 @@ describe('soupCalendarService', () => {
       const updates = [];
       const soupOptions = ['Chicken Noodle', 'Beef Stew',
         'Turkey Bean Soup', 'Black Bean (gf)', 'Italian Wedding (gf)',
-        'Local Corn Chowder']
+        'Local Corn Chowder'];
       let generateDays = lodash.random(1, 20);
       const expectedUpdateCount = generateDays * 2;
       let expectedStartDate;
@@ -73,23 +73,11 @@ describe('soupCalendarService', () => {
         });
       }
 
-      async.waterfall([
-        (cb) => {
-          soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
-            should.not.exist(err);
-            updated.should.have.property('rows', updates.length * 2);
-            updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD'));
-            updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD'));
-            cb();
-          });
-        },
-        (cb) => {
-          soupCalendarService.getSoupsForDay(testHelper.db, updates[0].date, cb)
-        }
-      ], (err, soupCal) => {
+      soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
         should.not.exist(err);
-        assert.equal(soupCal.day, moment(updates[0].date).format('YYYY-MM-DD'));
-        assert.deepEqual(soupCal.soups.sort(), updates[0].soups.sort());
+        updated.should.have.property('rows', updates.length * 2);
+        updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD'));
+        updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD'));
         done();
       });
     });

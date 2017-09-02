@@ -13,6 +13,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "body-parser": "^1.17.2",
+    "common-errors": "^1.0.4",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "eslint-changes": "^0.1.2",

@@ -4,18 +4,20 @@ const lodash = require('lodash');
 
 module.exports = {
   SLACK_CONSTS: {
-    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe']),
+    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe']),
     
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       search: '[soup name/type (example: gouda | gf)]',
-      subscribe: ''
+      subscribe: '',
+      unsubscribe: ''
     },
 
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
       search: ['soup'],
-      subscribe: []
+      subscribe: [],
+      unsubscribe: []
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({
