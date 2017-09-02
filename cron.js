@@ -5,11 +5,8 @@ require('dotenv').config({
 });
 
 const cron = require('node-cron');
-const moment = require('moment');
 const config = require('./config/config');
-const logger = require('./api/helpers/logger');
-const parseSubito = require('./api/helpers/parseSubito');
-const soupCalendarService = require('./api/services/soupCalendarService');
+const cronHelper = require('./api/helpers/cronHelper');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
@@ -18,22 +15,16 @@ if (config.NODE_ENV === 'development' ||
 
 const db = require('./config/db');
 
-const cronJob = () => {
-  logger.info('Running Cron:: ', moment().toDate());
-  parseSubito.fetchCalendar((err, data) => {
-    if (err) {
-      logger.error(err);
-      return;
-    }
-    soupCalendarService.massUpdate(db, data, (err, updated) => {
-      logger.debug('Update complete', updated);
-    });
-  });
+const runOnStart = () => {
+//  cronHelper.importCalendar(db)();
+  cronHelper.processSubscribers(db)();
 };
 
+// Weekly, runs as midnight on Sundays 
+cron.schedule('0 0 0 * * Sunday', cronHelper.importCalendar(db), true);
 
-cron.schedule('0 0 0 * * Sunday', cronJob, true);
+// Weekdays, runs at 10am
+cron.schedule('0 0 10 * * 1-5', cronHelper.processSubscribers(db), true);
 
 // Run now
-cronJob();
-
+runOnStart();

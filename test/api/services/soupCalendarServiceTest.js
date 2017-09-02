@@ -46,6 +46,16 @@ describe('soupCalendarService', () => {
         done();
       });
     });
+
+    it('should not find a soup', (done) => {
+      const day = '12/12/1995';
+      const date = utils.dateForText(day);
+      soupCalendarService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
+        should.not.exist(err);
+        assert.equal(soupCal, null);
+        done();
+      });
+    });
   });
 
   describe('massUpdate', () => {
