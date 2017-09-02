@@ -32,7 +32,7 @@ const processSubscribers = (db) => {
     let soups;
     async.waterfall([
       (cb) => {
-        soupCalendarService.getSoupsForDay(db, utils.dateForText('yesterday'), cb);
+        soupCalendarService.getSoupsForDay(db, utils.dateForText('today'), cb);
       },
       (soupCal, cb) => {
         if (!soupCal) {

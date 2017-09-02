@@ -20,7 +20,7 @@ const WEBHOOK_OPTS = {
 function messageChannel(channel, message, callback) {
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
     channel: '#'.concat(channel),
-    message: message
+    text: message
   });
   slack.webhook(hookSend, callback);
 }
@@ -28,9 +28,8 @@ function messageChannel(channel, message, callback) {
 function messageUser(user, message, callback) {
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
     channel: '@'.concat(user),
-    message: message
+    text: message
   });
-  logger.debug('slack.messageUser', hookSend);
   slack.webhook(hookSend, callback);
 }
 
