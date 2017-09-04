@@ -54,10 +54,8 @@ function pluralize(str) {
 }
 
 function camelCaseKeys(collection) {
-  // camelCase the keys of plain objects as well as objects with "anonymous"
-  // constructor, which are returned by massive-js.
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && collection.constructor && collection.constructor.name === 'anonymous')) {
+    (lodash.isObject(collection) && collection.constructor)) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));
@@ -82,9 +80,8 @@ function handleDatabaseError(err) {
   let httpError = null;
   if (!err) {
     return httpError;
-  } else if (lodash.includes(['23505', '22P02', '23502'], err.code)) {
-    // postgres error codes https://www.postgresql.org/docs/current/static/errcodes-appendix.html
-    // 23505 = unique_violation 22P02 = invalid_text_representation 23502 = not_null_violation
+  } else if (lodash.includes(['1054', '1171', '1263'], err.code)) {
+    // mysql error codes https://www.briandunning.com/error-codes/?source=MySQL
     httpError = new errors.HttpStatusError(400, err.message);
   } else if (err.name === 'HttpStatusError') {
     httpError = err;

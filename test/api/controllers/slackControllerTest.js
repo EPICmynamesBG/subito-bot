@@ -171,7 +171,7 @@ describe('slackController', () => {
         });
     });
 
-    it('should not yet support "subscribe"', (done) => {
+    it('should forward "subscribe" to /subito/subscribe', (done) => {
       request(server)
         .post(url)
         .type('form')
@@ -186,12 +186,34 @@ describe('slackController', () => {
         .expect(200)
         .end((err, res) => {
           should.not.exist(err);
-          assert.equal(res.body.text, 'Whoa there eager beaver, this function is still in development!');
+          assert.equal(res.body.slackUserId, 'ABC123');
+          assert.equal(res.body.slackUsername, 'testuser');
+          assert.equal(res.body.text, 'You\'re subscribed!');
           done();
         });
     });
 
-    it('should 400 and return a usage description when given an unknown command', (done) => {
+    it('should forward "unsubscribe" to /subito/unsubscribe', (done) => {
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: config.SLACK_SLASH_TOKEN,
+          text: 'unsubscribe',
+          user_id: 'ABC123',
+          user_name: 'testuser'
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.text, 'You\'ve been unsubscribed :disappointed:');
+          done();
+        });
+    });
+
+    it('should 200 and return a usage description when given an unknown command', (done) => {
       request(server)
         .post(url)
         .type('form')
