@@ -1,6 +1,6 @@
 # subito-bot
 [![Build Status](https://travis-ci.org/EPICmynamesBG/subito-bot.svg?branch=master)](https://travis-ci.org/EPICmynamesBG/subito-bot)
-[![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/subito/swagger)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/subito/swagger)
+[![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)
 
 
 A slash command Slack bot for getting the daily soup selection from Indianapolis' [_Subito_](http://www.subitosoups.com/)
@@ -41,6 +41,15 @@ _In Development Commands_
 [Localhost Docs](http://localhost:3000/docs)
 
 [Online Docs](http://dev.brandongroff.com:8080/docs)
+
+## Cron Schedule
+
+|         Job            |  Runtime         |    Description                                                                   |
+|------------------------|------------------|----------------------------------------------------------------------------------|
+| Soup Calendar Importer | 12:00am Sunday   | Fetches the latest soup calendar, parses, and updates the soup calendar database |
+| Subscriber Messaging   | 10:00am Weekdays | Handles messaging all subscribers the day's soups                                |
+
+\* _Hosted server timezone runs in [EST](https://time.is/EST)_
 
 ## Development
 
