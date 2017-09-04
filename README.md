@@ -81,6 +81,13 @@ LOGGING_LEVEL=debug
 NODE_ENV=development
 ```
 
+#### Database Changes
+
+Database changes should be added in the `db-migrations/sql` folder. File names should be something like `[migration id]-[hyphen case description]-[up | down].sql`, with a corresponding up and down file. 
+
+Migrations can be ran via `npm run migrate-up:[local | test]`. This command will process and run _all_ up migrations.
+`npm run migrate-down:[local | test]` will run _only the last_ migration down script, so undoing a migration will happen one at a time.
+
 ### Testing
 
 #### Setup
