@@ -1,6 +1,6 @@
 # subito-bot
 [![Build Status](https://travis-ci.org/EPICmynamesBG/subito-bot.svg?branch=master)](https://travis-ci.org/EPICmynamesBG/subito-bot)
-<img src="http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs" height="21" alt="Swagger Status" />
+[![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/subito/swagger)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/subito/swagger)
 
 
 A slash command Slack bot for getting the daily soup selection from Indianapolis' [_Subito_](http://www.subitosoups.com/)
