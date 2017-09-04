@@ -19,6 +19,8 @@ install:
   - npm install -g swagger
 before_script:
   - mysql -D subito_test < ddl/ddl.sql
+  - npm run migrate-up:local
+  - npm run migrate-up:test
 script:
   - ./node_modules/.bin/eslint-changes
   - npm run test

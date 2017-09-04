@@ -1,0 +1,2 @@
+ALTER TABLE subscribers
+ADD slack_username VARCHAR(100) NULL DEFAULT NULL;

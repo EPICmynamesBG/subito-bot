@@ -6,7 +6,7 @@ info:
 # during dev, should point to your local machine
 host: localhost:3000
 # basePath prefixes all resource paths 
-basePath: /subito/
+basePath: /subito
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -131,6 +131,79 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /subscribe:
+    x-swagger-router-controller: subscriberController
+    post:
+      description: Subscribe to daily (weekday) notifications
+      operationId: subscribe
+      tags:
+        - Subscribe
+      parameters:
+        - name: body
+          in: body
+          description: subscription request body
+          required: true
+          schema:
+            required:
+              - slackUserId
+            properties:
+              slackUserId:
+                type: string
+              slackUsername:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /unsubscribe:
+    x-swagger-router-controller: subscriberController
+    post:
+      description: Unsubscribe to daily (weekday) notifications
+      operationId: unsubscribe
+      tags:
+        - Subscribe
+      parameters:
+        - name: body
+          in: body
+          description: unsubscribe request body
+          required: true
+          schema:
+            $ref: "#/definitions/UnsubscribeBody"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      description: Unsubscribe to daily (weekday) notifications
+      operationId: unsubscribe2
+      tags:
+        - Subscribe
+      parameters:
+        - name: body
+          in: body
+          description: unsubscribe request body
+          required: true
+          schema:
+            $ref: "#/definitions/UnsubscribeBody"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -149,8 +222,24 @@ definitions:
           type: string
       soupsStr:
         type: string
+  UnsubscribeBody:
+    type: object
+    properties:
+      id:
+        type: number
+      slackUserId:
+        type: string
+      slackUsername:
+        type: string
   SlackResponse:
     type: object
+    required:
+      - text
+    properties:
+      text:
+        type: string
+        description: a Slack formatted message string
+  SuccessResponse:
     required:
       - text
     properties:

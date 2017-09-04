@@ -8,6 +8,7 @@ const cors = require('cors');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
 const config = require('./config/config');
+const middleware = require('./api/middleware/middleware');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
@@ -29,12 +30,9 @@ app.use(bodyParser.json({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ maxAge: 600 }));
 
-app.use((paramReq, res, next) => {
-  const req = paramReq;
-  req.app = app;
-  req.db = db; // add db to request
-  next();
-});
+app.use(middleware.bindDb(app, db));
+app.use(middleware.logging);
+app.use(middleware.camelCaseBody);
 
 var seConfig = { appRoot: __dirname };
 

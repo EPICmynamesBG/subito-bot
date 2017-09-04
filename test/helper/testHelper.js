@@ -8,29 +8,30 @@ const moment = require('moment');
 const async = require('async');
 const config = require('../../config/config');
 const logger = require('../../api/helpers/logger');
-//const parseSubito = require('./api/helpers/parseSubito');
-//const soupCalendarService = require('./api/services/soupCalendarService');
 
 const db = require('../../config/db');
 
 const TABLES = [
-  'soup_calendar'
+  'soup_calendar',
+  'subscribers'
 ];
 
 const TABLE_COLUMN_MAP = {
-  soup_calendar: ['id', 'day', 'soup']
+  soup_calendar: ['id', 'day', 'soup'],
+  subscribers: ['id', 'slack_user_id', 'slack_username']
 };
 
 const TABLE_DATA = {
-  soup_calendar: require('../data/SoupCalendar.json')
+  soup_calendar: require('../data/SoupCalendar.json'),
+  subscribers: require('../data/Subscribers.json')
 };
 
 function clearData(callback) {
-  const deleteQry = 'DELETE FROM ?';
+  const deleteQry = 'TRUNCATE TABLE ??';
   async.each(TABLES, (table, eachCb) => {
     db.query(deleteQry, [table], eachCb);
   }, (err) => {
-    if (err) logger.error(err);
+    if (err) logger.error('clearData', err);
     callback();
   });
 }
@@ -39,7 +40,7 @@ function resetData(callback) {
   if (typeof callback !== 'function') {
     logger.error('No callback provided');
   }
-  const deleteQry = 'DELETE FROM ??';
+  const deleteQry = 'TRUNCATE TABLE ??';
   const insertQry = 'INSERT INTO ?? (??) VALUES ?';
   async.waterfall([
     (cb) => {
@@ -65,7 +66,7 @@ function resetData(callback) {
       }, cb);
     }
   ], (err) => {
-    if (err) logger.error(err);
+    if (err) logger.error('resetData', err);
     callback();
   });
 }

@@ -49,22 +49,22 @@ function DB() {
   process.on('uncaughtException', onEnd.bind(this, {
     exit: true
   }));
-
-  this.pool.on('acquire', (connection) => {
-    logger.debug('Connection %d acquired', connection.threadId);
-  });
-
-  this.pool.on('connection', (connection) => {
-    logger.debug('Connection %d acquired', connection.threadId);
-  });
-
-  this.pool.on('enqueue', () => {
-    logger.debug('Pool Enqueue: Waiting for available connection slot');
-  });
-
-  this.pool.on('release', (connection) => {
-    logger.debug('Connection %d released', connection.threadId);
-  });
+//
+//  this.pool.on('acquire', (connection) => {
+//    logger.debug('Connection %d acquired', connection.threadId);
+//  });
+//
+//  this.pool.on('connection', (connection) => {
+//    logger.debug('Connection %d acquired', connection.threadId);
+//  });
+//
+//  this.pool.on('enqueue', () => {
+//    logger.debug('Pool Enqueue: Waiting for available connection slot');
+//  });
+//
+//  this.pool.on('release', (connection) => {
+//    logger.debug('Connection %d released', connection.threadId);
+//  });
 };
 
 DB.prototype.query = function (query, paramArr, callback) {

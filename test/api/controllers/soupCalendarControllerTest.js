@@ -2,6 +2,7 @@
 
 const should = require('should');
 const request = require('supertest');
+const errors = require('common-errors');
 const moment = require('moment');
 const server = require('../../../app');
 const sinon = require('sinon');
@@ -51,7 +52,7 @@ describe('soupCalendarController', () => {
     });
 
     it('should say server error', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error('500'), null);
+      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error(), null);
       request(server)
         .get('/subito/day')
         .set('Accept', 'application/json')
@@ -59,7 +60,7 @@ describe('soupCalendarController', () => {
         .expect(500)
         .end(function (err, res) {
           should.not.exist(err);
-          res.body.should.have.property('text', 'An unexpected server error occured');
+          res.body.should.have.property('text', 'Whoops, something unexpected happened...');
           soupCalendarService.getSoupsForDay.restore();
           done();
         });
@@ -194,7 +195,7 @@ describe('soupCalendarController', () => {
     });
 
     it('should say server error', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error('500'), null);
+      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error(), null);
       request(server)
         .get('/subito/day/today')
         .set('Accept', 'application/json')
@@ -202,7 +203,7 @@ describe('soupCalendarController', () => {
         .expect(500)
         .end(function (err, res) {
           should.not.exist(err);
-          res.body.should.have.property('text', 'An unexpected server error occured');
+          res.body.should.have.property('text', 'Whoops, something unexpected happened...');
           soupCalendarService.getSoupsForDay.restore();
           done();
         });

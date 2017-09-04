@@ -4,6 +4,7 @@ const Slack = require('slack-node');
 const lodash = require('lodash');
 const moment = require('moment');
 const logger = require('./logger');
+const utils  = require('./utils');
 const config = require('../../config/config');
 const SLACK_CONSTS = require('../../config/constants').SLACK_CONSTS;
 
@@ -19,32 +20,33 @@ const WEBHOOK_OPTS = {
 function messageChannel(channel, message, callback) {
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
     channel: '#'.concat(channel),
-    message: message
+    text: message
   });
   slack.webhook(hookSend, callback);
 }
 
 function messageUser(user, message, callback) {
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
-    channel: '@'.concat(channel),
-    message: message
+    channel: '@'.concat(user),
+    text: message
   });
   slack.webhook(hookSend, callback);
 }
 
 function parseRequestCommand(params) {
+  const snakeParams = utils.snakeCase(params);
   let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
   let text = params;
   if (typeof params === 'object') {
-    text = lodash.get(params, 'body.text', null);
+    text = lodash.get(params, 'text', null);
   }
 
   if (!text || text.trim().length === 0) {
     template.command = 'day';
     template.params.day = null;
     template.params.user = {
-      id: lodash.get(params, 'body.user_id', null),
-      username: lodash.get(params, 'body.user_name', null)
+      id: lodash.get(snakeParams, 'user_id', null),
+      username: lodash.get(snakeParams, 'user_name', null)
     };
     return template;
   }
@@ -66,8 +68,8 @@ function parseRequestCommand(params) {
     template.params.unknown = cmdArr.join(' ');
   }
   template.params.user = {
-    id: lodash.get(params, 'body.user_id', null),
-    username: lodash.get(params, 'body.user_name', null)
+    id: lodash.get(snakeParams, 'user_id', null),
+    username: lodash.get(snakeParams, 'user_name', null)
   };
   return template;
 }

@@ -71,4 +71,64 @@ describe('utils', () => {
       assert(moment(output).isSame(expected, 'day'), 'should be todays Date');
     });
   });
+
+  describe('camelCase', () => {
+    it('should camel case object properties', () => {
+      const input = {
+        test_input: 'A',
+        helloWorld: 'B',
+        HELLO_WORLD2: 'c'
+      };
+      const expected = {
+        testInput: 'A',
+        helloWorld: 'B',
+        helloWorld2: 'c'
+      };
+      assert.deepEqual(utils.camelCase(input), expected);
+    });
+
+    it('should handle an array of objects', () => {
+      const input = [{
+        test_input: 'A',
+        helloWorld: 'B',
+        HELLO_WORLD2: 'c'
+      }];
+      const expected = [{
+        testInput: 'A',
+        helloWorld: 'B',
+        helloWorld2: 'c'
+      }];
+      assert.deepEqual(utils.camelCase(input), expected);
+    });
+  });
+
+  describe('snakeCase', () => {
+    it('should snake case object properties', () => {
+      const input = {
+        testInput: 'A',
+        helloWorld: 'B',
+        helloWorld2: 'c'
+      };
+      const expected = {
+        test_input: 'A',
+        hello_world: 'B',
+        hello_world_2: 'c'
+      };
+      assert.deepEqual(utils.snakeCase(input), expected);
+    });
+
+    it('should handle an array of objects', () => {
+      const input = [{
+        testInput: 'A',
+        helloWorld: 'B',
+        helloWorld2: 'c'
+      }];
+      const expected = [{
+        test_input: 'A',
+        hello_world: 'B',
+        hello_world_2: 'c'
+      }];
+      assert.deepEqual(utils.snakeCase(input), expected);
+    });
+  });
 });
