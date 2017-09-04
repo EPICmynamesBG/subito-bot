@@ -1,6 +1,7 @@
 # subito-bot
 [![Build Status](https://travis-ci.org/EPICmynamesBG/subito-bot.svg?branch=master)](https://travis-ci.org/EPICmynamesBG/subito-bot)
-[![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)
+<img src="http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs" height="21" alt="Swagger Status" />
+
 
 A slash command Slack bot for getting the daily soup selection from Indianapolis' [_Subito_](http://www.subitosoups.com/)
 
@@ -8,7 +9,7 @@ A slash command Slack bot for getting the daily soup selection from Indianapolis
 ```text
 /subito - what's on the menu today!
 ```
-[![screnshot1](./assets/screenshots/screenshot_1.png)](./assets/screenshots/screenshot_1.png)
+<img src="./assets/screenshots/screenshot_1.png" height="120" alt="screenshot_1" />
 
 ```text
 /subito [today | tomorrow | yesterday | YYYY-MM-DD] - what's on the menu for some day
@@ -17,13 +18,22 @@ OR
 
 /subito day [today | tomorrow | yesterday | YYYY-MM-DD]
 ```
-[![screnshot2](./assets/screenshots/screenshot_2.png)](./assets/screenshots/screenshot_2.png)
+<img src="./assets/screenshots/screenshot_2.png" height="60" alt="screenshot_2" />
+
+```text
+/subito subscribe
+```
+<img src="./assets/screenshots/subscribe_1.png" height="60" alt="subscribe_1" />
+<img src="./assets/screenshots/subscribe_2.png" height="60" alt="subscribe_2" />
+
+```text
+/subito unsubscribe
+```
+<img src="./assets/screenshots/unsubscribe.png" height="60" alt="unsubscribe" />
 
 _In Development Commands_
 ```text
 /subito search [soup name/type (ex: gouda)]
-
-/subito subscribe
 ```
 
 ## Docs
