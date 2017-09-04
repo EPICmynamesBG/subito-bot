@@ -32,7 +32,7 @@ describe('subscriberController', () => {
           should.not.exist(err);
           res.body.should.have.property('slackUserId', '123456789');
           res.body.should.have.property('slackUsername', 'test_user');
-          res.body.should.have.property('text', "You're subscribed!");
+          res.body.should.have.property('text', "You're subscribed! :tada:");
           done();
         });
     });

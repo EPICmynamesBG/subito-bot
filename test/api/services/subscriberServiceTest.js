@@ -25,7 +25,7 @@ describe('subscriberService', () => {
         subscriber.should.have.property('id');
         subscriber.should.have.property('slack_user_id', user.slackUserId);
         subscriber.should.have.property('slack_username', user.slackUsername);
-        subscriber.should.have.property('text', "You're subscribed!");
+        subscriber.should.have.property('text', "You're subscribed! :tada:");
         done();
       });
     });

@@ -26,7 +26,7 @@ function addSubscriber(db, user, callback) {
     } else if (err) {
       return callback(err);
     }
-    const success = { text: "You're subscribed!" };
+    const success = { text: "You're subscribed! :tada:" };
     callback(err, Object.assign({}, subscriber, success));
   });
 }
