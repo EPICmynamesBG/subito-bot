@@ -151,13 +151,13 @@ describe('slackController', () => {
       });
     });
 
-    it('should not yet support "search"', (done) => {
+    it('should forward "search" to /subito/search', (done) => {
       request(server)
         .post(url)
         .type('form')
         .send({
           token: config.SLACK_SLASH_TOKEN,
-          text: 'search corn chowder',
+          text: 'search corn',
           user_id: 'ABC123',
           user_name: 'testuser'
         })
@@ -166,7 +166,8 @@ describe('slackController', () => {
         .expect(200)
         .end((err, res) => {
           should.not.exist(err);
-          assert.equal(res.body.text, 'Whoa there eager beaver, this function is still in development!');
+          res.body.should.have.property('text');
+          assert(res.body.soups.length > 0, 'should have soups');
           done();
         });
     });
@@ -188,7 +189,7 @@ describe('slackController', () => {
           should.not.exist(err);
           assert.equal(res.body.slackUserId, 'ABC123');
           assert.equal(res.body.slackUsername, 'testuser');
-          assert.equal(res.body.text, 'You\'re subscribed!');
+          assert.equal(res.body.text, 'You\'re subscribed! :tada:');
           done();
         });
     });

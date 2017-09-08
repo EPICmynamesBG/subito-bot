@@ -11,14 +11,14 @@ const moment = require('moment');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');
 const utils = require('../../../api/helpers/utils');
-const soupCalendarService = require('../../../api/services/soupCalendarService');
+const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');
 
-describe('soupCalendarService', () => {
+describe('soupCalendarViewService', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
   describe('getAllSoups', () => {
     it('should get all soup calendar entries', (done) => {
-      soupCalendarService.getAllSoups(testHelper.db, (err, soupsCals) => {
+      soupCalendarViewService.getAllSoups(testHelper.db, (err, soupsCals) => {
         should.not.exist(err);
         assert(soupsCals.length > 0, 'there should be soups');
         soupsCals.forEach((soupCal) => {
@@ -36,7 +36,7 @@ describe('soupCalendarService', () => {
     it('should get soup calendar entry for day', (done) => {
       const day = 'today';
       const date = utils.dateForText(day);
-      soupCalendarService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
+      soupCalendarViewService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
         should.not.exist(err);
         soupCal.should.have.property('text');
         assert(soupCal.text.includes(day), `text should have "${day}" in it`);
@@ -50,7 +50,7 @@ describe('soupCalendarService', () => {
     it('should not find a soup', (done) => {
       const day = '12/12/1995';
       const date = utils.dateForText(day);
-      soupCalendarService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
+      soupCalendarViewService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
         should.not.exist(err);
         assert.equal(soupCal, null);
         done();
@@ -83,7 +83,7 @@ describe('soupCalendarService', () => {
         });
       }
 
-      soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
+      soupCalendarViewService.massUpdate(testHelper.db, updates, (err, updated) => {
         should.not.exist(err);
         updated.should.have.property('rows', updates.length * 2);
         updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD'));

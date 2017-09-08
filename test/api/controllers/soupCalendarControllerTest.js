@@ -8,6 +8,7 @@ const server = require('../../../app');
 const sinon = require('sinon');
 const testHelper = require('../../helper/testHelper');
 
+const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');
 const soupCalendarService = require('../../../api/services/soupCalendarService');
 
 describe('soupCalendarController', () => {
@@ -37,7 +38,7 @@ describe('soupCalendarController', () => {
     });
 
     it('should say none found if no soups for today', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(null, null);
+      sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       request(server)
         .get('/subito/day')
         .set('Accept', 'application/json')
@@ -46,13 +47,13 @@ describe('soupCalendarController', () => {
         .end(function (err, res) {
           should.not.exist(err);
           res.body.should.have.property('text', 'Soups for today not found');
-          soupCalendarService.getSoupsForDay.restore();
+          soupCalendarViewService.getSoupsForDay.restore();
           done();
         });
     });
 
     it('should say server error', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error(), null);
+      sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(new Error(), null);
       request(server)
         .get('/subito/day')
         .set('Accept', 'application/json')
@@ -61,7 +62,7 @@ describe('soupCalendarController', () => {
         .end(function (err, res) {
           should.not.exist(err);
           res.body.should.have.property('text', 'Whoops, something unexpected happened...');
-          soupCalendarService.getSoupsForDay.restore();
+          soupCalendarViewService.getSoupsForDay.restore();
           done();
         });
     });
@@ -180,7 +181,7 @@ describe('soupCalendarController', () => {
     });
 
     it('should say none found if no soups for today', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(null, null);
+      sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       request(server)
         .get('/subito/day/today')
         .set('Accept', 'application/json')
@@ -189,13 +190,13 @@ describe('soupCalendarController', () => {
         .end(function (err, res) {
           should.not.exist(err);
           res.body.should.have.property('text', 'Soups for today not found');
-          soupCalendarService.getSoupsForDay.restore();
+          soupCalendarViewService.getSoupsForDay.restore();
           done();
         });
     });
 
     it('should say server error', (done) => {
-      sinon.stub(soupCalendarService, 'getSoupsForDay').yields(new Error(), null);
+      sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(new Error(), null);
       request(server)
         .get('/subito/day/today')
         .set('Accept', 'application/json')
@@ -204,7 +205,7 @@ describe('soupCalendarController', () => {
         .end(function (err, res) {
           should.not.exist(err);
           res.body.should.have.property('text', 'Whoops, something unexpected happened...');
-          soupCalendarService.getSoupsForDay.restore();
+          soupCalendarViewService.getSoupsForDay.restore();
           done();
         });
     });

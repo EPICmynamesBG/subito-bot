@@ -27,23 +27,20 @@ function handleSlack(req, res) {
   lodash.set(req, 'fromSlack', true);
   switch (action.command) {
     case 'subscribe':
-      logger.debug('slackHelper -> subscribe');
       lodash.set(req, 'body.slackUserId', action.params.user.id);
       lodash.set(req, 'body.slackUsername', action.params.user.username);
       subscriberController.subscribe(req, res);
       break;
     case 'unsubscribe':
-      logger.debug('slackHelper -> unsubscribe');
       lodash.set(req, 'body.slackUserId', action.params.user.id);
       lodash.set(req, 'body.slackUsername', action.params.user.username);
       subscriberController.unsubscribe(req, res);
       break;
     case 'search':
-      logger.info('Search requested', action.params);
-      utils.processResponse(null, { text: 'Whoa there eager beaver, this function is still in development!' }, res);
+      lodash.set(req, 'swagger.params.search.value', action.params.search);
+      soupCalendarController.search(req, res);
       break;
     case 'day':
-      logger.debug('slackHelper -> getSoupsForDay');
       lodash.set(req, 'swagger.params.day.value', action.params.day);
       soupCalendarController.getSoupsForDay(req, res);
       break;
