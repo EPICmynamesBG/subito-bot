@@ -21,7 +21,7 @@ function searchForSoup(db, searchStr, callback) {
   const queryStr = `SELECT * FROM soup_calendar
     WHERE LOWER(\`soup\`) LIKE LOWER(?)
 	AND \`day\` >= DATE(now())
-    ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`
+    ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`;
   queryHelper.custom(db, queryStr, [`%${searchStr}%`, searchStr], (err, rows) => {
     callback(err, Array.isArray(rows) ? rows.map(_parseRow) : []);
   });
