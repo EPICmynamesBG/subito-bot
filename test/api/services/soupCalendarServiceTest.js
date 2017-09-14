@@ -75,7 +75,7 @@ describe('soupCalendarService', () => {
         assert.equal(err, null);
         assert(res.length > 0, 'should have results');
         res.forEach((result) => {
-          assert(result.soup.trim().includes(searchStr.trim()));
+          assert(result.soup.toLowerCase().includes(searchStr.trim()));
         });
         done();
       });
