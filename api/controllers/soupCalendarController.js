@@ -45,7 +45,7 @@ function _buildSearchResponse(searchStr, soups) {
 
 function search(req, res) {
   const params = utils.getSwaggerParams(req);
-  soupCalendarService.searchForSoup(req.db, params.search,(err, soups) => {
+  soupCalendarService.searchForSoup(req.db, params.search, (err, soups) => {
     if (req.fromSlack) {
       const formatted = {
         soups: soups,

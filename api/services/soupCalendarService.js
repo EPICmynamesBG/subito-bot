@@ -18,11 +18,15 @@ function _parseRow(row) {
 }
 
 function searchForSoup(db, searchStr, callback) {
+  if (!searchStr || searchStr.trim() === '') {
+    process.nextTick(callback, null, []);
+    return;
+  }
   const queryStr = `SELECT * FROM soup_calendar
     WHERE LOWER(\`soup\`) LIKE LOWER(?)
 	AND \`day\` >= DATE(now())
     ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`;
-  queryHelper.custom(db, queryStr, [`%${searchStr}%`, searchStr], (err, rows) => {
+  queryHelper.custom(db, queryStr, [`%${searchStr.trim()}%`, searchStr.trim()], (err, rows) => {
     callback(err, Array.isArray(rows) ? rows.map(_parseRow) : []);
   });
 }

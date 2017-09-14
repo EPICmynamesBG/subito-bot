@@ -37,7 +37,7 @@ describe('soupCalendarService', () => {
     });
 
     it('should order by next soonest', (done) => {
-      const searchStr = 'CORN';
+      const searchStr = 'corn';
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
         assert(res.length > 1, 'should have results');
@@ -57,7 +57,7 @@ describe('soupCalendarService', () => {
     });
 
     it('should only return results for today and later', (done) => {
-      const searchStr = 'CORN';
+      const searchStr = 'corn';
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
         assert(res.length > 0, 'should have results');
@@ -65,6 +65,27 @@ describe('soupCalendarService', () => {
           assert(moment(result.day).isAfter(moment(), 'd') ||
                   moment(result.day).isSame(moment(), 'd'), `${result.day} is not equal or after today`);
         });
+        done();
+      });
+    });
+
+    it('should trim spaces', (done) => {
+      const searchStr = ' corn ';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        res.forEach((result) => {
+          assert(result.soup.trim().includes(searchStr.trim()));
+        });
+        done();
+      });
+    });
+
+    it('should return empty array on null searchStr', (done) => {
+      const searchStr = null;
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert.equal(res.length, 0, 'should not have results');
         done();
       });
     });

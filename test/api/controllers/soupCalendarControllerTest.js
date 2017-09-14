@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const should = require('should');
 const request = require('supertest');
 const errors = require('common-errors');
@@ -206,6 +207,54 @@ describe('soupCalendarController', () => {
           should.not.exist(err);
           res.body.should.have.property('text', 'Whoops, something unexpected happened...');
           soupCalendarViewService.getSoupsForDay.restore();
+          done();
+        });
+    });
+  });
+
+  describe('GET /subito/search', () => {
+    it('should search for soups', (done) => {
+      request(server)
+        .get('/subito/search?search=corn')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          assert(Array.isArray(res.body), 'body should be an array');
+          assert(res.body.length > 0, 'should have results');
+          const soupDay = res.body[0];
+          soupDay.should.have.property('day');
+          soupDay.should.have.property('soup');
+          done();
+        });
+    });
+
+    it('should have no results when no search parameter', (done) => {
+      request(server)
+        .get('/subito/search')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          assert(Array.isArray(res.body), 'body should be an array');
+          assert.equal(res.body.length, 0, 'should have no results');
+          done();
+        });
+    });
+
+    it('should say server error', (done) => {
+      sinon.stub(soupCalendarService, 'searchForSoup').yields(new Error(), null);
+      request(server)
+        .get('/subito/search?search=corn')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(500)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text', 'Whoops, something unexpected happened...');
+          soupCalendarService.searchForSoup.restore();
           done();
         });
     });
