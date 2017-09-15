@@ -112,6 +112,16 @@ function processResponse(paramErr, result, response) {
   }
 }
 
+function textCleaner(str) {
+  // 1: Remove double/extra spaces
+  let cleaned = str.replace(/\\n{2,}/g, '\n');
+  // 2: add spaces where needed
+  cleaned = cleaned.replace(/([a-z])([A-Z])/g, "$1 $2");
+  // 3: Remove special chars
+  cleaned = cleaned.replace(/\n|\*/g, '');
+  return cleaned;
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
@@ -121,5 +131,6 @@ module.exports = {
   snakeCase: snakeCaseKeys,
   getSwaggerParams: getSwaggerParams,
   handleDatabaseError: handleDatabaseError,
-  processResponse: processResponse
+  processResponse: processResponse,
+  textCleaner: textCleaner
 };

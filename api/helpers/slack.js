@@ -33,6 +33,20 @@ function messageUser(user, message, callback) {
   slack.webhook(hookSend, callback);
 }
 
+function sendError(message, callback) {
+  if (typeof callback !== 'function') {
+    callback = (err) => {
+      if (err) logger.error(err);
+    };
+  }
+  logger.error(message);
+  if (config.SLACK_NOTIFY_ERROR_USER) {
+    module.exports.messageUser(config.SLACK_NOTIFY_ERROR_USER, message, callback)
+  } else {
+    process.nextTick(callback, new Error('SLACK_NOTIFY_ERROR_USER not set'));
+  }
+}
+
 function parseRequestCommand(params) {
   const snakeParams = utils.snakeCase(params);
   let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -96,6 +110,7 @@ module.exports = {
   messageUser: messageUser,
   messageChannel: messageChannel,
   utils: {
-    parseRequestCommand: parseRequestCommand
+    parseRequestCommand: parseRequestCommand,
+    sendError: sendError
   }
 };

@@ -25,6 +25,8 @@ module.exports = {
   SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',
  
   SLACK_API_TOKEN: process.env.SLACK_API_TOKEN || '',
+
+  SLACK_NOTIFY_ERROR_USER : process.env.SLACK_NOTIFY_ERROR_USER,
   
   NODE_ENV: process.env.NODE_ENV || 'development',
 

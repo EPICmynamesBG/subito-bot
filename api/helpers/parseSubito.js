@@ -8,6 +8,7 @@ const lodash = require('lodash');
 const moment = require('moment');
 const utils = require('./utils');
 const logger = require('./logger');
+const slack = require('./slack');
 
 const subitoUrl = 'http://www.subitosoups.com';
 const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
@@ -94,6 +95,56 @@ function _filterDatesToPairs(dates) {
   return pairs;
 }
 
+/**
+ * "Manually" parse the string to array using known delimiters to validate
+ * the input looks as expected
+ * @private
+ * @author Brandon Groff <mynamesbg@gmail.com>
+ * @param   {string}   soupStr the soup string to analyze
+ * @returns {boolean}
+ */
+function _validateStringFormat(soupStr) {
+  let getIndex = function(str, endIndex = 0) {
+    let i = str.indexOf(')', endIndex);
+    let j = str.indexOf('\n', endIndex);
+    if (i !== -1 && j !== -1) {
+      if (i < j) return i;
+      else return j;
+    }
+    return i;
+  };
+  let lastFind = 0;
+  let index = getIndex(soupStr, lastFind);
+  let validationArr = [];
+  while (index !== -1) {
+    validationArr.push(soupStr.substring(lastFind, index + 1));
+    lastFind = index + 1;
+    index = getIndex(soupStr, lastFind);
+  }
+  validationArr.push(soupStr.substring(lastFind));
+
+  validationArr = validationArr.reduce((val, i) => {
+    if (i !== '\n' && i.trim() !== '') val.push(i);
+    return val;
+  }, []);
+
+  if (validationArr.length !== 2) {
+    slack.utils.sendError(`parseSubito:: validation failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
+  }
+  return;
+}
+
+function _soupStrToArray(rawStr) {
+  let soupStr = utils.trimChar(rawStr[1].rawText, '\\n');
+  let soupsArr = soupStr.split('\n\n');
+  if (soupsArr.length !== 2) {
+    logger.warn('parseSubito:: Attempting to recover from bad split', JSON.stringify(soupStr));
+    soupsArr = soupStr.split('\n');
+  }
+  _validateStringFormat(soupStr);
+  return soupsArr;
+}
+
 function fetchCalendar(callback) {
   async.autoInject({
     fetchSoupPage: (cb) => {
@@ -112,25 +163,23 @@ function fetchCalendar(callback) {
     pluckDates: (savedHtml, cb) => {
       const parsedHtml = htmlParser.parse(savedHtml);
       const body = recursivelySearchForElement('body', parsedHtml);
-      cb(null, getCalendarElements(body));
+      process.nextTick(cb, null, getCalendarElements(body));
     },
     filterPlucked: (pluckDates, cb) => {
       const pairs = _filterDatesToPairs(pluckDates);
       const mapped = pairs.map((pair) => {
-        let soupStr = utils.trimChar(pair[1].rawText, '\\n');
-        let soups = soupStr.split('\n\n').map((soup) => {
-          return soup.replace(/\n|\*/g, '');
-        });
+        const soupsArr = _soupStrToArray(pair);
+        let soups = soupsArr.map(utils.textCleaner);
         return {
           date: moment(pair[0].rawText, 'dddd, M/D').toDate(),
           soups: soups
         };
       });
-      cb(null, mapped);
+      process.nextTick(cb, null, mapped);
     }
   }, (err, res) => {
     if (err) {
-      logger.error(err);
+      slack.utils.sendError(JSON.stringify(err));
     }
     callback(err, res.filterPlucked);
   });
