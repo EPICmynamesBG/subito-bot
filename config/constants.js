@@ -15,7 +15,7 @@ module.exports = {
 
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
-      search: ['soup'],
+      search: ['search'],
       subscribe: [],
       unsubscribe: []
     }),

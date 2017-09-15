@@ -17,7 +17,6 @@ const db = require('./config/db');
 
 const runOnStart = () => {
   cronHelper.importCalendar(db)();
-  cronHelper.processSubscribers(db)();
 };
 
 // Weekly, runs as midnight on Sundays 

@@ -55,7 +55,7 @@ function pluralize(str) {
 
 function camelCaseKeys(collection) {
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && collection.constructor)) {
+    (lodash.isObject(collection) && !lodash.isArray(collection))) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));

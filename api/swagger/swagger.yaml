@@ -204,6 +204,31 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /search:
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: Search for soup availability
+      operationId: search
+      tags:
+        - Search
+        - SoupCalendar
+      parameters:
+        - name: search
+          in: query
+          description: a soup search string
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/SoupCalendarObject"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -221,6 +246,17 @@ definitions:
         items:
           type: string
       soupsStr:
+        type: string
+  SoupCalendarObject:
+    type: object
+    required:
+      - day
+      - soup
+    properties:
+      day:
+        type: string
+        format: date
+      soup:
         type: string
   UnsubscribeBody:
     type: object

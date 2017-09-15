@@ -2,92 +2,90 @@
 
 const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
-const lodash = require('lodash');
-const request = require('request');
 const moment = require('moment');
-const async = require('async');
+
 const testHelper = require('../../helper/testHelper');
-const utils = require('../../../api/helpers/utils');
 const soupCalendarService = require('../../../api/services/soupCalendarService');
 
 describe('soupCalendarService', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
-  describe('getAllSoups', () => {
-    it('should get all soup calendar entries', (done) => {
-      soupCalendarService.getAllSoups(testHelper.db, (err, soupsCals) => {
-        should.not.exist(err);
-        assert(soupsCals.length > 0, 'there should be soups');
-        soupsCals.forEach((soupCal) => {
-          soupCal.should.have.property('text');
-          soupCal.should.have.property('soups');
-          soupCal.should.have.property('soupsStr');
-          soupCal.should.have.property('day');
+  describe('searchForSoup', () => {
+    it('should search for a string', (done) => {
+      const searchStr = 'corn';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(Array.isArray(res));
+        assert(res.length > 0, 'should have results');
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr));
         });
         done();
       });
     });
-  });
 
-  describe('getSoupsForDay', () => {
-    it('should get soup calendar entry for day', (done) => {
-      const day = 'today';
-      const date = utils.dateForText(day);
-      soupCalendarService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
-        should.not.exist(err);
-        soupCal.should.have.property('text');
-        assert(soupCal.text.includes(day), `text should have "${day}" in it`);
-        soupCal.should.have.property('soups');
-        soupCal.should.have.property('soupsStr');
-        soupCal.should.have.property('day', moment(date).format('YYYY-MM-DD'));
-        done();
-      });
-    });
-
-    it('should not find a soup', (done) => {
-      const day = '12/12/1995';
-      const date = utils.dateForText(day);
-      soupCalendarService.getSoupsForDay(testHelper.db, date, (err, soupCal) => {
-        should.not.exist(err);
-        assert.equal(soupCal, null);
-        done();
-      });
-    });
-  });
-
-  describe('massUpdate', () => {
-    it('should get soup calendar entry for day', (done) => {
-      const updates = [];
-      const soupOptions = ['Chicken Noodle', 'Beef Stew',
-        'Turkey Bean Soup', 'Black Bean (gf)', 'Italian Wedding (gf)',
-        'Local Corn Chowder'];
-      let generateDays = lodash.random(1, 20);
-      const expectedUpdateCount = generateDays * 2;
-      let expectedStartDate;
-      let expectedEndDate;
-      for (var i = 0; i < generateDays; i++) {
-        const soups = lodash.clone(soupOptions).splice(lodash.random(0, soupOptions.length - 2), 2);
-        const date = moment().add(lodash.random(-10, 10), 'd');
-
-        if (!expectedStartDate) expectedStartDate = date;
-        else if (date < expectedStartDate) expectedStartDate = date;
-        if (!expectedEndDate) expectedEndDate = date;
-        else if (date > expectedEndDate) expectedEndDate = date;
-
-        updates.push({
-          date: date.format(),
-          soups: soups
+    it('should ignore case', (done) => {
+      const searchStr = 'CORN';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr.toLowerCase()));
         });
-      }
+        done();
+      });
+    });
 
-      soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
-        should.not.exist(err);
-        updated.should.have.property('rows', updates.length * 2);
-        updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD'));
-        updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD'));
+    it('should order by next soonest', (done) => {
+      const searchStr = 'corn';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 1, 'should have results');
+        let last = null;
+        res.forEach((result) => {
+          if (last === null) {
+            last = result;
+          } else {
+            assert(moment(last.day).isBefore(moment(result.day), 'd') ||
+                  moment(last.day).isSame(moment(result.day), 'd'),
+                  `${result.day} is not equal or before ${last.day}`);
+            last = result;
+          }
+        });
+        done();
+      });
+    });
+
+    it('should only return results for today and later', (done) => {
+      const searchStr = 'corn';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        res.forEach((result) => {
+          assert(moment(result.day).isAfter(moment(), 'd') ||
+                  moment(result.day).isSame(moment(), 'd'), `${result.day} is not equal or after today`);
+        });
+        done();
+      });
+    });
+
+    it('should trim spaces', (done) => {
+      const searchStr = ' corn ';
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr.trim()));
+        });
+        done();
+      });
+    });
+
+    it('should return empty array on null searchStr', (done) => {
+      const searchStr = null;
+      soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
+        assert.equal(err, null);
+        assert.equal(res.length, 0, 'should not have results');
         done();
       });
     });

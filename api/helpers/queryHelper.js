@@ -48,11 +48,6 @@ function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
       })
       query = query.slice(0, -2);
       query = query.concat(') VALUES ?');
-//      valuesKeys.forEach(() => {
-//        query = query.concat('?, ');
-//      });
-//      query = query.slice(0, -2);
-//      query = query.concat(')');
     } else if (queryType === QUERY_TYPE.UPDATE) {
       query.concat(' SET ');
       valuesKeys.forEach((key) => {

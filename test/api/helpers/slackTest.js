@@ -75,7 +75,7 @@ describe('slack helper', () => {
         const output = slack.utils.parseRequestCommand(text);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
         expected.command = 'search';
-        expected.params.soup = 'corn chowder';
+        expected.params.search = 'corn chowder';
         assert.deepEqual(output, expected);
       });
 

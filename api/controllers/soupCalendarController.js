@@ -5,12 +5,13 @@ const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const moment = require('moment');
 const config = require('../../config/config');
+const soupCalendarViewService = require('../services/soupCalendarViewService');
 const soupCalendarService = require('../services/soupCalendarService');
 
 function getSoupsForDay(req, res) {
   const params = utils.getSwaggerParams(req);
   const date = utils.dateForText(params.day);
-  soupCalendarService.getSoupsForDay(req.db, date, (err, soupDay) => {
+  soupCalendarViewService.getSoupsForDay(req.db, date, (err, soupDay) => {
     if (err) {
       utils.processResponse(err, null, res);
       return;
@@ -26,7 +27,33 @@ function getSoupsForDay(req, res) {
 }
 
 function getAllSoups(req, res) {
-  soupCalendarService.getAllSoups(req.db, (err, soups) => {
+  soupCalendarViewService.getAllSoups(req.db, (err, soups) => {
+    utils.processResponse(err, soups, res);
+  });
+}
+
+function _buildSearchResponse(searchStr, soups) {
+  if (!soups || soups.length === 0) {
+    return `Looks like no upcoming dates were found for _${searchStr}_.`;
+  }
+  let response = `Soups found! Here are some upcoming dates for _${searchStr}_`;
+  soups.forEach((soupCal) => {
+    response = response.concat(`\n>${soupCal.day} : ${soupCal.soup}`);
+  });
+  return response;
+}
+
+function search(req, res) {
+  const params = utils.getSwaggerParams(req);
+  soupCalendarService.searchForSoup(req.db, params.search, (err, soups) => {
+    if (req.fromSlack) {
+      const formatted = {
+        soups: soups,
+        text: _buildSearchResponse(params.search, soups)
+      };
+      utils.processResponse(err, formatted, res);
+      return;
+    }
     utils.processResponse(err, soups, res);
   });
 }
@@ -34,5 +61,6 @@ function getAllSoups(req, res) {
 module.exports = {
   getSoupsForToday: getSoupsForDay,
   getSoupsForDay: getSoupsForDay,
-  getAllSoups: getAllSoups
+  getAllSoups: getAllSoups,
+  search: search
 };
