@@ -7,32 +7,34 @@ const logger = require('./logger');
 const parseSubito = require('./parseSubito');
 const utils = require('./utils');
 const slack = require('./slack');
-const soupCalendarService = require('../services/soupCalendarService');
+const soupCalendarViewService = require('../services/soupCalendarViewService');
 const subscriberService = require('../services/subscriberService');
 
 const importCalendar = (db) => {
-  return () => {
+  return (cb) => {
     logger.info('Running importCalendar:: ', moment().format());
     parseSubito.fetchCalendar((err, data) => {
       if (err) {
         logger.error(err);
+        if (typeof cb === 'function') cb(err);
         return;
       }
-      soupCalendarService.massUpdate(db, data, (err, updated) => {
+      soupCalendarViewService.massUpdate(db, data, (err2, updated) => {
         logger.info('importCalendar complete:: ', updated);
+        if (typeof cb === 'function') cb(err2, updated);
       });
     });
   };
 };
 
 const processSubscribers = (db) => {
-  return () => {
+  return (cb) => {
     logger.info('Running processSubscribers:: ', moment().toDate());
     const cleanExit = { clean: true };
     let soups;
     async.waterfall([
       (cb) => {
-        soupCalendarService.getSoupsForDay(db, utils.dateForText('today'), cb);
+        soupCalendarViewService.getSoupsForDay(db, utils.dateForText('today'), cb);
       },
       (soupCal, cb) => {
         if (!soupCal) {
@@ -58,6 +60,7 @@ const processSubscribers = (db) => {
       } else {
         logger.info('processSubscribers complete:: ', moment().format());
       }
+      if (typeof cb === 'function') cb(err);
     });
   };
 };
