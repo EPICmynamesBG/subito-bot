@@ -31,9 +31,16 @@ OR
 ```
 <img src="./assets/screenshots/unsubscribe.png" height="60" alt="unsubscribe" />
 
-_In Development Commands_
 ```text
-/subito search [soup name/type (ex: gouda)]
+/subito search [search string]
+```
+<img src="./assets/screenshots/search.png" height="110" alt="search" />
+
+_In Development Commands_
+
+- Subscribe to specific soup types
+```text
+/subito subscribe [soup name/type (ex: gouda)]
 ```
 
 ## Docs
