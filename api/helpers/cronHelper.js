@@ -7,7 +7,7 @@ const logger = require('./logger');
 const parseSubito = require('./parseSubito');
 const utils = require('./utils');
 const slack = require('./slack');
-const soupCalendarService = require('../services/soupCalendarService');
+const soupCalendarViewService = require('../services/soupCalendarViewService');
 const subscriberService = require('../services/subscriberService');
 
 const importCalendar = (db) => {
@@ -18,7 +18,7 @@ const importCalendar = (db) => {
         logger.error(err);
         return;
       }
-      soupCalendarService.massUpdate(db, data, (err, updated) => {
+      soupCalendarViewService.massUpdate(db, data, (err, updated) => {
         logger.info('importCalendar complete:: ', updated);
       });
     });
@@ -32,7 +32,7 @@ const processSubscribers = (db) => {
     let soups;
     async.waterfall([
       (cb) => {
-        soupCalendarService.getSoupsForDay(db, utils.dateForText('today'), cb);
+        soupCalendarViewService.getSoupsForDay(db, utils.dateForText('today'), cb);
       },
       (soupCal, cb) => {
         if (!soupCal) {
