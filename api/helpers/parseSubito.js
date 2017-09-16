@@ -95,45 +95,6 @@ function _filterDatesToPairs(dates) {
   return pairs;
 }
 
-/**
- * "Manually" parse the string to array using known delimiters to validate
- * the input looks as expected
- * @private
- * @author Brandon Groff <mynamesbg@gmail.com>
- * @param   {string}   soupStr the soup string to analyze
- * @returns {boolean}
- */
-function _validateStringFormat(soupStr) {
-  let getIndex = function(str, endIndex = 0) {
-    let i = str.indexOf(')', endIndex);
-    let j = str.indexOf('\n', endIndex);
-    if (i !== -1 && j !== -1) {
-      if (i < j) return i;
-      else return j;
-    }
-    return i;
-  };
-  let lastFind = 0;
-  let index = getIndex(soupStr, lastFind);
-  let validationArr = [];
-  while (index !== -1) {
-    validationArr.push(soupStr.substring(lastFind, index + 1));
-    lastFind = index + 1;
-    index = getIndex(soupStr, lastFind);
-  }
-  validationArr.push(soupStr.substring(lastFind));
-
-  validationArr = validationArr.reduce((val, i) => {
-    if (i !== '\n' && i.trim() !== '') val.push(i);
-    return val;
-  }, []);
-
-  if (validationArr.length !== 2) {
-    slack.utils.sendError(`parseSubito:: validation failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
-  }
-  return;
-}
-
 function _soupStrToArray(rawStr) {
   let soupStr = utils.trimChar(rawStr[1].rawText, '\\n');
   let soupsArr = soupStr.split('\n\n');
@@ -141,7 +102,9 @@ function _soupStrToArray(rawStr) {
     logger.warn('parseSubito:: Attempting to recover from bad split', JSON.stringify(soupStr));
     soupsArr = soupStr.split('\n');
   }
-  _validateStringFormat(soupStr);
+  if (soupsArr.length !== 2) {
+    slack.utils.sendError(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
+  }
   return soupsArr;
 }
 
