@@ -29,11 +29,15 @@ function handleSlack(req, res) {
     case 'subscribe':
       lodash.set(req, 'body.slackUserId', action.params.user.id);
       lodash.set(req, 'body.slackUsername', action.params.user.username);
+      lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
+      lodash.set(req, 'body.slackTeamDomain', action.params.user.teamDomain);
       subscriberController.subscribe(req, res);
       break;
     case 'unsubscribe':
       lodash.set(req, 'body.slackUserId', action.params.user.id);
       lodash.set(req, 'body.slackUsername', action.params.user.username);
+      lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
+      lodash.set(req, 'body.slackTeamDomain', action.params.user.teamDomain);
       subscriberController.unsubscribe(req, res);
       break;
     case 'search':

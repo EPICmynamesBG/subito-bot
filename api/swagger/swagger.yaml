@@ -151,6 +151,12 @@ paths:
                 type: string
               slackUsername:
                 type: string
+              slackTeamId:
+                type: [string, "null"]
+                default: "null"
+              slackTeamDomain:
+                type: [string, "null"]
+                default: "null"
       responses:
         "200":
           description: Success
@@ -267,6 +273,12 @@ definitions:
         type: string
       slackUsername:
         type: string
+      slackTeamId:
+        type: [string, "null"]
+        default: "null"
+      slackTeamDomain:
+        type: [string, "null"]
+        default: "null"
   SlackResponse:
     type: object
     required:

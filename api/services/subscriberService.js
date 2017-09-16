@@ -10,7 +10,9 @@ const queryHelper = require('../helpers/queryHelper');
 function addSubscriber(db, user, callback) {
   const mappedUser = {
     slack_user_id: lodash.get(user, 'slackUserId', null),
-    slack_username: lodash.get(user, 'slackUsername', null)
+    slack_username: lodash.get(user, 'slackUsername', null),
+    slack_team_id: lodash.get(user, 'slackTeamId', null),
+    slack_team_domain: lodash.get(user, 'slackTeamDomain', null)
   };
   async.waterfall([
     (cb) => {
