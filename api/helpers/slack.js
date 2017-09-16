@@ -40,6 +40,7 @@ function sendError(message, callback) {
     };
   }
   logger.error(message);
+  if (process.env.NODE_ENV === 'test') return;
   if (config.SLACK_NOTIFY_ERROR_USER) {
     module.exports.messageUser(config.SLACK_NOTIFY_ERROR_USER, message, callback)
   } else {
