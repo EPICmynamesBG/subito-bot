@@ -1,6 +1,6 @@
 {
   "name": "subito",
-  "version": "3.0.1",
+  "version": "3.1.1",
   "private": false,
   "description": "A slack slash bot for getting Subito soups",
   "repository": {
