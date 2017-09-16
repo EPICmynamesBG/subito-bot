@@ -10,6 +10,11 @@ const config = require('../../../config/config');
 const testHelper = require('../../helper/testHelper');
 const async = require('async');
 
+const validAuth = {
+  team_id: 'ABCDEF123',
+  token: 'helloworld'
+};
+
 describe('slackController', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
@@ -44,6 +49,7 @@ describe('slackController', () => {
         .expect('Content-Type', /json/)
         .expect(403)
         .end((err, res) => {
+          should.not.exist(err);
           assert.equal(res.body.text, 'Invalid Slack token');
           done();
         });
@@ -54,10 +60,11 @@ describe('slackController', () => {
         .post(url)
         .type('form')
         .send({
-          token: config.SLACK_SLASH_TOKEN,
+          token: validAuth.token,
           text: '',
           user_id: '',
-          user_name: ''
+          user_name: '',
+          team_id: validAuth.team_id
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -75,17 +82,19 @@ describe('slackController', () => {
             .post(url)
             .type('form')
             .send({
-              token: config.SLACK_SLASH_TOKEN,
+              token: validAuth.token,
               text: '',
               user_id: '123ABC',
-              user_name: 'bobthebuilder'
+              user_name: 'bobthebuilder',
+              team_id: validAuth.team_id
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .end((err, res) => {
               should.not.exist(err);
-              assert.equal(res.body.text, 'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+              assert.equal(res.body.text,
+                'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
               cb();
             });
         },
@@ -94,17 +103,19 @@ describe('slackController', () => {
             .post(url)
             .type('form')
             .send({
-              token: config.SLACK_SLASH_TOKEN,
+              token: validAuth.token,
               text: 'today',
               user_id: '123ABC',
-              user_name: 'bobthebuilder'
+              user_name: 'bobthebuilder',
+              team_id: validAuth.team_id
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .end((err, res) => {
               should.not.exist(err);
-              assert.equal(res.body.text, 'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+              assert.equal(res.body.text,
+                'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
               cb();
             });
         },
@@ -113,17 +124,19 @@ describe('slackController', () => {
             .post(url)
             .type('form')
             .send({
-              token: config.SLACK_SLASH_TOKEN,
+              token: validAuth.token,
               text: '2017-07-31',
               user_id: '123ABC',
-              user_name: 'bobthebuilder'
+              user_name: 'bobthebuilder',
+              team_id: validAuth.team_id
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .end((err, res) => {
               should.not.exist(err);
-              assert.equal(res.body.text, 'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
+              assert.equal(res.body.text, // eslint-disable-next-line max-len
+                'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
               cb();
             });
         },
@@ -132,17 +145,19 @@ describe('slackController', () => {
             .post(url)
             .type('form')
             .send({
-              token: config.SLACK_SLASH_TOKEN,
+              token: validAuth.token,
               text: 'day 2017-07-31',
               user_id: '123ABC',
-              user_name: 'bobthebuilder'
+              user_name: 'bobthebuilder',
+              team_id: validAuth.team_id
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .end((err, res) => {
               should.not.exist(err);
-              assert.equal(res.body.text, 'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
+              assert.equal(res.body.text, // eslint-disable-next-line max-len
+                'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
               cb();
             });
         }
@@ -156,10 +171,11 @@ describe('slackController', () => {
         .post(url)
         .type('form')
         .send({
-          token: config.SLACK_SLASH_TOKEN,
+          token: validAuth.token,
           text: 'search corn',
           user_id: 'ABC123',
-          user_name: 'testuser'
+          user_name: 'testuser',
+          team_id: validAuth.team_id
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -177,10 +193,11 @@ describe('slackController', () => {
         .post(url)
         .type('form')
         .send({
-          token: config.SLACK_SLASH_TOKEN,
+          token: validAuth.token,
           text: 'subscribe',
           user_id: 'ABC123',
-          user_name: 'testuser'
+          user_name: 'testuser',
+          team_id: validAuth.team_id
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -199,10 +216,11 @@ describe('slackController', () => {
         .post(url)
         .type('form')
         .send({
-          token: config.SLACK_SLASH_TOKEN,
+          token: validAuth.token,
           text: 'unsubscribe',
           user_id: 'ABC123',
-          user_name: 'testuser'
+          user_name: 'testuser',
+          team_id: validAuth.team_id
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -219,10 +237,11 @@ describe('slackController', () => {
         .post(url)
         .type('form')
         .send({
-          token: config.SLACK_SLASH_TOKEN,
+          token: validAuth.token,
           text: 'hello world',
           user_id: 'ABC123',
-          user_name: 'testuser'
+          user_name: 'testuser',
+          team_id: validAuth.team_id
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)

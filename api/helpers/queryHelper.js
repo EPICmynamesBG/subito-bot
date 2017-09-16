@@ -14,22 +14,24 @@ const QUERY_TYPE = {
 };
 
 function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
+  /* eslint-disable no-param-reassign */
   if (!valuesParam) valuesParam = [];
   if (!whereParams) whereParams = {};
+  /* eslint-enable no-param-reassign */
 
   let query;
   switch (queryType) {
-    case QUERY_TYPE.INSERT:
-      query = `INSERT INTO \`${table}\``;
-      break;
-    case QUERY_TYPE.UPDATE:
-      query = `UPDATE \`${table}\``;
-      break;
-    case QUERY_TYPE.DELETE:
-      query = `DELETE FROM \`${table}\``;
-      break;
-    default:
-      query = `SELECT * FROM \`${table}\``;
+  case QUERY_TYPE.INSERT:
+    query = `INSERT INTO \`${table}\``;
+    break;
+  case QUERY_TYPE.UPDATE:
+    query = `UPDATE \`${table}\``;
+    break;
+  case QUERY_TYPE.DELETE:
+    query = `DELETE FROM \`${table}\``;
+    break;
+  default:
+    query = `SELECT * FROM \`${table}\``;
   }
 
   let values = [];
@@ -49,7 +51,7 @@ function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
       query = query.slice(0, -2);
       query = query.concat(') VALUES ?');
     } else if (queryType === QUERY_TYPE.UPDATE) {
-      query.concat(' SET ');
+      query = query.concat(' SET ');
       valuesKeys.forEach((key) => {
         query = query.concat(`\`${key}\` = ?, `);
       });
@@ -94,7 +96,7 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
   }
   if (context && context.queryType === QUERY_TYPE.SELECT_ONE) {
     if (results.length > 1) {
-      logger.warn('More than 1 result found with Select One query', context); 
+      logger.warn('More than 1 result found with Select One query', context);
       callback(new Error('Multiple results found when expecting one'));
     }
     callback(null, lodash.toPlainObject(results[0]))
@@ -102,7 +104,12 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
   } else if (context && (context.queryType === QUERY_TYPE.INSERT ||
                         context.queryType === QUERY_TYPE.UPDATE ||
                         context.queryType === QUERY_TYPE.DELETE)) {
-    const response = { text: `${results.affectedRows} ${utils.pluralize(context.table)} ${context.queryType.concat('D')}` };
+    const pastTenseAction = context.queryType.slice(-1) === 'E' ?
+      context.queryType.concat('D') :
+      context.queryType.concat('ED');
+    const response = {
+      text: `${results.affectedRows} ${utils.pluralize(context.table)} ${pastTenseAction}`
+    };
     callback(null, Object.assign(response, results));
     return;
   }
@@ -126,8 +133,10 @@ function _query(db, build, callback) {
 
 function select(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
   const build = _queryBuilder(table, QUERY_TYPE.SELECT, [], whereParams);
   _query(db, build, callback);
@@ -135,8 +144,10 @@ function select(db, table, whereParams, callback) {
 
 function selectOne(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
   const build = _queryBuilder(table, QUERY_TYPE.SELECT_ONE, [], whereParams);
   _query(db, build, callback);
@@ -144,13 +155,16 @@ function selectOne(db, table, whereParams, callback) {
 
 function insert(db, table, values, callback) {
   if (typeof values === 'object' && !Array.isArray(values)) {
+    /* eslint-disable no-param-reassign */
     values = [values];
+    /* eslint-enable no-param-reassign */
   }
   const build = _queryBuilder(table, QUERY_TYPE.INSERT, values, {});
   _query(db, build, callback);
 }
 
 function update(db, table, values, whereParams, callback) {
+  /* eslint-disable no-param-reassign */
   if (typeof values === 'object') {
     values = [values];
   }
@@ -158,14 +172,17 @@ function update(db, table, values, whereParams, callback) {
     callback = whereParams;
     whereParams = {};
   }
+  /* eslint-enable no-param-reassign */
   const build = _queryBuilder(table, QUERY_TYPE.UPDATE, values, whereParams);
   _query(db, build, callback);
 }
 
 function deleteAction(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
   const build = _queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
   _query(db, build, callback);

@@ -2,17 +2,13 @@
 
 const async = require('async');
 const lodash = require('lodash');
-const moment = require('moment');
-const logger = require('../helpers/logger');
-const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
 function addSubscriber(db, user, callback) {
   const mappedUser = {
     slack_user_id: lodash.get(user, 'slackUserId', null),
     slack_username: lodash.get(user, 'slackUsername', null),
-    slack_team_id: lodash.get(user, 'slackTeamId', null),
-    slack_team_domain: lodash.get(user, 'slackTeamDomain', null)
+    slack_team_id: lodash.get(user, 'slackTeamId', null)
   };
   async.waterfall([
     (cb) => {
@@ -35,6 +31,10 @@ function addSubscriber(db, user, callback) {
 
 function getSubscribers(db, callback) {
   queryHelper.select(db, 'subscribers', callback);
+}
+
+function getSubscribersForTeam(db, teamId, callback) {
+  queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, callback);
 }
 
 function getSubscriberById(db, id, callback) {
@@ -64,6 +64,7 @@ function deleteSubscriberBySlackUsername(db, slackName, callback) {
 module.exports = {
   addSubscriber: addSubscriber,
   getSubscribers: getSubscribers,
+  getSubscribersForTeam: getSubscribersForTeam,
   getSubscriberById: getSubscriberById,
   getSubscriberBySlackUserId: getSubscriberBySlackUserId,
   getSubscriberBySlackUsername: getSubscriberBySlackUsername,

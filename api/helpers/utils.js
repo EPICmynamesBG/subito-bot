@@ -3,7 +3,10 @@
 const moment = require('moment');
 const lodash = require('lodash');
 const errors = require('common-errors');
+const crypto = require('crypto-js');
 const logger = require('./logger');
+
+const ENCRYPTION_KEY = require('../../config/config').ENCRYPTION_KEY;
 
 function trimChar(str, char) {
   let regx = new RegExp('^'+ char + '+|' + char + '+$', 'g');
@@ -122,6 +125,36 @@ function textCleaner(str) {
   return cleaned;
 }
 
+function encrypt(thing) {
+  let clone = lodash.cloneDeep(thing);
+  if (typeof thing !== 'string') {
+    clone = JSON.stringify(clone);
+  }
+  try {
+    const result = crypto.AES.encrypt(clone, ENCRYPTION_KEY).toString();
+    return result;
+  } catch (e) {
+    logger.warn('Encryption error', e);
+    return null;
+  }
+}
+
+function decrypt(thing) {
+  let clone = lodash.cloneDeep(thing);
+  if (typeof thing !== 'string') {
+    logger.warn('Decrypt was not passed a string!', thing);
+    clone = JSON.stringify(clone);
+  }
+
+  try {
+    const result = crypto.AES.decrypt(clone, ENCRYPTION_KEY).toString(crypto.enc.Utf8);
+    return result;
+  } catch (e) {
+    logger.warn('Decryption error', e);
+    return null;
+  }
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
@@ -132,5 +165,7 @@ module.exports = {
   getSwaggerParams: getSwaggerParams,
   handleDatabaseError: handleDatabaseError,
   processResponse: processResponse,
-  textCleaner: textCleaner
+  textCleaner: textCleaner,
+  encrypt: encrypt,
+  decrypt: decrypt
 };

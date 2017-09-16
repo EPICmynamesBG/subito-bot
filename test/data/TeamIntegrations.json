@@ -1,0 +1,15 @@
+[
+  {
+    "team_id": "ABCDEF123",
+    "team_domain": "abcdomain",
+    "slack_slash_token": "helloworld",
+    "slack_webhook_url": "http://test.com"
+  },
+  {
+    "team_id": "XYZDEF123",
+    "team_domain": "xyzdomain",
+    "slack_slash_token": "helloworld",
+    "slack_webhook_url": "http://xyz.com",
+    "metadata": "{\"a\": \"some data\"}"
+  }
+]

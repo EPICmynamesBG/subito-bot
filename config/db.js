@@ -18,7 +18,8 @@ const testConfig = {
   host: config.TEST_DATABASE_HOST,
   user: config.TEST_DATABASE_USER,
   password: config.TEST_DATABASE_PASSWORD,
-  database: config.TEST_DATABASE_NAME
+  database: config.TEST_DATABASE_NAME,
+  multipleStatements: true
 };
 
 function DB() {
@@ -65,7 +66,7 @@ function DB() {
 //  this.pool.on('release', (connection) => {
 //    logger.debug('Connection %d released', connection.threadId);
 //  });
-};
+}
 
 DB.prototype.query = function (query, paramArr, callback) {
   let dbConnection;

@@ -1,7 +1,5 @@
 'use strict';
 
-require('dotenv').config({ silent: true });
-
 const util = require('util');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -9,6 +7,7 @@ const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
 const config = require('./config/config');
 const middleware = require('./api/middleware/middleware');
+const logger = require('./api/helpers/logger');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
@@ -46,7 +45,7 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
 
   var port = process.env.PORT || 10010;
   app.listen(port);
-  console.info("\x1b[32m", util.format('Express running on port %s', port), "\x1b[0m");
+  logger.info(util.format('Express running on port %s', port));
 });
 
 module.exports = app;
