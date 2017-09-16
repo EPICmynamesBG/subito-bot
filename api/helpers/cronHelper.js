@@ -15,7 +15,7 @@ const importCalendar = (db) => {
     logger.info('Running importCalendar:: ', moment().format());
     parseSubito.fetchCalendar((err, data) => {
       if (err) {
-        logger.error(err);
+        slack.utils.sendError(JSON.stringify(err));
         if (typeof cb === 'function') cb(err);
         return;
       }
@@ -56,7 +56,7 @@ const processSubscribers = (db) => {
       if (err && err.clean) {
         logger.info('processSubscribers complete: no soups for today:: ', moment().format());
       } else if (err) {
-        logger.error(err); // should never occur
+        slack.utils.sendError(JSON.stringify(err)); // should never occur
       } else {
         logger.info('processSubscribers complete:: ', moment().format());
       }

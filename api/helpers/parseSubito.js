@@ -8,6 +8,7 @@ const lodash = require('lodash');
 const moment = require('moment');
 const utils = require('./utils');
 const logger = require('./logger');
+const slack = require('./slack');
 
 const subitoUrl = 'http://www.subitosoups.com';
 const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
@@ -94,6 +95,19 @@ function _filterDatesToPairs(dates) {
   return pairs;
 }
 
+function _soupStrToArray(rawStr) {
+  let soupStr = utils.trimChar(rawStr[1].rawText, '\\n');
+  let soupsArr = soupStr.split('\n\n');
+  if (soupsArr.length !== 2) {
+    logger.warn('parseSubito:: Attempting to recover from bad split', JSON.stringify(soupStr));
+    soupsArr = soupStr.split('\n');
+  }
+  if (soupsArr.length !== 2) {
+    slack.utils.sendError(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
+  }
+  return soupsArr;
+}
+
 function fetchCalendar(callback) {
   async.autoInject({
     fetchSoupPage: (cb) => {
@@ -112,25 +126,23 @@ function fetchCalendar(callback) {
     pluckDates: (savedHtml, cb) => {
       const parsedHtml = htmlParser.parse(savedHtml);
       const body = recursivelySearchForElement('body', parsedHtml);
-      cb(null, getCalendarElements(body));
+      process.nextTick(cb, null, getCalendarElements(body));
     },
     filterPlucked: (pluckDates, cb) => {
       const pairs = _filterDatesToPairs(pluckDates);
       const mapped = pairs.map((pair) => {
-        let soupStr = utils.trimChar(pair[1].rawText, '\\n');
-        let soups = soupStr.split('\n\n').map((soup) => {
-          return soup.replace(/\n|\*/g, '');
-        });
+        const soupsArr = _soupStrToArray(pair);
+        let soups = soupsArr.map(utils.textCleaner);
         return {
           date: moment(pair[0].rawText, 'dddd, M/D').toDate(),
           soups: soups
         };
       });
-      cb(null, mapped);
+      process.nextTick(cb, null, mapped);
     }
   }, (err, res) => {
     if (err) {
-      logger.error(err);
+      slack.utils.sendError(JSON.stringify(err));
     }
     callback(err, res.filterPlucked);
   });
