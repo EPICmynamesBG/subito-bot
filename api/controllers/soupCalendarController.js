@@ -1,10 +1,6 @@
 'use strict';
 
-const lodash = require('lodash');
-const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
-const moment = require('moment');
-const config = require('../../config/config');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const soupCalendarService = require('../services/soupCalendarService');
 

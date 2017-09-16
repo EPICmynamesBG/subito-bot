@@ -1,7 +1,6 @@
 'use strict';
 
 const async = require('async');
-const mysql = require('mysql');
 const moment = require('moment');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
@@ -69,7 +68,7 @@ function massUpdate(db, soupDays, callback) {
       updatedCount += parseInt(autoRes.insert.affectedRows || 0);
       eachCb(autoErr, autoRes);
     });
-  }, (err, res) => {
+  }, (err) => {
     if (err) {
       logger.error(err);
     }

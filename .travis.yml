@@ -22,5 +22,5 @@ before_script:
   - npm run migrate-up:local
   - npm run migrate-up:test
 script:
-  - ./node_modules/.bin/eslint-changes
+  - npm run eslint
   - npm run test

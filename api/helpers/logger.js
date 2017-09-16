@@ -40,7 +40,7 @@ if (env === 'test') {
 } else {
   logger = new(winston.Logger)({
     transports: [
-    new winston.transports.File({
+      new winston.transports.File({
         name: 'file#debug',
         level: 'debug',
         filename: logDir + '/debug.log',
@@ -51,7 +51,7 @@ if (env === 'test') {
         colorize: false,
         timestamp: true
       }),
-    new winston.transports.File({
+      new winston.transports.File({
         name: 'file#error',
         filename: logDir + '/error.log',
         level: 'error',
@@ -62,7 +62,7 @@ if (env === 'test') {
         colorize: false,
         timestamp: true
       }),
-    new winston.transports.Console({
+      new winston.transports.Console({
         level: loggingLevel,
         handleExceptions: true,
         json: false,

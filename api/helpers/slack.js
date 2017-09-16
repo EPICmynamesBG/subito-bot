@@ -35,6 +35,7 @@ function messageUser(user, message, callback) {
 
 function sendError(message, callback) {
   if (typeof callback !== 'function') {
+    // eslint-disable-next-line no-param-reassign
     callback = (err) => {
       if (err) logger.error(err);
     };

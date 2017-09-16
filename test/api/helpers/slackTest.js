@@ -1,11 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-const moment = require('moment');
 const lodash = require('lodash');
 const slack = require('../../../api/helpers/slack');
 
@@ -104,7 +99,7 @@ describe('slack helper', () => {
         };
         assert.deepEqual(output, expected);
       });
-  
+
       it('should support "unsubscribe" command', () => {
         let input = {
           text: 'unsubscribe',

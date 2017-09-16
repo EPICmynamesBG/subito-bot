@@ -42,6 +42,7 @@
   "scripts": {
     "start": "node app.js",
     "test": "NODE_ENV=test swagger project test",
+    "eslint": "node ./node_modules/eslint/bin/eslint.js --ext=.js *",
     "migrate-up:local": "node db-migrations/migrate.js --dir='up' --db='local'",
     "migrate-up:test": "node db-migrations/migrate.js --dir='up' --db='test'",
     "migrate-down:local": "node db-migrations/migrate.js --dir='down' --db='local'",

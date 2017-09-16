@@ -2,7 +2,6 @@
 
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
-const lodash = require('lodash');
 
 function bindDb(app, db) {
   return function (req, res, next) {
@@ -25,7 +24,7 @@ function logging(req, res, next) {
 function camelCaseBody(req, res, next) {
   req.body = utils.camelCase(req.body);
   next();
-};
+}
 
 module.exports = {
   bindDb: bindDb,

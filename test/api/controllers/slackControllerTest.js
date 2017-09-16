@@ -3,10 +3,7 @@
 const assert = require('assert');
 const should = require('should');
 const request = require('supertest');
-const moment = require('moment');
 const server = require('../../../app');
-const sinon = require('sinon');
-const config = require('../../../config/config');
 const testHelper = require('../../helper/testHelper');
 const async = require('async');
 
