@@ -58,7 +58,8 @@ function pluralize(str) {
 
 function camelCaseKeys(collection) {
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && !lodash.isArray(collection))) {
+    (lodash.isObject(collection) && !lodash.isArray(collection) &&
+     collection.constructor && collection.constructor.name === 'anonymous')) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));
@@ -115,6 +116,12 @@ function processResponse(paramErr, result, response) {
   }
 }
 
+function processResponseCb(response) {
+  return (paramErr, result) => {
+    module.exports.processResponse(paramErr, result, response);
+  };
+}
+
 function textCleaner(str) {
   // 1: Remove double/extra spaces
   let cleaned = str.replace(/\\n{2,}/g, '\n');
@@ -165,6 +172,7 @@ module.exports = {
   getSwaggerParams: getSwaggerParams,
   handleDatabaseError: handleDatabaseError,
   processResponse: processResponse,
+  processResponseCb: processResponseCb,
   textCleaner: textCleaner,
   encrypt: encrypt,
   decrypt: decrypt

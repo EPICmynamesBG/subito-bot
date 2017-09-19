@@ -16,6 +16,7 @@ function handleSlack(req, res) {
   const params = req.body;
   authService.validateTeamToken(req.db, params.teamId, params.token, (valid) => {
     if (!valid) {
+      logger.warn('Bad auth', params);
       utils.processResponse(new errors.HttpStatusError(403, 'Invalid Slack token'), null, res);
       return;
     }

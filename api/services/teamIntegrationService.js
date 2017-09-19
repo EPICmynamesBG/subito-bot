@@ -2,12 +2,21 @@
 
 const queryHelper = require('../helpers/queryHelper');
 const utils = require('../helpers/utils');
+const logger = require('../helpers/logger');
 
 function _mapDecrypt(row) {
   if (!row) return;
   row.slack_slash_token = utils.decrypt(row.slack_slash_token);
   row.slack_webhook_url = utils.decrypt(row.slack_webhook_url);
-  row.metadata = row.metadata ? utils.decrypt(row.metadata) : null;
+  let metadata = row.metadata ? utils.decrypt(row.metadata) : null;
+  if (metadata) {
+    try {
+      metadata = JSON.parse(metadata);
+    } catch (e) {
+      logger.debug('Parsing metadata failed.', metadata);
+    }
+  }
+  row.metadata = metadata;
   return row;
 }
 
@@ -21,8 +30,8 @@ function addIntegration(db, integrationObj, callback) {
   const toCreate = {
     team_id: snaked.team_id,
     team_domain: snaked.team_domain,
-    slack_slash_token: utils.encrypt(snaked.slash_token),
-    slack_webhook_url: utils.encrypt(snaked.webhook_url),
+    slack_slash_token: utils.encrypt(snaked.slack_slash_token),
+    slack_webhook_url: utils.encrypt(snaked.slack_webhook_url),
     metadata: snaked.metadata ? utils.encrypt(snaked.metadata) : null
   };
   queryHelper.insert(db, 'team_integrations', toCreate, callback);
@@ -70,9 +79,9 @@ function updateIntegration(db, teamId, fields, callback) {
   const snaked = utils.snakeCase(fields);
   const fieldsToUpdate = {};
   Object.keys(snaked).forEach((field) => {
-    if (field === 'slash_token') {
+    if (field === 'slack_slash_token') {
       fieldsToUpdate.slack_slash_token = utils.encrypt(snaked[field])
-    } else if (field === 'webhook_url') {
+    } else if (field === 'slack_webhook_url') {
       fieldsToUpdate.slack_webhook_url = utils.encrypt(snaked[field])
     } else if (field === 'metadata' && snaked[field] !== null) {
       fieldsToUpdate.metadata = utils.encrypt(snaked.metadata);

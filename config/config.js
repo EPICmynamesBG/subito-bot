@@ -31,6 +31,8 @@ module.exports = {
   SLACK_NOTIFY_ERROR_USER : process.env.SLACK_NOTIFY_ERROR_USER,
 
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+  
+  ADMIN_AUTH_SECRET: process.env.ADMIN_AUTH_SECRET,
 
   NODE_ENV: process.env.NODE_ENV || 'development',
 
