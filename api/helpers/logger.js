@@ -17,7 +17,7 @@ if (env === 'test') {
       name: 'file#debug',
       level: 'debug',
       filename: logDir + '/test.log',
-      handleExceptions: true,
+      handleExceptions: false,
       json: true,
       maxsize: 5242880, // 5MB
       maxFiles: 1,
@@ -27,7 +27,7 @@ if (env === 'test') {
   if (TEST_CONSOLE_LOGGING) {
     testTransports.push(new winston.transports.Console({
       level: loggingLevel,
-      handleExceptions: true,
+      handleExceptions: false,
       json: false,
       colorize: true,
       timestamp: true
