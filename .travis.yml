@@ -10,6 +10,9 @@ env:
     - DATABASE_HOST=localhost
     - DATABASE_USER=root
     - DATABASE_NAME=subito_test
+    - ENCRYPTION_KEY=test_key_123
+    - ADMIN_AUTH_SECRET=helloworld
+    - TEST_CONSOLE_LOGGING=true
 addons:
   mysql: "5.7.19"
 before_install:
