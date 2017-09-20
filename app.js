@@ -1,7 +1,5 @@
 'use strict';
 
-require('dotenv').config({ silent: true });
-
 const util = require('util');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -36,6 +34,14 @@ app.use(middleware.camelCaseBody);
 
 var seConfig = { appRoot: __dirname };
 
+let sslConfig = null;
+if (config.SSL_PORT && config.SSL_PRIV_KEY && config.SSL_CERT) {
+  sslConfig = {
+    key: config.SSL_PRIV_KEY,
+    cert: config.SSL_CERT
+  };
+}
+
 SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   if (err) { throw err; }
 
@@ -44,8 +50,10 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   // install middleware
   swaggerExpress.register(app);
 
-  var port = process.env.PORT || 10010;
-  app.listen(port);
+  app.listen(config.PORT);
+  if (config.NODE_ENV === 'production' && sslConfig) {
+    app.listen(sslConfig, config.SSL_PORT);
+  }
   console.info("\x1b[32m", util.format('Express running on port %s', port), "\x1b[0m");
 });
 

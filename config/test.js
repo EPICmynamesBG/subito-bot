@@ -1,4 +1,5 @@
 module.exports = {
+  NODE_ENV: 'test',
   LOGGING_LEVEL: 'fatal',
   DATABASE_HOST: process.env.TEST_DATABASE_HOST,
   DATABASE_USER: process.env.TEST_DATABASE_USER,
