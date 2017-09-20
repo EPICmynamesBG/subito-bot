@@ -7,7 +7,7 @@ const fs = require('fs');
 module.exports = {
   NODE_ENV: 'production',
 
-  LOGGING_LEVEL: 'info',
+  LOGGING_LEVEL: 'debug',
 
   SSL_PORT: process.env.SSL_PORT,
     
