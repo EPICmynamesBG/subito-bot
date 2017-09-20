@@ -2,8 +2,6 @@
 
 require('dotenv').config({ silent: true });
 
-const fs = require('fs');
-
 const config = {  
   DATABASE_HOST: process.env.DATABASE_HOST || 'localhost',
   

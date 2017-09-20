@@ -1,3 +1,7 @@
+'use strict';
+
+require('dotenv').config({ silent: true });
+
 module.exports = {
   NODE_ENV: 'test',
   

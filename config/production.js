@@ -1,3 +1,9 @@
+'use strict';
+
+require('dotenv').config({ silent: true });
+
+const fs = require('fs');
+
 module.exports = {
   NODE_ENV: 'production',
 
