@@ -47,7 +47,7 @@ _In Development Commands_
 
 [Localhost Docs](http://localhost:3000/docs)
 
-[Online Docs](http://dev.brandongroff.com:8080/docs)
+[Online Docs](https://dev.brandongroff.com:8443/docs)
 
 ## Cron Schedule
 
