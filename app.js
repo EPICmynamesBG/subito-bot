@@ -1,5 +1,6 @@
 'use strict';
 
+const https = require('https');
 const util = require('util');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -46,12 +47,16 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   // install middleware
   swaggerExpress.register(app);
 
-  app.listen(config.PORT);
-  logger.info(util.format('Express running on port %s', config.PORT));
+  app.listen(config.PORT, (err) => {
+    if (err) { logger.error(err); }
+    else { logger.info(util.format('Express running on port %s', config.PORT)); }
+  });
 
   if (config.NODE_ENV === 'production' && sslConfig) {
-    app.listen(sslConfig, config.SSL_PORT);
-    logger.info(util.format('Express running on port %s', config.SSL_PORT));
+    https.createServer(sslConfig, app).listen(config.SSL_PORT, (err) => {
+      if (err) { logger.error(err); }
+      else { logger.info(util.format('Express running on port %s', config.SSL_PORT)); }
+    });
   }
 });
 
