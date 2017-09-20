@@ -6,16 +6,12 @@ const cors = require('cors');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
 const config = require('./config/config');
+const logger = require('./api/helpers/logger');
 const middleware = require('./api/middleware/middleware');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
   require('pretty-error').start();
-}
-
-if (process.env.NODE_ENV === 'test') {
-  // eslint-disable-next-line global-require
-  Object.assign(require('./config/config'), require('./config/test'));
 }
 
 const db = require('./config/db');
@@ -51,10 +47,12 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   swaggerExpress.register(app);
 
   app.listen(config.PORT);
+  logger.info(util.format('Express running on port %s', config.PORT));
+
   if (config.NODE_ENV === 'production' && sslConfig) {
     app.listen(sslConfig, config.SSL_PORT);
+    logger.info(util.format('Express running on port %s', config.SSL_PORT));
   }
-  console.info("\x1b[32m", util.format('Express running on port %s', port), "\x1b[0m");
 });
 
 module.exports = app;
