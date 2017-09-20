@@ -39,8 +39,9 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
-    "start": "node app.js",
-    "test": "NODE_ENV=test swagger project test",
+    "start": "npm run buildSwagger && node app.js",
+    "test": "NODE_ENV=test npm run buildSwagger && NODE_ENV=test swagger project test",
+    "buildSwagger": "node scripts/buildSwagger.js",
     "migrate-up:local": "node db-migrations/migrate.js --dir='up' --db='local'",
     "migrate-up:test": "node db-migrations/migrate.js --dir='up' --db='test'",
     "migrate-down:local": "node db-migrations/migrate.js --dir='down' --db='local'",
