@@ -32,7 +32,7 @@ app.use(middleware.camelCaseBody);
 var seConfig = { appRoot: __dirname };
 
 let sslConfig = null;
-if (config.SSL_PORT && config.SSL_PRIV_KEY && config.SSL_CERT) {
+if (config.USE_SSL) {
   sslConfig = {
     key: config.SSL_PRIV_KEY,
     cert: config.SSL_CERT
@@ -52,7 +52,7 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
     else { logger.info(util.format('Express running on port %s', config.PORT)); }
   });
 
-  if (config.NODE_ENV === 'production' && sslConfig) {
+  if (config.USE_SSL) {
     https.createServer(sslConfig, app).listen(config.SSL_PORT, (err) => {
       if (err) { logger.error(err); }
       else { logger.info(util.format('Express running on port %s', config.SSL_PORT)); }

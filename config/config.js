@@ -21,6 +21,8 @@ const config = {
   
   SSL_CERT: process.env.SSL_CERT ? fs.readFileSync(process.env.SSL_CERT, 'utf8') : null,
   
+  USE_SSL: false,
+  
   TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost',
   
   TEST_DATABASE_USER: process.env.TEST_DATABASE_USER || '',
@@ -44,12 +46,14 @@ const config = {
 
   LOGGING_LEVEL: process.env.LOGGING_LEVEL || 'debug',
 
-  LOG_DIR: './logs',
+  LOG_DIR: './logs'
 };
 
-if (process.env.NODE_ENV === 'test') {
+if (config.NODE_ENV === 'test') {
   // eslint-disable-next-line global-require
   Object.assign(config, require('./test'));
+} else if (config.NODE_ENV === 'production') {
+  config.USE_SSL = (config.SSL_PORT && config.SSL_PRIV_KEY && config.SSL_CERT);
 }
 
 module.exports = config;
