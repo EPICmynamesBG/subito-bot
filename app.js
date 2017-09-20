@@ -47,15 +47,15 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   // install middleware
   swaggerExpress.register(app);
 
-  app.listen(config.PORT, (err) => {
-    if (err) { logger.error(err); }
-    else { logger.info(util.format('Express running on port %s', config.PORT)); }
-  });
-
   if (config.USE_SSL) {
     https.createServer(sslConfig, app).listen(config.SSL_PORT, (err) => {
       if (err) { logger.error(err); }
       else { logger.info(util.format('Express running on port %s', config.SSL_PORT)); }
+    });
+  } else {
+    app.listen(config.PORT, (err) => {
+      if (err) { logger.error(err); }
+      else { logger.info(util.format('Express running on port %s', config.PORT)); }
     });
   }
 });

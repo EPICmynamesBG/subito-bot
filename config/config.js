@@ -15,12 +15,6 @@ const config = {
   
   PORT: process.env.PORT || 10010,
   
-  SSL_PORT: process.env.SSL_PORT,
-    
-  SSL_PRIV_KEY: process.env.SSL_PRIV_KEY ? fs.readFileSync(process.env.SSL_PRIV_KEY, 'utf8') : null,
-  
-  SSL_CERT: process.env.SSL_CERT ? fs.readFileSync(process.env.SSL_CERT, 'utf8') : null,
-  
   USE_SSL: false,
   
   TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost',
@@ -46,14 +40,34 @@ const config = {
 
   LOGGING_LEVEL: process.env.LOGGING_LEVEL || 'debug',
 
-  LOG_DIR: './logs'
+  LOG_DIR: './logs',
+  
+  SWAGGER: {
+    
+    APP_VERSION: '3.1.2',
+    
+    HOSTNAME: process.env.HOST || 'localhost',
+    
+    PORT: process.env.PORT || 10010,
+    
+    BASEPATH: '/subito',
+    
+    SCHEMAS: ['http']
+    
+  }
 };
 
 if (config.NODE_ENV === 'test') {
   // eslint-disable-next-line global-require
   Object.assign(config, require('./test'));
 } else if (config.NODE_ENV === 'production') {
+  // eslint-disable-next-line global-require
+  Object.assign(config, require('./production'));
   config.USE_SSL = (config.SSL_PORT && config.SSL_PRIV_KEY && config.SSL_CERT);
+  if (config.USE_SSL) {
+    config.SWAGGER.SCHEMAS = ['https'];
+    config.SWAGGER.PORT = config.SSL_PORT;
+  }
 }
 
 module.exports = config;
