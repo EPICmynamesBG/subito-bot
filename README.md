@@ -121,3 +121,6 @@ Migrations can be ran via `npm run migrate-up:[local | test]`. This command will
 - `mysql -e "GRANT ALL PRIVILEGES ON subito_test . * TO 'test'@'localhost';" -u root -p`
 - `mysql -D subito_test < ddl/ddl.sql -u root -p`
  
+## License
+
+[GNU General Public License v3.0](http://www.gnu.org/licenses/gpl-3.0.txt)

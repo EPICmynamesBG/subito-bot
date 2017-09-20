@@ -3,6 +3,13 @@ info:
   version: {appVersion}
   title: Subito Slash Service
   description: a service for getting soup data from [Subito](http://www.subitosoups.com/) in Indianapolis
+  contact:
+    name: Brandon Groff
+    url: http://brandongroff.com
+    email: mynamesbg@gmail.com
+  license:
+    name: GNU General Public License v3.0
+    url: http://www.gnu.org/licenses/gpl-3.0.txt
 # during dev, should point to your local machine
 host: {host}
 # basePath prefixes all resource paths 
