@@ -58,7 +58,7 @@ function pluralize(str) {
 
 function camelCaseKeys(collection) {
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && !lodash.isArray(collection))) {
+    (lodash.isObject(collection) && !lodash.isArray(collection) && collection.constructor.name !== 'Date')) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));
@@ -70,7 +70,7 @@ function camelCaseKeys(collection) {
 
 function snakeCaseKeys(collection) {
   if (lodash.isPlainObject(collection)  ||
-    (lodash.isObject(collection) && !lodash.isArray(collection))) {
+    (lodash.isObject(collection) && !lodash.isArray(collection) && collection.constructor.name !== 'Date')) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.snakeCase(key), snakeCaseKeys(value)]
     )));
@@ -84,7 +84,7 @@ function handleDatabaseError(err) {
   let httpError = null;
   if (!err) {
     return httpError;
-  } else if (lodash.includes(['1054', '1171', '1263'], err.code)) {
+  } else if (lodash.includes(['1054', '1171', '1263', 'ER_BAD_FIELD_ERROR'], err.code)) {
     // mysql error codes https://www.briandunning.com/error-codes/?source=MySQL
     httpError = new errors.HttpStatusError(400, err.message);
   } else if (err.name === 'HttpStatusError') {

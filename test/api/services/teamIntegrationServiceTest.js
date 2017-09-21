@@ -169,6 +169,19 @@ describe('subscriberService', () => {
       });
     });
 
+    it('should update multiple values', (done) => {
+      const testId = 'ABCDEF123';
+      const updateObj = {
+        teamDomain: 'newdomain',
+        slackSlashToken: 'world'
+      };
+      teamIntegrationService.updateIntegration(testHelper.db, testId, updateObj, (err, updated) => {
+        should.not.exist(err);
+        assert.equal(updated.affectedRows, 1);
+        done();
+      });
+    });
+
     it('should allow updating the team id', (done) => {
       const testId = 'ABCDEF123';
       const updateObj = {

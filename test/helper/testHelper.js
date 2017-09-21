@@ -58,7 +58,7 @@ function resetData(callback) {
           data = data.map((entry) => {
             let clone = Object.assign({}, entry);
             clone.slack_slash_token = utils.encrypt(clone.slack_slash_token);
-            clone.slack_webhook_url = utils.encrypt(clone.slack_webhook_token);
+            clone.slack_webhook_url = utils.encrypt(clone.slack_webhook_url);
             if (clone.metadata) {
               clone.metadata = utils.encrypt(clone.metadata);
             }

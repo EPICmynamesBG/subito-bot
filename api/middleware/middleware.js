@@ -36,6 +36,10 @@ function adminAuth(req, res, next) {
   }
   const authRegex = /Bearer\s(.*)/ig;
   const auth = req.swagger.params.authorization.value;
+  if (!auth) {
+    utils.processResponse(new errors.HttpStatusError(401, 'Missing Authorization'), null, res);
+    return;
+  }
   const token = authRegex.exec(auth)[1];
   if (!token) {
     utils.processResponse(new errors.HttpStatusError(401, 'Missing Authorization'), null, res);

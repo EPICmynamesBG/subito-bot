@@ -17,6 +17,8 @@ module.exports = {
   
   DATABASE_NAME: process.env.TEST_DATABASE_NAME,
   
+  ADMIN_AUTH_SECRET: 'HelloWorld',
+  
   SWAGGER: {
     
     APP_VERSION: '0.0.1',

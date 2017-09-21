@@ -13,9 +13,11 @@ const QUERY_TYPE = {
   DELETE: 'DELETE'
 };
 
-function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
+// eslint-disable-next-line complexity
+function _queryBuilder(table, queryType, valuesParam, whereParams = {}) {
   /* eslint-disable no-param-reassign */
-  if (!valuesParam) valuesParam = [];
+  if (!valuesParam && queryType !== QUERY_TYPE.UPDATE) valuesParam = [];
+  else if (!valuesParam && queryType === QUERY_TYPE.UPDATE) valuesParam = {};
   if (!whereParams) whereParams = {};
   /* eslint-enable no-param-reassign */
 
@@ -38,7 +40,9 @@ function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
   const where = [];
   const whereKeys = Object.keys(whereParams);
   let valuesKeys = [];
-  if (valuesParam.length > 0) {
+  if (queryType === QUERY_TYPE.UPDATE) {
+    valuesKeys = Object.keys(valuesParam);
+  } else if (valuesParam.length > 0) {
     valuesKeys = Object.keys(valuesParam[0]);
   }
 
@@ -57,13 +61,19 @@ function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
       });
       query = query.slice(0, -2);
     }
-    values = valuesParam.map((entry) => {
-      let temp = new Array(valuesKeys.length);
+    if (queryType === QUERY_TYPE.UPDATE) {
       valuesKeys.forEach((key, index) => {
-        temp[index] = entry[key];
+        values[index] = valuesParam[key];
       });
-      return temp;
-    });
+    } else {
+      values = valuesParam.map((entry) => {
+        let temp = new Array(valuesKeys.length);
+        valuesKeys.forEach((key, index) => {
+          temp[index] = entry[key];
+        });
+        return temp;
+      });
+    }
   }
   if (whereKeys.length > 0) {
     query = query.concat(' WHERE ');
@@ -122,8 +132,10 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
 
 function _query(db, build, callback) {
   let paramArr = [];
-  if (build.values.length > 0) {
+  if (build.values.length > 0 && build.queryType !== QUERY_TYPE.UPDATE) {
     paramArr = [build.values];
+  } else if (build.queryType === QUERY_TYPE.UPDATE) {
+    paramArr = build.values;
   }
   paramArr = paramArr.concat(build.where);
   db.query(build.query, paramArr, (e, res) => {
@@ -165,9 +177,6 @@ function insert(db, table, values, callback) {
 
 function update(db, table, values, whereParams, callback) {
   /* eslint-disable no-param-reassign */
-  if (typeof values === 'object') {
-    values = [values];
-  }
   if (typeof whereParams === 'function') {
     callback = whereParams;
     whereParams = {};
