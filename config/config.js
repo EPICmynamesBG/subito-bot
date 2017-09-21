@@ -23,9 +23,6 @@ const config = {
 
   TEST_DATABASE_NAME: process.env.TEST_DATABASE_NAME || '',
 
-  TEST_CONSOLE_LOGGING: process.env.TEST_CONSOLE_LOGGING &&
-    process.env.TEST_CONSOLE_LOGGING.toLowerCase() === 'true' ? true : false,
-
   SLACK_SLASH_TOKEN: process.env.SLACK_SLASH_TOKEN || '',
 
   SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',

@@ -101,7 +101,7 @@ function handleDatabaseError(err) {
 function processResponse(paramErr, result, response) {
   let err = paramErr;
   if (!err && result) {
-    logger.debug('request.status.200', camelCaseKeys(result));
+    logger.analytics('request.status.200', camelCaseKeys(result));
     response.status(200).json(camelCaseKeys(result)).end();
   } else {
     err = handleDatabaseError(err);
@@ -111,7 +111,7 @@ function processResponse(paramErr, result, response) {
       message = 'Whoops, something unexpected happened...';
     }
 
-    logger.debug(`request.status.${statusCode}`);
+    logger.analytics(`request.status.${statusCode}`);
     response.status(statusCode).json({ text: message }).end();
   }
 }

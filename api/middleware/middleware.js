@@ -14,11 +14,11 @@ function bindDb(app, db) {
 }
 
 function logging(req, res, next) {
-  logger.debug(`${req.protocol}:/${req.url}`, req.body);
+  logger.analytics(`${req.protocol}:/${req.url}`, req.body);
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    logger.debug('request.duration', `${req.protocol}:/${req.url} - ${duration}ms`);
+    logger.analytics('request.duration', `${req.protocol}:/${req.url} - ${duration}ms`);
   });
   next();
 }
