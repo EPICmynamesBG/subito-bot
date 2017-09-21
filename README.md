@@ -1,5 +1,6 @@
 # subito-bot
 [![Build Status](https://travis-ci.org/EPICmynamesBG/subito-bot.svg?branch=master)](https://travis-ci.org/EPICmynamesBG/subito-bot)
+[![Coverage Status](https://coveralls.io/repos/github/EPICmynamesBG/subito-bot/badge.svg?branch=master)](https://coveralls.io/github/EPICmynamesBG/subito-bot?branch=master)
 [![Swagger Status](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)](http://online.swagger.io/validator?url=http://dev.brandongroff.com:8080/api-docs)
 
 

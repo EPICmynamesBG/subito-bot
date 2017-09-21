@@ -31,8 +31,10 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "coveralls": "^2.13.1",
     "eslint": "^4.6.1",
     "eslint-ignore": "^1.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.5.0",
     "pretty-error": "^2.1.1",
     "should": "^7.1.0",
@@ -41,7 +43,8 @@
   },
   "scripts": {
     "start": "npm run buildSwagger && node app.js",
-    "test": "NODE_ENV=test npm run buildSwagger && mocha test",
+    "test": "NODE_ENV=test npm run buildSwagger && istanbul test node_modules/mocha/bin/_mocha",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "buildSwagger": "node scripts/buildSwagger.js",
     "eslint": "node ./node_modules/eslint/bin/eslint.js --ext=.js *",
     "migrate-up:local": "node db-migrations/migrate.js --dir='up' --db='local'",

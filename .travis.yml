@@ -27,3 +27,4 @@ before_script:
 script:
   - npm run eslint
   - npm run test
+  - npm run coverage
