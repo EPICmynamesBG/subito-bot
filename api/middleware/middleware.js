@@ -19,6 +19,7 @@ function logging(req, res, next) {
   res.on('finish', () => {
     const duration = Date.now() - start;
     logger.analytics('request.duration', `${req.protocol}:/${req.url} - ${duration}ms`);
+    logger.analytics('response.statusCode', `${req.protocol}:/${req.url} - (${res.statusCode})`);
   });
   next();
 }

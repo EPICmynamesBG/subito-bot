@@ -58,7 +58,8 @@ function pluralize(str) {
 
 function camelCaseKeys(collection) {
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && !lodash.isArray(collection) && collection.constructor.name !== 'Date')) {
+    (lodash.isObject(collection) && !lodash.isArray(collection) &&
+      lodash.get(collection, 'constructor.name', null) !== 'Date')) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));
@@ -70,7 +71,8 @@ function camelCaseKeys(collection) {
 
 function snakeCaseKeys(collection) {
   if (lodash.isPlainObject(collection)  ||
-    (lodash.isObject(collection) && !lodash.isArray(collection) && collection.constructor.name !== 'Date')) {
+    (lodash.isObject(collection) && !lodash.isArray(collection) &&
+      lodash.get(collection, 'constructor.name', null) !== 'Date')) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.snakeCase(key), snakeCaseKeys(value)]
     )));
@@ -101,7 +103,6 @@ function handleDatabaseError(err) {
 function processResponse(paramErr, result, response) {
   let err = paramErr;
   if (!err && result) {
-    logger.analytics('request.status.200', camelCaseKeys(result));
     response.status(200).json(camelCaseKeys(result)).end();
   } else {
     err = handleDatabaseError(err);
@@ -110,8 +111,7 @@ function processResponse(paramErr, result, response) {
     if (statusCode === 500 && err && err.code) {
       message = 'Whoops, something unexpected happened...';
     }
-
-    logger.analytics(`request.status.${statusCode}`);
+    logger.analytics('api.error', statusCode, message);
     response.status(statusCode).json({ text: message }).end();
   }
 }
