@@ -58,8 +58,7 @@ function pluralize(str) {
 
 function camelCaseKeys(collection) {
   if (lodash.isPlainObject(collection) ||
-    (lodash.isObject(collection) && !lodash.isArray(collection) &&
-     collection.constructor && collection.constructor.name === 'anonymous')) {
+    (lodash.isObject(collection) && !lodash.isArray(collection))) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.camelCase(key), camelCaseKeys(value)]
     )));
@@ -70,7 +69,8 @@ function camelCaseKeys(collection) {
 }
 
 function snakeCaseKeys(collection) {
-  if (lodash.isPlainObject(collection)) {
+  if (lodash.isPlainObject(collection)  ||
+    (lodash.isObject(collection) && !lodash.isArray(collection))) {
     return lodash.fromPairs(lodash.map(collection, (value, key) => (
       [lodash.snakeCase(key), snakeCaseKeys(value)]
     )));

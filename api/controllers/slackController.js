@@ -13,7 +13,7 @@ const soupCalendarController = require('./soupCalendarController');
 const subscriberController = require('./subscriberController');
 
 function handleSlack(req, res) {
-  const params = req.body;
+  const params = utils.camelCase(req.body);
   authService.validateTeamToken(req.db, params.teamId, params.token, (valid) => {
     if (!valid) {
       logger.warn('Bad auth', params);

@@ -41,7 +41,7 @@
   },
   "scripts": {
     "start": "npm run buildSwagger && node app.js",
-    "test": "NODE_ENV=test npm run buildSwagger && NODE_ENV=test swagger project test | tee out.log && grep -q -E \"[0-9]+ failing\" out.log && exit 1",
+    "test": "NODE_ENV=test npm run buildSwagger && mocha test",
     "buildSwagger": "node scripts/buildSwagger.js",
     "eslint": "node ./node_modules/eslint/bin/eslint.js --ext=.js *",
     "migrate-up:local": "node db-migrations/migrate.js --dir='up' --db='local'",

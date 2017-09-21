@@ -40,6 +40,7 @@ if (env === 'test') {
       level: 'debug',
       levels: CUSTOM_LEVELS.levels,
       filename: logDir + '/test.log',
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: false,
       json: true,
       maxsize: 5242880, // 5MB
@@ -50,6 +51,7 @@ if (env === 'test') {
     new winston.transports.Console({
       level: loggingLevel,
       levels: CUSTOM_LEVELS.levels,
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: false,
       json: false,
       colorize: true,
@@ -63,6 +65,7 @@ if (env === 'test') {
       level: 'debug',
       levels: CUSTOM_LEVELS.levels,
       filename: logDir + '/debug.log',
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: true,
       json: true,
       maxsize: 5242880, // 5MB
@@ -75,6 +78,7 @@ if (env === 'test') {
       level: 'analytics',
       levels: CUSTOM_LEVELS.levels,
       filename: logDir + '/analytics.log',
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: false,
       json: true,
       maxsize: 5242880, // 5MB
@@ -87,6 +91,7 @@ if (env === 'test') {
       filename: logDir + '/error.log',
       level: 'error',
       levels: CUSTOM_LEVELS.levels,
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: true,
       json: true,
       maxsize: 5242880, // 5MB
@@ -97,6 +102,7 @@ if (env === 'test') {
     new winston.transports.Console({
       level: loggingLevel,
       levels: CUSTOM_LEVELS.levels,
+      exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
       handleExceptions: true,
       json: false,
       colorize: true,
