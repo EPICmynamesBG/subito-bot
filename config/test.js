@@ -5,7 +5,7 @@ require('dotenv').config({ silent: true });
 module.exports = {
   NODE_ENV: 'test',
   
-  LOGGING_LEVEL: 'warn',
+  LOGGING_LEVEL: process.env.TEST_LOGGING_LEVEL || 'warn',
   
   USE_SSL: false,
   

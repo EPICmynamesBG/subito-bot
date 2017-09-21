@@ -57,7 +57,7 @@ describe('utils', () => {
       input = 'yesterday';
       expected = moment().subtract(1, 'd').toDate();
       output = utils.dateForText(input);
-      assert(moment(output).isSame(expected), 'should be yesterdays Date');
+      assert(moment(output).isSame(expected, 'd'), 'should be yesterdays Date');
 
       input = '2017-06-03';
       expected = moment(input).toDate();

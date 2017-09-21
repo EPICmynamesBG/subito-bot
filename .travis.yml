@@ -12,7 +12,7 @@ env:
     - DATABASE_NAME=subito_test
     - ENCRYPTION_KEY=test_key_123
     - ADMIN_AUTH_SECRET=helloworld
-    - TEST_CONSOLE_LOGGING=true
+    - TEST_LOGGING_LEVEL=fatal
 addons:
   mysql: "5.7.19"
 before_install:
