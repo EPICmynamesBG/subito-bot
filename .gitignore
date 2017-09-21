@@ -36,3 +36,4 @@ config/runtime.yaml
 pipe/*
 
 .env
+api/swagger/swagger.yaml

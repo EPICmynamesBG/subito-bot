@@ -2,7 +2,7 @@
 
 require('dotenv').config({ silent: true });
 
-module.exports = {
+const config = {  
   DATABASE_HOST: process.env.DATABASE_HOST || 'localhost',
 
   DATABASE_USER: process.env.DATABASE_USER || '',
@@ -10,7 +10,11 @@ module.exports = {
   DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || '',
 
   DATABASE_NAME: process.env.DATABASE_NAME || '',
-
+  
+  PORT: process.env.PORT || 10010,
+  
+  USE_SSL: false,
+  
   TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost',
 
   TEST_DATABASE_USER: process.env.TEST_DATABASE_USER || '',
@@ -38,5 +42,34 @@ module.exports = {
 
   LOGGING_LEVEL: process.env.LOGGING_LEVEL || 'debug',
 
-  LOG_DIR: './logs'
+  LOG_DIR: './logs',
+  
+  SWAGGER: {
+    
+    APP_VERSION: '3.1.2',
+    
+    HOSTNAME: process.env.HOST || 'localhost',
+    
+    PORT: process.env.PORT || 10010,
+    
+    BASEPATH: '/subito',
+    
+    SCHEMAS: ['http']
+    
+  }
+};
+
+if (config.NODE_ENV === 'test') {
+  // eslint-disable-next-line global-require
+  Object.assign(config, require('./test'));
+} else if (config.NODE_ENV === 'production') {
+  // eslint-disable-next-line global-require
+  Object.assign(config, require('./production'));
+  config.USE_SSL = (config.SSL_PORT && config.SSL_PRIV_KEY && config.SSL_CERT);
+  if (config.USE_SSL) {
+    config.SWAGGER.SCHEMAS = ['https'];
+    config.SWAGGER.PORT = config.SSL_PORT;
+  }
 }
+
+module.exports = config;

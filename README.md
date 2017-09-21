@@ -47,7 +47,7 @@ _In Development Commands_
 
 [Localhost Docs](http://localhost:3000/docs)
 
-[Online Docs](http://dev.brandongroff.com:8080/docs)
+[Online Docs](https://dev.brandongroff.com:8443/docs)
 
 ## Cron Schedule
 
@@ -82,7 +82,11 @@ DATABASE_HOST=localhost
 DATABASE_USER=subito
 DATABASE_PASSWORD=[password]
 DATABASE_NAME=subito
+HOST=localhost
 PORT=3000
+SSL_PORT=443
+SSL_PRIV_KEY=[absolute path to key]
+SSL_CERT=[absolute path to cert]
 SLACK_SLASH_TOKEN=[token]
 SLACK_INTEGRATIONS_APIKEY=[apikey]
 SLACK_IMPORTS_APIKEY=[apikey]
@@ -96,6 +100,10 @@ TEST_CONSOLE_LOGGING=true
 LOGGING_LEVEL=debug
 NODE_ENV=development
 ```
+
+### Swagger Building
+
+By design, the `swagger.yaml` file is git-ignored. This is to leverge dynamic variables per environment, as can be seen in `config/[env].js`. While the _buildSwagger_ command is included at the start of a standard run and test, it does not run when `swagger project start` is used to start the server, nor `node app.js`. So be aware when changes are made to index.yaml that `npm run buildSwagger` needs to run or you won't be up to date.
 
 #### Database Changes
 
@@ -113,3 +121,6 @@ Migrations can be ran via `npm run migrate-up:[local | test]`. This command will
 - `mysql -e "GRANT ALL PRIVILEGES ON subito_test . * TO 'test'@'localhost';" -u root -p`
 - `mysql -D subito_test < ddl/ddl.sql -u root -p`
  
+## License
+
+[GNU General Public License v3.0](http://www.gnu.org/licenses/gpl-3.0.txt)
