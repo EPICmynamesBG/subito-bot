@@ -20,14 +20,14 @@ const CUSTOM_LEVELS = {
     silly: 7
   },
   colors: {
-    fatal: 'crimson',
+    fatal: 'white',
     error: 'red',
-    warn: 'orange',
+    warn: 'yellow',
     info: 'green',
     analytics: 'cyan',
-    verbose: 'yellow',
+    verbose: 'gray',
     debug: 'blue',
-    silly: 'pink'
+    silly: 'magenta'
   }
 };
 
@@ -106,12 +106,11 @@ if (env === 'test') {
 }
 
 const logger = new (winston.Logger)({
+  colors: CUSTOM_LEVELS.colors,
   level: loggingLevel,
   levels: CUSTOM_LEVELS.levels,
   transports: transports,
   exitOnError: false
 });
-
-winston.addColors(CUSTOM_LEVELS.colors);
 
 module.exports = logger;
