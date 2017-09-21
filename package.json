@@ -43,9 +43,12 @@
     "supertest": "^1.0.0"
   },
   "scripts": {
-    "start": "npm run buildSwagger && node app.js",
-    "test": "NODE_ENV=test npm run buildSwagger && istanbul test node_modules/mocha/bin/_mocha",
+    "start": "node app.js",
+    "test": "NODE_ENV=test istanbul test node_modules/mocha/bin/_mocha",
     "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "prestart": "npm run buildSwagger",
+    "pretest": "npm run buildSwagger",
+    "precoverage": "npm run buildSwagger",
     "buildSwagger": "node scripts/buildSwagger.js",
     "eslint": "node ./node_modules/eslint/bin/eslint.js --ext=.js *",
     "migrate-up:local": "node db-migrations/migrate.js --dir='up' --db='local'",
