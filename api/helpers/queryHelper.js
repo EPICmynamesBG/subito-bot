@@ -108,6 +108,7 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
     if (results.length > 1) {
       logger.warn('More than 1 result found with Select One query', context);
       callback(new Error('Multiple results found when expecting one'));
+      return;
     }
     callback(null, lodash.toPlainObject(results[0]))
     return;
