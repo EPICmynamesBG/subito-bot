@@ -139,7 +139,7 @@ function _query(db, build, callback) {
   }
   paramArr = paramArr.concat(build.where);
   db.query(build.query, paramArr, (e, res) => {
-    _resultsHandler(e, res, callback, build);
+    module.exports.private.resultsHandler(e, res, callback, build);
   });
 }
 
@@ -150,8 +150,8 @@ function select(db, table, whereParams, callback) {
     whereParams = {};
     /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.SELECT, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.SELECT, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function selectOne(db, table, whereParams, callback) {
@@ -161,8 +161,8 @@ function selectOne(db, table, whereParams, callback) {
     whereParams = {};
     /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.SELECT_ONE, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.SELECT_ONE, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function insert(db, table, values, callback) {
@@ -171,8 +171,8 @@ function insert(db, table, values, callback) {
     values = [values];
     /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.INSERT, values, {});
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.INSERT, values, {});
+  module.exports.private.query(db, build, callback);
 }
 
 function update(db, table, values, whereParams, callback) {
@@ -182,8 +182,8 @@ function update(db, table, values, whereParams, callback) {
     whereParams = {};
   }
   /* eslint-enable no-param-reassign */
-  const build = _queryBuilder(table, QUERY_TYPE.UPDATE, values, whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.UPDATE, values, whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function deleteAction(db, table, whereParams, callback) {
@@ -193,8 +193,8 @@ function deleteAction(db, table, whereParams, callback) {
     whereParams = {};
     /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function deleteOne(db, table, whereParams, callback) {
@@ -204,15 +204,16 @@ function deleteOne(db, table, whereParams, callback) {
     },
     (selected, cb) => {
       // selectOne will throw error if not just one found
-      const build = _queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
-      _query(db, build, cb);
+      const build = module.exports.private.queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
+      module.exports.private.query(db, build, cb);
     }
   ], callback);
 }
 
 function custom(db, query, paramArr, callback) {
   db.query(query, paramArr, (e, res) => {
-    _resultsHandler(e, res, callback, { query: query, customParams: paramArr, queryType: 'CUSTOM' });
+    module.exports.private.resultsHandler(e, res, callback,
+      { query: query, customParams: paramArr, queryType: 'CUSTOM' });
   });
 }
 
@@ -225,5 +226,11 @@ module.exports = {
   update: update,
   delete: deleteAction,
   deleteOne: deleteOne,
-  custom: custom
+  custom: custom,
+  private: {
+    queryBuilder: _queryBuilder,
+    QUERY_TYPE: QUERY_TYPE,
+    query: _query,
+    resultsHandler: _resultsHandler
+  }
 }
