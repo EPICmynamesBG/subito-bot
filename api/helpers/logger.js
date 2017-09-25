@@ -61,8 +61,8 @@ if (env === 'test') {
 } else {
   transports = [
     new winston.transports.File({
-      name: 'file#debug',
-      level: 'debug',
+      name: 'file#silly',
+      level: 'silly',
       levels: CUSTOM_LEVELS.levels,
       filename: logDir + '/debug.log',
       exceptionsLevel: CUSTOM_LEVELS.levels.fatal,
