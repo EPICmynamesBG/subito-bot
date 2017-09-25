@@ -260,4 +260,166 @@ describe('queryHelper', () => {
       });
     });
   });
+
+  describe('update', () => {
+    it('should perform a single column update on one row', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const newSoup = 'Test Soup Update';
+      
+      queryHelper.update(testHelper.db, 'soup_calendar', { soup: newSoup }, { id: 1001 }, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('changedRows', 1);
+        res.should.have.property('text', '1 soup_calendars UPDATED');
+        res.should.have.property('affectedRows', 1);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.UPDATE,
+          { soup: newSoup },
+          { id: 1001 })
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'UPDATE `soup_calendar` SET `soup` = ? WHERE `id` = ?',
+          queryType: queryHelper.private.QUERY_TYPE.UPDATE,
+          values: [newSoup],
+          where: [1001]
+        });
+        done();
+      });
+    });
+
+    it('should perform a multi column update', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const newSoup = 'Test Soup Update';
+      const day = moment().add(3, 'd').format('YYYY-MM-DD');
+      
+      queryHelper.update(testHelper.db, 'soup_calendar', { day: day, soup: newSoup }, { id: 1001 }, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('changedRows', 1);
+        res.should.have.property('text', '1 soup_calendars UPDATED');
+        res.should.have.property('affectedRows', 1);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.UPDATE,
+          { day: day, soup: newSoup },
+          { id: 1001 })
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'UPDATE `soup_calendar` SET `day` = ?, `soup` = ? WHERE `id` = ?',
+          queryType: queryHelper.private.QUERY_TYPE.UPDATE,
+          values: [day, newSoup],
+          where: [1001]
+        });
+        done();
+      });
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a row', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      
+      queryHelper.delete(testHelper.db, 'soup_calendar', { id: 1001 }, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('text', '1 soup_calendars DELETED');
+        res.should.have.property('affectedRows', 1);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.DELETE,
+          [],
+          { id: 1001 })
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'DELETE FROM `soup_calendar` WHERE `id` = ?',
+          queryType: queryHelper.private.QUERY_TYPE.DELETE,
+          values: [],
+          where: [1001]
+        });
+        done();
+      });
+    });
+
+    it('should delete multiple rows', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const day = moment().add(-1, 'd').format('YYYY-MM-DD');
+      
+      queryHelper.delete(testHelper.db, 'soup_calendar', { day: day }, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('text', '2 soup_calendars DELETED');
+        res.should.have.property('affectedRows', 2);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.DELETE,
+          [],
+          { day: day })
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'DELETE FROM `soup_calendar` WHERE `day` = ?',
+          queryType: queryHelper.private.QUERY_TYPE.DELETE,
+          values: [],
+          where: [day]
+        });
+        done();
+      });
+    });
+  });
+
+  describe('deleteOne', () => {
+    before(testHelper.resetData);
+    it('should delete a row', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      
+      queryHelper.deleteOne(testHelper.db, 'soup_calendar', { id: 1003 }, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('text', '1 soup_calendars DELETED');
+        res.should.have.property('affectedRows', 1);
+        assert(queryBuilderSpy.calledTwice);
+        assert(querySpy.calledTwice);
+        assert(resultsHandlerSpy.calledTwice);
+        done();
+      });
+    });
+
+    it('should error when multiple rows will be deleted', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const day = moment().add(-1, 'd').format('YYYY-MM-DD');
+      
+      queryHelper.deleteOne(testHelper.db, 'soup_calendar', { day: day }, (err, res) => {
+        should.exist(err);
+        assert.equal(err.message, 'Multiple results found when expecting one');
+        should.not.exist(res);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+        done();
+      });
+    });
+  });
 });
