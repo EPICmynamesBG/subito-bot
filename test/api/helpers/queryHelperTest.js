@@ -184,4 +184,80 @@ describe('queryHelper', () => {
       });
     });
   });
+
+  describe('insert', () => {
+    it('should perform a single insert', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const day = moment().add(7, 'd').format('YYYY-MM-DD');
+      const newSoup = {
+        day: day,
+        soup: 'Test Soup'
+      };
+      
+      queryHelper.insert(testHelper.db, 'soup_calendar', newSoup, (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('insertId');
+        res.should.have.property('text', '1 soup_calendars INSERTED');
+        res.should.have.property('affectedRows', 1);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.INSERT,
+          [newSoup],
+          {})
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'INSERT INTO `soup_calendar` (`day`, `soup`) VALUES ?',
+          queryType: queryHelper.private.QUERY_TYPE.INSERT,
+          values: [[newSoup.day, newSoup.soup]],
+          where: []
+        });
+        done();
+      });
+    });
+
+    it('should perform a multiple insert', (done) => {
+      queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
+      querySpy = sinon.spy(queryHelper.private, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+      const day = moment().add(8, 'd').format('YYYY-MM-DD');
+      const newSoup1 = {
+        day: day,
+        soup: 'Test Soup 1'
+      };
+      const newSoup2 = {
+        day: day,
+        soup: 'Test Soup 2'
+      };
+      
+      queryHelper.insert(testHelper.db, 'soup_calendar', [newSoup1, newSoup2], (err, res) => {
+        should.not.exist(err);
+        res.should.have.property('insertId');
+        res.should.have.property('text', '2 soup_calendars INSERTED');
+        res.should.have.property('affectedRows', 2);
+        assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+
+        assert(queryBuilderSpy.calledWith('soup_calendar',
+          queryHelper.private.QUERY_TYPE.INSERT,
+          [newSoup1, newSoup2],
+          {})
+        );
+        assert.deepEqual(querySpy.args[0][1], {
+          table: 'soup_calendar',
+          query: 'INSERT INTO `soup_calendar` (`day`, `soup`) VALUES ?',
+          queryType: queryHelper.private.QUERY_TYPE.INSERT,
+          values: [[newSoup1.day, newSoup1.soup], [newSoup2.day, newSoup2.soup]],
+          where: []
+        });
+        done();
+      });
+    });
+  });
 });
