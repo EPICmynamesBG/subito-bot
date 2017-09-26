@@ -10,7 +10,7 @@ const validAuth = 'Bearer HelloWorld';
 const invalidAuth = 'Bearer Goodbye';
 const url = '/subito/integrations';
 
-describe('slackController', () => {
+describe('teamIntegrationsController', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
 
