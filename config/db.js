@@ -10,20 +10,12 @@ const dbConfig = {
   host: config.DATABASE_HOST,
   user: config.DATABASE_USER,
   password: config.DATABASE_PASSWORD,
-  database: config.DATABASE_NAME
-};
-
-const testConfig = {
-  connectionLimit: 15,
-  host: config.TEST_DATABASE_HOST,
-  user: config.TEST_DATABASE_USER,
-  password: config.TEST_DATABASE_PASSWORD,
-  database: config.TEST_DATABASE_NAME,
-  multipleStatements: true
+  database: config.DATABASE_NAME,
+  multipleStatements: config.NODE_ENV === 'test'
 };
 
 function DB() {
-  this.pool = mysql.createPool(config.NODE_ENV === 'test' ? testConfig : dbConfig);
+  this.pool = mysql.createPool(dbConfig);
 
   const onEnd = function (options, err) {
     this.pool.end((poolErr) => {

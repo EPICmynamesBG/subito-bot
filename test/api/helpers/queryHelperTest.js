@@ -19,6 +19,19 @@ describe('queryHelper', () => {
     resultsHandlerSpy ? resultsHandlerSpy.restore() : null;
   });
   after(testHelper.clearData);
+
+  it('shouldn\'t crash on DB error', (done) => {
+    sinon.stub(testHelper.db, 'query').yields('Some DB Error');
+    resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+
+    queryHelper.select(testHelper.db, 'soup_calendar', (err, res) => {
+      assert.notEqual(err, null);
+      assert.equal(res, null);
+      testHelper.db.query.restore();
+      done();
+    });
+  });
+
   describe('select', () => {
     it('should perform a basic select', (done) => {
       queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
@@ -416,6 +429,21 @@ describe('queryHelper', () => {
         assert.equal(err.message, 'Multiple results found when expecting one');
         should.not.exist(res);
         assert(queryBuilderSpy.calledOnce);
+        assert(querySpy.calledOnce);
+        assert(resultsHandlerSpy.calledOnce);
+        done();
+      });
+    });
+  });
+
+  describe('custom', () => {
+    it('should directly execute the query with params', (done) => {
+      querySpy = sinon.spy(testHelper.db, 'query');
+      resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
+
+      queryHelper.custom(testHelper.db, 'SELECT * FROM `soup_calendar` WHERE `id` = ?', [1001], (err, res) => {
+        should.not.exist(err);
+        assert(Array.isArray(res) || res === null, 'response should be an array or null');
         assert(querySpy.calledOnce);
         assert(resultsHandlerSpy.calledOnce);
         done();
