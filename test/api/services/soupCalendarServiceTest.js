@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const should = require('should');
 const moment = require('moment');
 
 const testHelper = require('../../helper/testHelper');
@@ -17,9 +16,11 @@ describe('soupCalendarService', () => {
         assert.equal(err, null);
         assert(Array.isArray(res));
         assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {
           assert(result.soup.toLowerCase().includes(searchStr));
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -29,9 +30,11 @@ describe('soupCalendarService', () => {
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
         assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {
           assert(result.soup.toLowerCase().includes(searchStr.toLowerCase()));
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -42,16 +45,18 @@ describe('soupCalendarService', () => {
         assert.equal(err, null);
         assert(res.length > 1, 'should have results');
         let last = null;
+        /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {
           if (last === null) {
             last = result;
           } else {
             assert(moment(last.day).isBefore(moment(result.day), 'd') ||
                   moment(last.day).isSame(moment(result.day), 'd'),
-                  `${result.day} is not equal or before ${last.day}`);
+            `${result.day} is not equal or before ${last.day}`);
             last = result;
           }
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -61,10 +66,12 @@ describe('soupCalendarService', () => {
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
         assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {
           assert(moment(result.day).isAfter(moment(), 'd') ||
                   moment(result.day).isSame(moment(), 'd'), `${result.day} is not equal or after today`);
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -74,9 +81,11 @@ describe('soupCalendarService', () => {
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
         assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {
           assert(result.soup.toLowerCase().includes(searchStr.trim()));
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });

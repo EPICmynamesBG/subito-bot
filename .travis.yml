@@ -10,6 +10,9 @@ env:
     - DATABASE_HOST=localhost
     - DATABASE_USER=root
     - DATABASE_NAME=subito_test
+    - ENCRYPTION_KEY=test_key_123
+    - ADMIN_AUTH_SECRET=helloworld
+    - TEST_LOGGING_LEVEL=fatal
 addons:
   mysql: "5.7.19"
 before_install:
@@ -22,5 +25,6 @@ before_script:
   - npm run migrate-up:local
   - npm run migrate-up:test
 script:
-  - ./node_modules/.bin/eslint-changes
+  - npm run eslint
+  - npm run coverage
   - npm run test

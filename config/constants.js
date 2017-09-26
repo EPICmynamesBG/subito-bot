@@ -25,7 +25,9 @@ module.exports = {
       params: {
         user: {
           id: null,
-          username: null
+          username: null,
+          teamId: null,
+          teamDomain: null
         }
       }
     })

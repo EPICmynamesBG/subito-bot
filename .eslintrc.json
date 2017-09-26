@@ -26,5 +26,5 @@
     "browser": true,
     "mocha": true
   },
-  "extends": ["eslint:recommended", "airbnb"]
+  "extends": ["eslint:recommended"]
 }

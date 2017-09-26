@@ -10,19 +10,12 @@ const dbConfig = {
   host: config.DATABASE_HOST,
   user: config.DATABASE_USER,
   password: config.DATABASE_PASSWORD,
-  database: config.DATABASE_NAME
-};
-
-const testConfig = {
-  connectionLimit: 15,
-  host: config.TEST_DATABASE_HOST,
-  user: config.TEST_DATABASE_USER,
-  password: config.TEST_DATABASE_PASSWORD,
-  database: config.TEST_DATABASE_NAME
+  database: config.DATABASE_NAME,
+  multipleStatements: config.NODE_ENV === 'test'
 };
 
 function DB() {
-  this.pool = mysql.createPool(config.NODE_ENV === 'test' ? testConfig : dbConfig);
+  this.pool = mysql.createPool(dbConfig);
 
   const onEnd = function (options, err) {
     this.pool.end((poolErr) => {
@@ -49,23 +42,23 @@ function DB() {
   process.on('uncaughtException', onEnd.bind(this, {
     exit: true
   }));
-//
-//  this.pool.on('acquire', (connection) => {
-//    logger.debug('Connection %d acquired', connection.threadId);
-//  });
-//
-//  this.pool.on('connection', (connection) => {
-//    logger.debug('Connection %d acquired', connection.threadId);
-//  });
-//
-//  this.pool.on('enqueue', () => {
-//    logger.debug('Pool Enqueue: Waiting for available connection slot');
-//  });
-//
-//  this.pool.on('release', (connection) => {
-//    logger.debug('Connection %d released', connection.threadId);
-//  });
-};
+
+  this.pool.on('acquire', (connection) => {
+    logger.silly('Connection %d acquired', connection.threadId);
+  });
+
+  this.pool.on('connection', (connection) => {
+    logger.silly('Connection %d acquired', connection.threadId);
+  });
+
+  this.pool.on('enqueue', () => {
+    logger.silly('Pool Enqueue: Waiting for available connection slot');
+  });
+
+  this.pool.on('release', (connection) => {
+    logger.silly('Connection %d released', connection.threadId);
+  });
+}
 
 DB.prototype.query = function (query, paramArr, callback) {
   let dbConnection;

@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const moment = require('moment');
+const sinon = require('sinon');
+const crypto = require('crypto-js');
 const utils = require('../../../api/helpers/utils');
 
 describe('utils', () => {
@@ -55,7 +57,7 @@ describe('utils', () => {
       input = 'yesterday';
       expected = moment().subtract(1, 'd').toDate();
       output = utils.dateForText(input);
-      assert(moment(output).isSame(expected), 'should be yesterdays Date');
+      assert(moment(output).isSame(expected, 'd'), 'should be yesterdays Date');
 
       input = '2017-06-03';
       expected = moment(input).toDate();
@@ -129,6 +131,98 @@ describe('utils', () => {
         hello_world_2: 'c'
       }];
       assert.deepEqual(utils.snakeCase(input), expected);
+    });
+  });
+
+  describe('encrypt', () => {
+    it('should encrypt anything into a string', () => {
+      let input = 'ABC123';
+      let output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+
+      input = 12000;
+      output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+
+      input = { a: 'test', b: 3 };
+      output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+
+      input = ['test', { a: 1 }, 22 ];
+      output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+
+      input = null;
+      output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+
+      input = undefined;
+      output = utils.encrypt(input);
+      assert.notEqual(input, output);
+      assert(typeof output === 'string');
+    });
+
+    it('should return null on an error', () => {
+      sinon.stub(crypto.AES, 'encrypt').throws(new Error('Some error'));
+      const input = 'ABC123';
+      const output = utils.encrypt(input);
+      assert.equal(output, null);
+      crypto.AES.encrypt.restore();
+    });
+  });
+
+  describe('decrypt', () => {
+    it('should decrypt anything', () => {
+      let input = 'ABC123';
+      let encrypted = utils.encrypt(input);
+      let output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal(input, output);
+
+      input = 12000;
+      encrypted = utils.encrypt(input);
+      output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal(input.toString(), output);
+
+      input = { a: 'test', b: 3 };
+      encrypted = utils.encrypt(input);
+      output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal(JSON.stringify(input), output);
+
+      input = ['test', { a: 1 }, 22 ];
+      encrypted = utils.encrypt(input);
+      output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal(JSON.stringify(input), output);
+
+
+      input = null;
+      encrypted = utils.encrypt(input);
+      output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal(JSON.stringify(input), output);
+
+      input = undefined;
+      encrypted = utils.encrypt(input);
+      output = utils.decrypt(encrypted);
+      assert(typeof output === 'string');
+      assert.equal('', output);
+    });
+
+    it('should return null on an error', () => {
+      sinon.stub(crypto.AES, 'decrypt').throws(new Error('Some error'));
+      const input = 'ABC123';
+      const encrypted = utils.encrypt(input);
+      const output = utils.decrypt(encrypted);
+      assert.equal(output, null);
+      crypto.AES.decrypt.restore();
     });
   });
 });

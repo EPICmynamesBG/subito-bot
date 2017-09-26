@@ -2,13 +2,7 @@
 
 const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
-const lodash = require('lodash');
-const request = require('request');
-const moment = require('moment');
-const async = require('async');
 const testHelper = require('../../helper/testHelper');
-const utils = require('../../../api/helpers/utils');
 const subscriberService = require('../../../api/services/subscriberService');
 
 describe('subscriberService', () => {
@@ -18,7 +12,8 @@ describe('subscriberService', () => {
     it('should return the created subscriber', (done) => {
       const user = {
         slackUserId: 'ABCXYZ123',
-        slackUsername: 'bobby'
+        slackUsername: 'bobby',
+        slackTeamId: 'ABCDEF123'
       };
       subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
         should.not.exist(err);
@@ -33,7 +28,8 @@ describe('subscriberService', () => {
     it('should respond user already subscribed', (done) => {
       const user = {
         slackUserId: 'ABCXYZ123',
-        slackUsername: 'bobby'
+        slackUsername: 'bobby',
+        slackTeamId: 'ABCDEF123'
       };
       subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
         should.not.exist(err);
@@ -48,11 +44,30 @@ describe('subscriberService', () => {
       subscriberService.getSubscribers(testHelper.db, (err, subscribers) => {
         should.not.exist(err);
         assert(subscribers.length > 0, 'should have subscribers');
+        /* eslint-disable max-nested-callbacks */
         subscribers.forEach((subscriber) => {
           subscriber.should.have.property('id');
           subscriber.should.have.property('slack_user_id');
           subscriber.should.have.property('slack_username');
+          subscriber.should.have.property('slack_team_id');
         });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+  });
+
+  describe('getSubscribersForTeam', () => {
+    const testId = 'ABCDEF123';
+    it('should return all subscribers on a slack team', (done) => {
+      subscriberService.getSubscribersForTeam(testHelper.db, testId, (err, subscribers) => {
+        should.not.exist(err);
+        assert(subscribers.length > 0, 'should have subscribers');
+        /* eslint-disable max-nested-callbacks */
+        subscribers.forEach((subscriber) => {
+          subscriber.should.have.property('slack_team_id', testId);
+        });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -63,7 +78,8 @@ describe('subscriberService', () => {
       const expected = {
         id: 1001,
         slack_user_id: 'ABC_123',
-        slack_username: 'benjamin'
+        slack_username: 'benjamin',
+        slack_team_id: 'ABCDEF123'
       };
       subscriberService.getSubscriberById(testHelper.db, expected.id, (err, subscriber) => {
         should.not.exist(err);
@@ -78,7 +94,8 @@ describe('subscriberService', () => {
       const expected = {
         id: 1001,
         slack_user_id: 'ABC_123',
-        slack_username: 'benjamin'
+        slack_username: 'benjamin',
+        slack_team_id: 'ABCDEF123'
       };
       subscriberService.getSubscriberBySlackUserId(testHelper.db, expected.slack_user_id, (err, subscriber) => {
         should.not.exist(err);
@@ -93,7 +110,8 @@ describe('subscriberService', () => {
       const expected = {
         id: 1001,
         slack_user_id: 'ABC_123',
-        slack_username: 'benjamin'
+        slack_username: 'benjamin',
+        slack_team_id: 'ABCDEF123'
       };
       subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, (err, subscriber) => {
         should.not.exist(err);
@@ -108,7 +126,8 @@ describe('subscriberService', () => {
       const subscriber = {
         id: 1001,
         slack_user_id: 'ABC_123',
-        slack_username: 'benjamin'
+        slack_username: 'benjamin',
+        slack_team_id: 'ABCDEF123'
       };
       subscriberService.deleteSubscriberById(testHelper.db, subscriber.id, (err, subscriber) => {
         should.not.exist(err);

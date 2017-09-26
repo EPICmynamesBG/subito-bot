@@ -1,8 +1,9 @@
 'use strict';
 
+const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
-const lodash = require('lodash');
+const ADMIN_AUTH_SECRET = require('../../config/config').ADMIN_AUTH_SECRET;
 
 function bindDb(app, db) {
   return function (req, res, next) {
@@ -13,11 +14,12 @@ function bindDb(app, db) {
 }
 
 function logging(req, res, next) {
-  logger.debug(`${req.protocol}:/${req.url}`, req.body);
+  logger.analytics(`${req.protocol}:/${req.url}`, req.body);
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    logger.debug('request.duration', `${req.protocol}:/${req.url} - ${duration}ms`);
+    logger.analytics('request.duration', `${req.protocol}:/${req.url} - ${duration}ms`);
+    logger.analytics('response.statusCode', `${req.protocol}:/${req.url} - (${res.statusCode})`);
   });
   next();
 }
@@ -25,10 +27,34 @@ function logging(req, res, next) {
 function camelCaseBody(req, res, next) {
   req.body = utils.camelCase(req.body);
   next();
-};
+}
+
+function adminAuth(req, res, next) {
+  const authRequired = Object.keys(req.swagger.params).includes('authorization');
+  if (!authRequired) {
+    next();
+    return;
+  }
+  const authRegex = /Bearer\s(.*)/ig;
+  const auth = req.swagger.params.authorization.value;
+  if (!auth) {
+    utils.processResponse(new errors.HttpStatusError(401, 'Missing Authorization'), null, res);
+    return;
+  }
+  const token = authRegex.exec(auth)[1];
+  if (!token) {
+    utils.processResponse(new errors.HttpStatusError(401, 'Missing Authorization'), null, res);
+    return;
+  } else if (token !== ADMIN_AUTH_SECRET) {
+    utils.processResponse(new errors.HttpStatusError(403, 'Invalid Authorization'), null, res);
+    return;
+  }
+  next();
+}
 
 module.exports = {
   bindDb: bindDb,
   logging: logging,
-  camelCaseBody: camelCaseBody
+  camelCaseBody: camelCaseBody,
+  adminAuth: adminAuth
 };

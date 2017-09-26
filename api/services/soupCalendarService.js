@@ -1,10 +1,6 @@
 'use strict';
 
-const async = require('async');
-const mysql = require('mysql');
 const moment = require('moment');
-const logger = require('../helpers/logger');
-const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
 function _parseRow(row) {
@@ -24,7 +20,7 @@ function searchForSoup(db, searchStr, callback) {
   }
   const queryStr = `SELECT * FROM soup_calendar
     WHERE LOWER(\`soup\`) LIKE LOWER(?)
-	AND \`day\` >= DATE(now())
+	   AND \`day\` >= DATE(now())
     ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`;
   queryHelper.custom(db, queryStr, [`%${searchStr.trim()}%`, searchStr.trim()], (err, rows) => {
     callback(err, Array.isArray(rows) ? rows.map(_parseRow) : []);

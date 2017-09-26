@@ -5,7 +5,7 @@ require('dotenv').config({ silent: true });
 module.exports = {
   NODE_ENV: 'test',
   
-  LOGGING_LEVEL: 'fatal',
+  LOGGING_LEVEL: process.env.TEST_LOGGING_LEVEL || 'warn',
   
   USE_SSL: false,
   
@@ -16,6 +16,8 @@ module.exports = {
   DATABASE_PASSWORD: process.env.TEST_DATABASE_PASSWORD,
   
   DATABASE_NAME: process.env.TEST_DATABASE_NAME,
+  
+  ADMIN_AUTH_SECRET: 'HelloWorld',
   
   SWAGGER: {
     

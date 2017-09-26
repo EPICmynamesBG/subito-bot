@@ -6,9 +6,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const SwaggerExpress = require('swagger-express-mw');
 const express = require('express');
+const swaggerUi = require('swagger-tools/middleware/swagger-ui');
+const swaggerMetadata = require('swagger-tools/middleware/swagger-metadata');
 const config = require('./config/config');
-const logger = require('./api/helpers/logger');
 const middleware = require('./api/middleware/middleware');
+const logger = require('./api/helpers/logger');
 
 if (config.NODE_ENV === 'development' ||
    config.NODE_ENV === 'test') {
@@ -42,8 +44,9 @@ if (config.USE_SSL) {
 SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
   if (err) { throw err; }
 
-  const swaggerUi = require('swagger-tools/middleware/swagger-ui');
+  app.use(swaggerMetadata(swaggerExpress.runner.swagger))
   app.use(swaggerUi(swaggerExpress.runner.swagger));
+  app.use(middleware.adminAuth);
   // install middleware
   swaggerExpress.register(app);
 

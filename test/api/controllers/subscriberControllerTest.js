@@ -2,10 +2,7 @@
 
 const should = require('should');
 const request = require('supertest');
-const errors = require('common-errors');
-const moment = require('moment');
 const server = require('../../../app');
-const sinon = require('sinon');
 const testHelper = require('../../helper/testHelper');
 
 const subscriberService = require('../../../api/services/subscriberService');
@@ -13,10 +10,11 @@ const subscriberService = require('../../../api/services/subscriberService');
 describe('subscriberController', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
-  
+
   const testUser = {
     slackUserId: '123456789',
-    slackUsername: 'test_user'
+    slackUsername: 'test_user',
+    slackTeamId: 'ABCDEF123'
   };
   describe('POST /subito/subscribe', () => {
     it('should add a subscriber', (done) => {
@@ -32,6 +30,7 @@ describe('subscriberController', () => {
           should.not.exist(err);
           res.body.should.have.property('slackUserId', '123456789');
           res.body.should.have.property('slackUsername', 'test_user');
+          res.body.should.have.property('slackTeamId', 'ABCDEF123');
           res.body.should.have.property('text', "You're subscribed! :tada:");
           done();
         });

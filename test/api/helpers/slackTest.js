@@ -1,11 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-const moment = require('moment');
 const lodash = require('lodash');
 const slack = require('../../../api/helpers/slack');
 
@@ -18,7 +13,9 @@ describe('slack helper', () => {
         let input = {
           text: 'August 23, 2017',
           userId: 'ABC123',
-          userName: 'bobbyboy'
+          userName: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'testteam'
         };
         let output = slack.utils.parseRequestCommand(input);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -26,7 +23,9 @@ describe('slack helper', () => {
         expected.params.day = 'August 23, 2017';
         expected.params.user = {
           id: 'ABC123',
-          username: 'bobbyboy'
+          username: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'testteam'
         };
         assert.deepEqual(output, expected);
 
@@ -34,7 +33,9 @@ describe('slack helper', () => {
         output = slack.utils.parseRequestCommand(input);
         expected.params.user = {
           id: null,
-          username: null
+          username: null,
+          teamId: null,
+          teamDomain: null
         };
         assert.deepEqual(output, expected);
       });
@@ -83,14 +84,38 @@ describe('slack helper', () => {
         let input = {
           text: 'subscribe',
           user_id: 'ABC123',
-          user_name: 'bobbyboy'
+          user_name: 'bobbyboy',
+          team_id: '123XYZ',
+          team_domain: 'test'
         };
         const output = slack.utils.parseRequestCommand(input);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
         expected.command = 'subscribe';
         expected.params.user = {
           id: 'ABC123',
-          username: 'bobbyboy'
+          username: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'test'
+        };
+        assert.deepEqual(output, expected);
+      });
+
+      it('should support "unsubscribe" command', () => {
+        let input = {
+          text: 'unsubscribe',
+          user_id: 'ABC123',
+          user_name: 'bobbyboy',
+          team_id: '123XYZ',
+          team_domain: 'test'
+        };
+        const output = slack.utils.parseRequestCommand(input);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'unsubscribe';
+        expected.params.user = {
+          id: 'ABC123',
+          username: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'test'
         };
         assert.deepEqual(output, expected);
       });

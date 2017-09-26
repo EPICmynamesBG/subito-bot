@@ -1,11 +1,7 @@
 'use strict';
 
-const lodash = require('lodash');
 const errors = require('common-errors');
-const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
-const moment = require('moment');
-const config = require('../../config/config');
 const subscriberService = require('../services/subscriberService');
 
 function subscribe(req, res) {
@@ -28,7 +24,7 @@ function unsubscribe(req, res) {
     }
     utils.processResponse(err, { text: results.text }, res);
   };
-  
+
   if (params.id) {
     subscriberService.deleteSubscriberById(req.db, params.id, handleResponse);
   } else if (params.slackUserId) {

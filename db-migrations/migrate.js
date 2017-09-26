@@ -7,9 +7,6 @@ require('dotenv').config({
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
-const lodash = require('lodash');
-const mysql = require('mysql');
-const moment = require('moment');
 const config = require('../config/config');
 const logger = require('../api/helpers/logger');
 
@@ -17,7 +14,7 @@ let db;
 
 function processCliArgs() {
   const params = {};
-  const regx = /\-\-(.*)=(.*)/;
+  const regx = /--(.*)=(.*)/;
   process.argv.forEach((arg) => {
     const matches = regx.exec(arg);
     if (matches) {
@@ -28,7 +25,7 @@ function processCliArgs() {
 }
 
 function processMigrationsFolder(callback) {
-  const idNameMapRegex = /(\d*)\-(.*)\-(?:(up|down))\.sql/;
+  const idNameMapRegex = /(\d*)-(.*)-(?:(up|down))\.sql/;
   fs.readdir(path.join('./db-migrations/sql'), 'utf8', (err, files) => {
     if (err) {
       callback(err);
@@ -75,6 +72,7 @@ function determineChanges(migrationList, migrateDirection, callback) {
 
 function query(db, queryStr, callback) {
   if (typeof callback !== 'function') {
+    // eslint-disable-next-line no-param-reassign
     callback = (err) => {
       logger.error('Callback is not a function!', err);
     };
@@ -86,7 +84,7 @@ function query(db, queryStr, callback) {
   }, (err) => {
     callback(err);
   });
-};
+}
 
 function migrateUp() {
   const insertQry = 'INSERT INTO migrations (id, name) VALUES (?, ?)';
@@ -105,18 +103,18 @@ function migrateUp() {
           async.waterfall([
             (cb3) => {
               fs.readFile(path.join(`./db-migrations/sql/${migration.filename}`), 'utf8', cb3);
-          },
+            },
             (fileQuery, cb3) => {
               query(db, fileQuery, cb3);
-          },
+            },
             (cb3) => {
               db.query(insertQry, [migration.id, migration.name], cb3);
-          }
-        ], cb2);
+            }
+          ], cb2);
         }
       }, cb);
     }
-  }, (err, res) => {
+  }, (err) => {
     if (err) {
       logger.error(err);
       return process.exit(1);
@@ -150,13 +148,13 @@ function migrateDown() {
       async.waterfall([
         (cb2) => {
           fs.readFile(path.join(`./db-migrations/sql/${lastMigration.filename}`), 'utf8', cb2);
-          },
+        },
         (fileQuery, cb2) => {
           query(db, fileQuery, cb2);
-          },
+        },
         (cb2) => {
           db.query(deleteQry, [lastMigration.id], cb2);
-      }], (err) => {
+        }], (err) => {
         cb(err, lastMigration);
       });
     }

@@ -2,13 +2,8 @@
 
 const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
-const fs = require('fs');
-const path = require('path');
 const lodash = require('lodash');
-const request = require('request');
 const moment = require('moment');
-const async = require('async');
 const testHelper = require('../../helper/testHelper');
 const utils = require('../../../api/helpers/utils');
 const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');
@@ -21,12 +16,14 @@ describe('soupCalendarViewService', () => {
       soupCalendarViewService.getAllSoups(testHelper.db, (err, soupsCals) => {
         should.not.exist(err);
         assert(soupsCals.length > 0, 'there should be soups');
+        /* eslint-disable max-nested-callbacks */
         soupsCals.forEach((soupCal) => {
           soupCal.should.have.property('text');
           soupCal.should.have.property('soups');
           soupCal.should.have.property('soupsStr');
           soupCal.should.have.property('day');
         });
+        /* eslint-enable max-nested-callbacks */
         done();
       });
     });
@@ -65,7 +62,6 @@ describe('soupCalendarViewService', () => {
         'Turkey Bean Soup', 'Black Bean (gf)', 'Italian Wedding (gf)',
         'Local Corn Chowder'];
       let generateDays = lodash.random(1, 20);
-      const expectedUpdateCount = generateDays * 2;
       let expectedStartDate;
       let expectedEndDate;
       for (var i = 0; i < generateDays; i++) {

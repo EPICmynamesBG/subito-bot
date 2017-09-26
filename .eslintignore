@@ -1,7 +1,8 @@
-node_modules/*
-*.rmd
+*.md
+*.md
 *.json
 *.yaml
-Procfile
+*.log
+node_modules/*
 coverage/
 bower_components/*

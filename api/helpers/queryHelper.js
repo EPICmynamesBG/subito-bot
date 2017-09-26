@@ -13,30 +13,36 @@ const QUERY_TYPE = {
   DELETE: 'DELETE'
 };
 
-function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
-  if (!valuesParam) valuesParam = [];
+// eslint-disable-next-line complexity
+function _queryBuilder(table, queryType, valuesParam, whereParams = {}) {
+  /* eslint-disable no-param-reassign */
+  if (!valuesParam && queryType !== QUERY_TYPE.UPDATE) valuesParam = [];
+  else if (!valuesParam && queryType === QUERY_TYPE.UPDATE) valuesParam = {};
   if (!whereParams) whereParams = {};
+  /* eslint-enable no-param-reassign */
 
   let query;
   switch (queryType) {
-    case QUERY_TYPE.INSERT:
-      query = `INSERT INTO \`${table}\``;
-      break;
-    case QUERY_TYPE.UPDATE:
-      query = `UPDATE \`${table}\``;
-      break;
-    case QUERY_TYPE.DELETE:
-      query = `DELETE FROM \`${table}\``;
-      break;
-    default:
-      query = `SELECT * FROM \`${table}\``;
+  case QUERY_TYPE.INSERT:
+    query = `INSERT INTO \`${table}\``;
+    break;
+  case QUERY_TYPE.UPDATE:
+    query = `UPDATE \`${table}\``;
+    break;
+  case QUERY_TYPE.DELETE:
+    query = `DELETE FROM \`${table}\``;
+    break;
+  default:
+    query = `SELECT * FROM \`${table}\``;
   }
 
   let values = [];
   const where = [];
   const whereKeys = Object.keys(whereParams);
   let valuesKeys = [];
-  if (valuesParam.length > 0) {
+  if (queryType === QUERY_TYPE.UPDATE) {
+    valuesKeys = Object.keys(valuesParam);
+  } else if (valuesParam.length > 0) {
     valuesKeys = Object.keys(valuesParam[0]);
   }
 
@@ -49,19 +55,25 @@ function _queryBuilder(table, queryType, valuesParam = [], whereParams = {}) {
       query = query.slice(0, -2);
       query = query.concat(') VALUES ?');
     } else if (queryType === QUERY_TYPE.UPDATE) {
-      query.concat(' SET ');
+      query = query.concat(' SET ');
       valuesKeys.forEach((key) => {
         query = query.concat(`\`${key}\` = ?, `);
       });
       query = query.slice(0, -2);
     }
-    values = valuesParam.map((entry) => {
-      let temp = new Array(valuesKeys.length);
+    if (queryType === QUERY_TYPE.UPDATE) {
       valuesKeys.forEach((key, index) => {
-        temp[index] = entry[key];
+        values[index] = valuesParam[key];
       });
-      return temp;
-    });
+    } else {
+      values = valuesParam.map((entry) => {
+        let temp = new Array(valuesKeys.length);
+        valuesKeys.forEach((key, index) => {
+          temp[index] = entry[key];
+        });
+        return temp;
+      });
+    }
   }
   if (whereKeys.length > 0) {
     query = query.concat(' WHERE ');
@@ -94,15 +106,21 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
   }
   if (context && context.queryType === QUERY_TYPE.SELECT_ONE) {
     if (results.length > 1) {
-      logger.warn('More than 1 result found with Select One query', context); 
+      logger.warn('More than 1 result found with Select One query', context);
       callback(new Error('Multiple results found when expecting one'));
+      return;
     }
     callback(null, lodash.toPlainObject(results[0]))
     return;
   } else if (context && (context.queryType === QUERY_TYPE.INSERT ||
                         context.queryType === QUERY_TYPE.UPDATE ||
                         context.queryType === QUERY_TYPE.DELETE)) {
-    const response = { text: `${results.affectedRows} ${utils.pluralize(context.table)} ${context.queryType.concat('D')}` };
+    const pastTenseAction = context.queryType.slice(-1) === 'E' ?
+      context.queryType.concat('D') :
+      context.queryType.concat('ED');
+    const response = {
+      text: `${results.affectedRows} ${utils.pluralize(context.table)} ${pastTenseAction}`
+    };
     callback(null, Object.assign(response, results));
     return;
   }
@@ -115,60 +133,69 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
 
 function _query(db, build, callback) {
   let paramArr = [];
-  if (build.values.length > 0) {
+  if (build.values.length > 0 && build.queryType !== QUERY_TYPE.UPDATE) {
     paramArr = [build.values];
+  } else if (build.queryType === QUERY_TYPE.UPDATE) {
+    paramArr = build.values;
   }
   paramArr = paramArr.concat(build.where);
   db.query(build.query, paramArr, (e, res) => {
-    _resultsHandler(e, res, callback, build);
+    module.exports.private.resultsHandler(e, res, callback, build);
   });
 }
 
 function select(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.SELECT, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.SELECT, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function selectOne(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.SELECT_ONE, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.SELECT_ONE, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function insert(db, table, values, callback) {
   if (typeof values === 'object' && !Array.isArray(values)) {
+    /* eslint-disable no-param-reassign */
     values = [values];
+    /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.INSERT, values, {});
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.INSERT, values, {});
+  module.exports.private.query(db, build, callback);
 }
 
 function update(db, table, values, whereParams, callback) {
-  if (typeof values === 'object') {
-    values = [values];
-  }
+  /* eslint-disable no-param-reassign */
   if (typeof whereParams === 'function') {
     callback = whereParams;
     whereParams = {};
   }
-  const build = _queryBuilder(table, QUERY_TYPE.UPDATE, values, whereParams);
-  _query(db, build, callback);
+  /* eslint-enable no-param-reassign */
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.UPDATE, values, whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function deleteAction(db, table, whereParams, callback) {
   if (typeof whereParams === 'function') {
+    /* eslint-disable no-param-reassign */
     callback = whereParams;
     whereParams = {};
+    /* eslint-enable no-param-reassign */
   }
-  const build = _queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
-  _query(db, build, callback);
+  const build = module.exports.private.queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
+  module.exports.private.query(db, build, callback);
 }
 
 function deleteOne(db, table, whereParams, callback) {
@@ -178,15 +205,16 @@ function deleteOne(db, table, whereParams, callback) {
     },
     (selected, cb) => {
       // selectOne will throw error if not just one found
-      const build = _queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
-      _query(db, build, cb);
+      const build = module.exports.private.queryBuilder(table, QUERY_TYPE.DELETE, [], whereParams);
+      module.exports.private.query(db, build, cb);
     }
   ], callback);
 }
 
 function custom(db, query, paramArr, callback) {
   db.query(query, paramArr, (e, res) => {
-    _resultsHandler(e, res, callback, { query: query, customParams: paramArr, queryType: 'CUSTOM' });
+    module.exports.private.resultsHandler(e, res, callback,
+      { query: query, customParams: paramArr, queryType: 'CUSTOM' });
   });
 }
 
@@ -199,5 +227,11 @@ module.exports = {
   update: update,
   delete: deleteAction,
   deleteOne: deleteOne,
-  custom: custom
+  custom: custom,
+  private: {
+    queryBuilder: _queryBuilder,
+    QUERY_TYPE: QUERY_TYPE,
+    query: _query,
+    resultsHandler: _resultsHandler
+  }
 }

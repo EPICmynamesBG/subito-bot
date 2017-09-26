@@ -35,6 +35,7 @@ function messageUser(user, message, callback) {
 
 function sendError(message, callback) {
   if (typeof callback !== 'function') {
+    // eslint-disable-next-line no-param-reassign
     callback = (err) => {
       if (err) logger.error(err);
     };
@@ -61,7 +62,9 @@ function parseRequestCommand(params) {
     template.params.day = null;
     template.params.user = {
       id: lodash.get(snakeParams, 'user_id', null),
-      username: lodash.get(snakeParams, 'user_name', null)
+      username: lodash.get(snakeParams, 'user_name', null),
+      teamId: lodash.get(snakeParams, 'team_id', null),
+      teamDomain: lodash.get(snakeParams, 'team_domain', null)
     };
     return template;
   }
@@ -84,7 +87,9 @@ function parseRequestCommand(params) {
   }
   template.params.user = {
     id: lodash.get(snakeParams, 'user_id', null),
-    username: lodash.get(snakeParams, 'user_name', null)
+    username: lodash.get(snakeParams, 'user_name', null),
+    teamId: lodash.get(snakeParams, 'team_id', null),
+    teamDomain: lodash.get(snakeParams, 'team_domain', null)
   };
   return template;
 }
