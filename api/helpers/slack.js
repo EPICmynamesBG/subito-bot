@@ -10,14 +10,15 @@ const SLACK_CONSTS = require('../../config/constants').SLACK_CONSTS;
 
 const slack = new Slack();
 
-slack.setWebhook(config.SLACK_WEBHOOK_URL);
+//slack.setWebhook(config.SLACK_WEBHOOK_URL);
 
 const WEBHOOK_OPTS = {
   username: config.SLACK_WEBHOOK_USERNAME || "Subito-Suboto",
   icon_emoji: config.SLACK_WEBHOOK_ICON || ":stew:"
 };
 
-function messageChannel(channel, message, callback) {
+function messageChannel(channel, message, webhookUrl, callback) {
+  slack.setWebhook(webhookUrl);
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
     channel: '#'.concat(channel),
     text: message
@@ -25,7 +26,8 @@ function messageChannel(channel, message, callback) {
   slack.webhook(hookSend, callback);
 }
 
-function messageUser(user, message, callback) {
+function messageUser(user, message, webhookUrl, callback) {
+  slack.setWebhook(webhookUrl);
   const hookSend = Object.assign({}, WEBHOOK_OPTS, {
     channel: '@'.concat(user),
     text: message

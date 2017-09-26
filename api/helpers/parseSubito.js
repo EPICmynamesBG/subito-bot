@@ -8,7 +8,6 @@ const lodash = require('lodash');
 const moment = require('moment');
 const utils = require('./utils');
 const logger = require('./logger');
-const slack = require('./slack');
 
 const subitoUrl = 'http://www.subitosoups.com';
 const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
@@ -103,7 +102,7 @@ function _soupStrToArray(rawStr) {
     soupsArr = soupStr.split('\n');
   }
   if (soupsArr.length !== 2) {
-    slack.utils.sendError(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
+    logger.error(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
   }
   return soupsArr;
 }
@@ -142,7 +141,7 @@ function fetchCalendar(callback) {
     }
   }, (err, res) => {
     if (err) {
-      slack.utils.sendError(JSON.stringify(err));
+      logger.error(err);
     }
     callback(err, res.filterPlucked);
   });

@@ -152,17 +152,15 @@ paths:
           schema:
             required:
               - slackUserId
+              - slackUsername
+              - slackTeamId
             properties:
               slackUserId:
                 type: string
               slackUsername:
                 type: string
               slackTeamId:
-                type: [string, "null"]
-                default: "null"
-              slackTeamDomain:
-                type: [string, "null"]
-                default: "null"
+                type: string
       responses:
         "200":
           description: Success
