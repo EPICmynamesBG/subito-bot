@@ -103,7 +103,7 @@ function _soupStrToArray(rawStr) {
     soupsArr = soupStr.split('\n');
   }
   if (soupsArr.length !== 2) {
-    slack.utils.sendError(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
+    logger.error(`parseSubito:: Split failed. Potentially incorrect parsing - ${JSON.stringify(soupStr)}`);
   }
   return soupsArr;
 }
@@ -142,7 +142,7 @@ function fetchCalendar(callback) {
     }
   }, (err, res) => {
     if (err) {
-      slack.utils.sendError(JSON.stringify(err));
+      logger.error(err);
     }
     callback(err, res.filterPlucked);
   });
