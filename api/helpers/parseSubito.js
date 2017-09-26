@@ -8,7 +8,6 @@ const lodash = require('lodash');
 const moment = require('moment');
 const utils = require('./utils');
 const logger = require('./logger');
-const slack = require('./slack');
 
 const subitoUrl = 'http://www.subitosoups.com';
 const subitoSoupsUrl = subitoUrl.concat('/soup-calendar');
