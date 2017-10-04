@@ -1,8 +1,6 @@
 'use strict';
 
-const async = require('async');
 const moment = require('moment');
-const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
@@ -36,53 +34,7 @@ function getSoupsForDay(db, day, callback) {
     });
 }
 
-function massUpdate(db, soupDays, callback) {
-  let updatedCount = 0;
-  let updatedRange = { start: null, end: null };
-  async.each(soupDays, (soupDay, eachCb) => {
-    let day = moment(soupDay.date).format('YYYY/MM/DD');
-    if (updatedRange.start === null || moment(updatedRange.start) > moment(soupDay.date)) {
-      updatedRange.start = moment(soupDay.date);
-    }
-    if (updatedRange.end === null || moment(updatedRange.end) < moment(soupDay.date)) {
-      updatedRange.end = moment(soupDay.date);
-    }
-    const insertArr = soupDay.soups.map((soup) => {
-      return {
-        day: day,
-        soup: soup
-      };
-    });
-    async.autoInject({
-      deleteAction: (cb) => {
-        queryHelper.delete(db, 'soup_calendar', { day: day }, cb);
-      },
-      insert: (deleteAction, cb) => {
-        queryHelper.insert(db, 'soup_calendar', insertArr, cb);
-      }
-    }, (autoErr, autoRes) => {
-      if (autoErr) {
-        eachCb(autoErr);
-        return;
-      }
-      updatedCount += parseInt(autoRes.insert.affectedRows || 0);
-      eachCb(autoErr, autoRes);
-    });
-  }, (err) => {
-    if (err) {
-      logger.error(err);
-    }
-    callback(err, {
-      rows: updatedCount,
-      startDate: updatedRange.start.format('YYYY/MM/DD'),
-      endDate: updatedRange.end.format('YYYY/MM/DD')
-    });
-  });
-}
-
-
 module.exports = {
   getAllSoups: getAllSoups,
-  getSoupsForDay: getSoupsForDay,
-  massUpdate: massUpdate
+  getSoupsForDay: getSoupsForDay
 }

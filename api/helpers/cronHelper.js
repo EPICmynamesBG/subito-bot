@@ -7,6 +7,7 @@ const logger = require('./logger');
 const parseSubito = require('./parseSubito');
 const utils = require('./utils');
 const slack = require('./slack');
+const soupCalendarService = require('../services/soupCalendarService');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const subscriberService = require('../services/subscriberService');
 const teamIntegrationService = require('../services/teamIntegrationService');
@@ -20,7 +21,7 @@ const importCalendar = (db) => {
         if (typeof cb === 'function') cb(err);
         return;
       }
-      soupCalendarViewService.massUpdate(db, data, (err2, updated) => {
+      soupCalendarService.massUpdate(db, data, (err2, updated) => {
         logger.info('importCalendar complete:: ', updated);
         if (typeof cb === 'function') cb(err2, updated);
       });
@@ -62,11 +63,11 @@ const processSubscribers = (db) => {
       }
     ], (err) => {
       if (err && err.clean) {
-        logger.info('processSubscribers complete: no soups for today:: ', moment().format());
+        logger.info('processSubscribers complete', 'no soups for today');
       } else if (err) {
         logger.error(err); // should never occur
       } else {
-        logger.info('processSubscribers complete:: ', moment().format());
+        logger.info('processSubscribers complete');
       }
       if (typeof cb === 'function') cb(err);
     });
