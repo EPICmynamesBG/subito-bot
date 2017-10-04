@@ -13,7 +13,11 @@ const logger = require('../../../api/helpers/logger');
 const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');
 
 const testSubscribers = require('../../data/Subscribers.json');
+const testIntegrations = require('../../data/TeamIntegrations.json');
 const testHtml = fs.readFileSync(path.join(__dirname, '../../data') + '/test-calendar.html', 'utf-8');
+
+const subscriberNames = testSubscribers.map(sub => sub.slack_username);
+const integrationWebhooks = testIntegrations.map(integration => integration.slack_webhook_url);
 
 describe('cronHelper', () => {
   before(testHelper.resetData);
@@ -46,6 +50,15 @@ describe('cronHelper', () => {
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
         assert.equal(slackSpy.getCalls().length, testSubscribers.length);
+        
+        /* eslint-disable max-nested-callbacks */
+        slackSpy.getCalls().forEach((call) => {
+          const name = call.args[0];
+          const webhookUrl = call.args[1];
+          assert(subscriberNames.includes(name));
+          assert(integrationWebhooks.includes(webhookUrl));
+        });
+        /* eslint-enable max-nested-callbacks */
 
         slackSpy.restore();
         soupCalSpy.restore();
