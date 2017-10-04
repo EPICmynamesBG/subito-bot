@@ -30,7 +30,7 @@ function unsubscribe(req, res) {
   } else if (params.slackUserId) {
     subscriberService.deleteSubscriberBySlackUserId(req.db, params.slackUserId, handleResponse);
   } else if (params.slackUsername) {
-    subscriberService.deleteSubscriberBySlackUsername(req.db, params.slackUsername, handleResponse);
+    subscriberService.deleteSubscriberBySlackUsername(req.db, params.slackUsername, params.slackTeamId, handleResponse);
   } else {
     const msg = 'Missing one of required: id, slackUserId, slackUsername';
     utils.processResponse(new errors.HttpStatusError(400, msg), null, res);

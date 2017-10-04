@@ -113,11 +113,12 @@ describe('subscriberService', () => {
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123'
       };
-      subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, (err, subscriber) => {
-        should.not.exist(err);
-        assert.deepEqual(subscriber, expected);
-        done();
-      });
+      subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, expected.slack_team_id,
+        (err, subscriber) => {
+          should.not.exist(err);
+          assert.deepEqual(subscriber, expected);
+          done();
+        });
     });
   });
 

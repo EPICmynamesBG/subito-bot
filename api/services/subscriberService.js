@@ -45,8 +45,8 @@ function getSubscriberBySlackUserId(db, slackId, callback) {
   queryHelper.selectOne(db, 'subscribers', { slack_user_id: slackId }, callback);
 }
 
-function getSubscriberBySlackUsername(db, slackName, callback) {
-  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName }, callback);
+function getSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
+  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId }, callback);
 }
 
 function deleteSubscriberById(db, id, callback) {
@@ -57,8 +57,8 @@ function deleteSubscriberBySlackUserId(db, slackId, callback) {
   queryHelper.deleteOne(db, 'subscribers', { slack_user_id: slackId }, callback);
 }
 
-function deleteSubscriberBySlackUsername(db, slackName, callback) {
-  queryHelper.deleteOne(db, 'subscribers', { slack_username: slackName }, callback);
+function deleteSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
+  queryHelper.deleteOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId }, callback);
 }
 
 module.exports = {
