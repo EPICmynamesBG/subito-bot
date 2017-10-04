@@ -10,8 +10,6 @@ const slack = require('./slack');
 const soupCalendarService = require('../services/soupCalendarService');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const integrationSubscriberViewService = require('../services/integrationSubscriberViewService');
-//const subscriberService = require('../services/subscriberService');
-//const teamIntegrationService = require('../services/teamIntegrationService');
 
 const importCalendar = (db) => {
   return (cb) => {
