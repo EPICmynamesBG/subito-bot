@@ -45,7 +45,7 @@ const processSubscribers = (db) => {
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
-          slack.messageUser(subscriber.slack_username, subscriber.slack_webhook_url, (err, res) => {
+          slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
             if (err || res.status === 'fail') logger.error(subscriber, err, res);
             eachCb();
           });

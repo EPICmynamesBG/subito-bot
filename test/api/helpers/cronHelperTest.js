@@ -54,8 +54,10 @@ describe('cronHelper', () => {
         /* eslint-disable max-nested-callbacks */
         slackSpy.getCalls().forEach((call) => {
           const name = call.args[0];
-          const webhookUrl = call.args[1];
+          const message = call.args[1];
+          const webhookUrl = call.args[2];
           assert(subscriberNames.includes(name));
+          assert(typeof message === 'string');
           assert(integrationWebhooks.includes(webhookUrl));
         });
         /* eslint-enable max-nested-callbacks */
