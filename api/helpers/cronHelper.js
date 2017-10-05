@@ -53,8 +53,11 @@ const processSubscribers = (db) => {
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
-          module.exports.private.processSubscriber(subscriber, soups, eachCb);
-        }, cb); 
+          slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
+            if (err || res.status === 'fail') logger.error(subscriber, err, res);
+            eachCb();
+          });
+        }, cb);
       }
     }, (err) => {
       if (err && err.clean) {
