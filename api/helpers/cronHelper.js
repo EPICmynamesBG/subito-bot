@@ -28,11 +28,44 @@ const importCalendar = (db) => {
   };
 };
 
-const _processSubscriber = (subscriber, soups, callback) => {
+const _buildCustomText = (searchStr, soups) => {
+  return `Today's the day! _${searchStr}_ is on the menu! Here are the soups: \n>${soups[0]}\n>${soups[1]}`;
+};
+
+const _processSubscriber = (db, subscriber, soups, callback) => {
   if (subscriber.search_term) {
-    
+    async.autoInject({
+      searchResults: (cb) => {
+        soupCalendarService.searchForSoupOnDay(db, subscriber.search_term, moment().toDate(), cb);
+      },
+      soupCalResults: (searchResults, cb) => {
+        if (searchResults.length > 0) {
+          soupCalendarViewService.getSoupsForDay(db, moment().toDate(), cb);
+        } else {
+          cb(new Error(`no soups for "${subscriber.search_term}" found today`));
+        }
+      },
+      message: (soupCalResults, cb) => {
+        if (soupCalResults) {
+          const message = _buildCustomText(subscriber.search_term, soupCalResults.soups);
+          slack.messageUser(subscriber.slack_username, message, subscriber.slack_webhook_url, (err, res) => {
+            if (err) callback(err);
+            else if (res.status === 'fail') callback(res);
+            else callback(null, res);
+          });
+        } else {
+          cb(null, null);
+        }
+      }
+    }, (err) => {
+      if (err) logger.error('_processSubscriber', subscriber, err);
+      callback();
+    });
   } else {
-    slack.messageUser(subscriber.slack_username, soups, subscriber.slack_webhook_url, )
+    slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
+      if (err || res.status === 'fail') logger.error('_processSubscriber', subscriber, err, res);
+      callback();
+    });
   }
 }
 
@@ -53,10 +86,7 @@ const processSubscribers = (db) => {
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
-          slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
-            if (err || res.status === 'fail') logger.error(subscriber, err, res);
-            eachCb();
-          });
+          module.exports.private.processSubscriber(db, subscriber, soups, eachCb);
         }, cb);
       }
     }, (err) => {
@@ -76,6 +106,7 @@ module.exports = {
   importCalendar: importCalendar,
   processSubscribers: processSubscribers,
   private: {
-    processSubscriber: _processSubscriber
+    processSubscriber: _processSubscriber,
+    buildCustomTest: _buildCustomText
   }
 };
