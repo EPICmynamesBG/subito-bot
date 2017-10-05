@@ -28,6 +28,14 @@ const importCalendar = (db) => {
   };
 };
 
+const _processSubscriber = (subscriber, soups, callback) => {
+  if (subscriber.search_term) {
+    
+  } else {
+    slack.messageUser(subscriber.slack_username, soups, subscriber.slack_webhook_url, )
+  }
+}
+
 const processSubscribers = (db) => {
   return (callback) => {
     logger.info('Running processSubscribers:: ', moment().toDate());
@@ -45,11 +53,8 @@ const processSubscribers = (db) => {
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
-          slack.messageUser(subscriber.slack_username, subscriber.slack_webhook_url, (err, res) => {
-            if (err || res.status === 'fail') logger.error(subscriber, err, res);
-            eachCb();
-          });
-        }, cb);
+          module.exports.private.processSubscriber(subscriber, soups, eachCb);
+        }, cb); 
       }
     }, (err) => {
       if (err && err.clean) {
@@ -66,5 +71,8 @@ const processSubscribers = (db) => {
 
 module.exports = {
   importCalendar: importCalendar,
-  processSubscribers: processSubscribers
+  processSubscribers: processSubscribers,
+  private: {
+    processSubscriber: _processSubscriber
+  }
 };
