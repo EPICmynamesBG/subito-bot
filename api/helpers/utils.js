@@ -34,7 +34,7 @@ function dateForText(text) {
   } else if (text.toLowerCase() === 'yesterday') {
     date = moment().subtract(1, 'd');
   } else {
-    date = moment(text).isValid() ? moment(text) : moment();
+    date = moment(new Date(text)).isValid() ? moment(text) : moment();
   }
   return date.toDate();
 }

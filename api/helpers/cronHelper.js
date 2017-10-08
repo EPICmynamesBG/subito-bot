@@ -36,18 +36,16 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
   if (subscriber.search_term) {
     async.autoInject({
       searchResults: (cb) => {
-        soupCalendarService.searchForSoupOnDay(db, subscriber.search_term, moment().toDate(), cb);
+        soupCalendarService.searchForSoupOnDay(db, subscriber.search_term, utils.dateForText('today'),
+          (err, searchResults) => {
+            if (err) cb(err);
+            else if (searchResults.length > 0) cb(null, soups);
+            else cb(new Error(`no soups for "${subscriber.search_term}" found today`));
+          });
       },
-      soupCalResults: (searchResults, cb) => {
-        if (searchResults.length > 0) {
-          soupCalendarViewService.getSoupsForDay(db, moment().toDate(), cb);
-        } else {
-          cb(new Error(`no soups for "${subscriber.search_term}" found today`));
-        }
-      },
-      message: (soupCalResults, cb) => {
-        if (soupCalResults) {
-          const message = _buildCustomText(subscriber.search_term, soupCalResults.soups);
+      message: (searchResults, cb) => {
+        if (searchResults) {
+          const message = _buildCustomText(subscriber.search_term, searchResults.soups);
           slack.messageUser(subscriber.slack_username, message, subscriber.slack_webhook_url, (err, res) => {
             if (err) callback(err);
             else if (res.status === 'fail') callback(res);

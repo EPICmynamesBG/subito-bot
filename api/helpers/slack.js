@@ -85,16 +85,19 @@ function _parseRequestParams(command, givenParams) {
   const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
 
   if (supportedParams.length === 1) {
-    paramObj[supportedParams[0]] = givenParams.join(' ');
+    let value = givenParams.join(' ');
+    if (typeof value === 'string' && value.length === 0) value = null;
+    paramObj[supportedParams[0]] = value;
   } else {
     if (supportedParams.length !== givenParams.length) {
       logger.warn('Slack param mapping likely to fail. ', supportedParams, givenParams);
     }
     supportedParams.forEach((param, index) => {
-      paramObj[param] = givenParams[index];
+      let value = givenParams[index];
+      if (typeof value === 'string' && value.length === 0) value = null;
+      paramObj[param] = value;
     });
   }
-
   return paramObj;
 }
 
