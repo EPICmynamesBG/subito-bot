@@ -208,6 +208,29 @@ describe('slackController', () => {
         });
     });
 
+    it('should forward "subscribe" to /subito/subscribe with search string', (done) => {
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: validAuth.token,
+          text: 'subscribe corn',
+          user_id: 'ABCD123',
+          user_name: 'testuser2',
+          team_id: validAuth.team_id
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.slackUserId, 'ABCD123');
+          assert.equal(res.body.slackUsername, 'testuser2');
+          assert.equal(res.body.text, 'You\'re subscribed to _corn_! :tada:');
+          done();
+        });
+    });
+
     it('should forward "unsubscribe" to /subito/unsubscribe', (done) => {
       request(server)
         .post(url)

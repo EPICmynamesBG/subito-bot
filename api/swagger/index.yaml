@@ -161,6 +161,8 @@ paths:
                 type: string
               slackTeamId:
                 type: string
+              searchTerm:
+                type: string
       responses:
         "200":
           description: Success
