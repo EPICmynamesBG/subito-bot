@@ -32,4 +32,5 @@ async.autoInject({
 }, (err) => {
   if (err) logger.error(err);
   else logger.info('Test Complete');
+  process.exit(0);
 });
