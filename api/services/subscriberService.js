@@ -10,7 +10,23 @@ function addSubscriber(db, user, callback) {
     slack_username: lodash.get(user, 'slackUsername', null),
     slack_team_id: lodash.get(user, 'slackTeamId', null)
   };
+  const searchTerm = lodash.get(user, 'searchTerm', null);
+  if (searchTerm) {
+    mappedUser.search_term = searchTerm;
+  }
   async.waterfall([
+    (cb) => {
+      module.exports.getSubscriberBySlackUserId(db, mappedUser.slack_user_id, (err, sub) => {
+        if (err) {
+          cb(err);
+          return;
+        } else if (sub) {
+          cb({ code: 'ER_DUP_ENTRY' }, sub);
+          return;
+        }
+        cb();
+      });
+    },
     (cb) => {
       queryHelper.insert(db, 'subscribers', mappedUser, cb);
     },
@@ -24,7 +40,10 @@ function addSubscriber(db, user, callback) {
     } else if (err) {
       return callback(err);
     }
-    const success = { text: "You're subscribed! :tada:" };
+    let success = { text: "You're subscribed! :tada:" };
+    if (searchTerm) {
+      success = { text: `You're subscribed to _${searchTerm}_! :tada:` };
+    }
     callback(err, Object.assign({}, subscriber, success));
   });
 }
