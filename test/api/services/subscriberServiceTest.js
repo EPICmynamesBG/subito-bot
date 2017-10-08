@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const should = require('should');
+const async = require('async');
 const testHelper = require('../../helper/testHelper');
 const subscriberService = require('../../../api/services/subscriberService');
 
@@ -9,6 +10,7 @@ describe('subscriberService', () => {
   before(testHelper.resetData);
   after(testHelper.clearData);
   describe('addSubscriber', () => {
+    beforeEach(testHelper.resetData);
     it('should return the created subscriber', (done) => {
       const user = {
         slackUserId: 'ABCXYZ123',
@@ -20,7 +22,26 @@ describe('subscriberService', () => {
         subscriber.should.have.property('id');
         subscriber.should.have.property('slack_user_id', user.slackUserId);
         subscriber.should.have.property('slack_username', user.slackUsername);
+        subscriber.should.have.property('search_term', null);
         subscriber.should.have.property('text', "You're subscribed! :tada:");
+        done();
+      });
+    });
+
+    it('should create a subscriber with a search term', (done) => {
+      const user = {
+        slackUserId: 'ABCXYZ123',
+        slackUsername: 'bobby',
+        slackTeamId: 'ABCDEF123',
+        searchTerm: 'corn'
+      };
+      subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
+        should.not.exist(err);
+        subscriber.should.have.property('id');
+        subscriber.should.have.property('slack_user_id', user.slackUserId);
+        subscriber.should.have.property('slack_username', user.slackUsername);
+        subscriber.should.have.property('search_term', user.searchTerm);
+        subscriber.should.have.property('text', `You're subscribed to _${user.searchTerm}_! :tada:`);
         done();
       });
     });
@@ -31,9 +52,16 @@ describe('subscriberService', () => {
         slackUsername: 'bobby',
         slackTeamId: 'ABCDEF123'
       };
-      subscriberService.addSubscriber(testHelper.db, user, (err, subscriber) => {
+      async.autoInject({
+        before: (cb) => {
+          subscriberService.addSubscriber(testHelper.db, user, cb);
+        },
+        subscriber: (before, cb) => {
+          subscriberService.addSubscriber(testHelper.db, user, cb);
+        }
+      }, (err, res) => {
         should.not.exist(err);
-        subscriber.should.have.property('text', "You're already subscribed :+1:");
+        res.subscriber.should.have.property('text', "You're already subscribed :+1:");
         done();
       });
     });
@@ -79,7 +107,8 @@ describe('subscriberService', () => {
         id: 1001,
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
-        slack_team_id: 'ABCDEF123'
+        slack_team_id: 'ABCDEF123',
+        search_term: null
       };
       subscriberService.getSubscriberById(testHelper.db, expected.id, (err, subscriber) => {
         should.not.exist(err);
@@ -95,7 +124,8 @@ describe('subscriberService', () => {
         id: 1001,
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
-        slack_team_id: 'ABCDEF123'
+        slack_team_id: 'ABCDEF123',
+        search_term: null
       };
       subscriberService.getSubscriberBySlackUserId(testHelper.db, expected.slack_user_id, (err, subscriber) => {
         should.not.exist(err);
@@ -111,7 +141,8 @@ describe('subscriberService', () => {
         id: 1001,
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
-        slack_team_id: 'ABCDEF123'
+        slack_team_id: 'ABCDEF123',
+        search_term: null
       };
       subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, expected.slack_team_id,
         (err, subscriber) => {
@@ -128,7 +159,8 @@ describe('subscriberService', () => {
         id: 1001,
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
-        slack_team_id: 'ABCDEF123'
+        slack_team_id: 'ABCDEF123',
+        search_term: null
       };
       subscriberService.deleteSubscriberById(testHelper.db, subscriber.id, (err, subscriber) => {
         should.not.exist(err);

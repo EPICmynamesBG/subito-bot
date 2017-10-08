@@ -29,6 +29,21 @@ function searchForSoup(db, searchStr, callback) {
   });
 }
 
+function searchForSoupOnDay(db, searchStr, day, callback) {
+  if (!searchStr || searchStr.trim() === '') {
+    process.nextTick(callback, null, []);
+    return;
+  }
+  const queryStr = `SELECT * FROM soup_calendar
+    WHERE LOWER(\`soup\`) LIKE LOWER(?)
+	   AND \`day\` = DATE(?)
+    ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`;
+  const formattedDate = moment(day).format('YYYY/MM/DD');
+  queryHelper.custom(db, queryStr, [`%${searchStr.trim()}%`, formattedDate, searchStr.trim()], (err, rows) => {
+    callback(err, Array.isArray(rows) ? rows.map(_parseRow) : []);
+  });
+}
+
 function massUpdate(db, soupDays, callback) {
   let updatedCount = 0;
   let updatedRange = { start: null, end: null };
@@ -75,5 +90,6 @@ function massUpdate(db, soupDays, callback) {
 
 module.exports = {
   searchForSoup: searchForSoup,
+  searchForSoupOnDay: searchForSoupOnDay,
   massUpdate: massUpdate
 };

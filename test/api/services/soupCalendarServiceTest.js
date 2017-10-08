@@ -102,6 +102,75 @@ describe('soupCalendarService', () => {
     });
   });
 
+  describe('searchForSoupOnDay', () => {
+    it('should search for a string', (done) => {
+      const searchStr = 'corn';
+      soupCalendarService.searchForSoupOnDay(testHelper.db, searchStr, moment().toDate(), (err, res) => {
+        assert.equal(err, null);
+        assert(Array.isArray(res));
+        assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr));
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+
+    it('should ignore case', (done) => {
+      const searchStr = 'CORN';
+      soupCalendarService.searchForSoupOnDay(testHelper.db, searchStr, moment().toDate(), (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr.toLowerCase()));
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+
+    it('should only return results for the given day', (done) => {
+      const searchStr = 'corn';
+      soupCalendarService.searchForSoupOnDay(testHelper.db, searchStr, moment().toDate(), (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
+        res.forEach((result) => {
+          assert(moment(result.day).isAfter(moment(), 'd') ||
+                  moment(result.day).isSame(moment(), 'd'), `${result.day} is not equal or after today`);
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+
+    it('should trim spaces', (done) => {
+      const searchStr = ' corn ';
+      soupCalendarService.searchForSoupOnDay(testHelper.db, searchStr, moment().toDate(), (err, res) => {
+        assert.equal(err, null);
+        assert(res.length > 0, 'should have results');
+        /* eslint-disable max-nested-callbacks */
+        res.forEach((result) => {
+          assert(result.soup.toLowerCase().includes(searchStr.trim()));
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+
+    it('should return empty array on null searchStr', (done) => {
+      const searchStr = null;
+      soupCalendarService.searchForSoupOnDay(testHelper.db, searchStr, moment().toDate(), (err, res) => {
+        assert.equal(err, null);
+        assert.equal(res.length, 0, 'should not have results');
+        done();
+      });
+    });
+  });
+
   describe('massUpdate', () => {
     it('should get soup calendar entry for day', (done) => {
       const updates = [];

@@ -28,6 +28,7 @@ describe('integrationSubscriberViewService', () => {
           assert.notEqual(entry.slack_slash_token, 'helloworld');
           entry.should.have.property('slack_webhook_url');
           assert(!testIntegrationWebhookUrls.includes(entry.slack_webhook_url));
+          entry.should.have.property('search_term');
         });
         /* eslint-enable max-nested-callbacks */
         done();
@@ -49,6 +50,7 @@ describe('integrationSubscriberViewService', () => {
           assert.equal(entry.slack_slash_token, 'helloworld');
           entry.should.have.property('slack_webhook_url');
           assert(testIntegrationWebhookUrls.includes(entry.slack_webhook_url));
+          entry.should.have.property('search_term');
         });
         /* eslint-enable max-nested-callbacks */
         done();

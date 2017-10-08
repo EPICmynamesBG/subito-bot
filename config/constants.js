@@ -9,14 +9,14 @@ module.exports = {
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       search: '[soup name/type (example: gouda | gf)]',
-      subscribe: '',
+      subscribe: '[search (example: corn)]',
       unsubscribe: ''
     },
 
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
       search: ['search'],
-      subscribe: [],
+      subscribe: ['search'],
       unsubscribe: []
     }),
 

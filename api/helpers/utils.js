@@ -15,13 +15,10 @@ function trimChar(str, char) {
 
 function textForDate(date) {
   let dayText = moment(date).format('dddd, MMM D');
-  if (moment(date).isSame(moment(), 'day')) {
-    dayText = 'today';
-  } else if (moment(date).isSame(moment().add(1, 'days'), 'day')) {
-    dayText = 'tomorrow';
-  } else if (moment(date).isSame(moment().subtract(1, 'days'), 'day')) {
-    dayText = 'yesterday';
-  }
+  if (moment(date).isSame(moment(), 'day')) dayText = 'today';
+  else if (moment(date).isSame(moment().add(1, 'days'), 'day')) dayText = 'tomorrow';
+  else if (moment(date).isSame(moment().subtract(1, 'days'), 'day')) dayText = 'yesterday';
+
   return dayText;
 }
 
@@ -29,13 +26,9 @@ function dateForText(text) {
   if (!text || typeof (text) !== 'string') return moment().toDate();
 
   let date;
-  if (text.toLowerCase() === 'tomorrow') {
-    date = moment().add(1, 'd');
-  } else if (text.toLowerCase() === 'yesterday') {
-    date = moment().subtract(1, 'd');
-  } else {
-    date = moment(text).isValid() ? moment(text) : moment();
-  }
+  if (text.toLowerCase() === 'tomorrow') date = moment().add(1, 'd');
+  else if (text.toLowerCase() === 'yesterday') date = moment().subtract(1, 'd');
+  else date = moment(text).isValid() ? moment(text) : moment();
   return date.toDate();
 }
 
@@ -50,9 +43,7 @@ function getSwaggerParams(req) {
 
 function pluralize(str) {
   const lastChar = str.charAt(str.length - 1);
-  if (lastChar.toLowerCase() === 's') {
-    return str;
-  }
+  if (lastChar.toLowerCase() === 's') return str;
   return str.concat('s');
 }
 
@@ -84,18 +75,13 @@ function snakeCaseKeys(collection) {
 
 function handleDatabaseError(err) {
   let httpError = null;
-  if (!err) {
-    return httpError;
-  } else if (lodash.includes(['1054', '1171', '1263', 'ER_BAD_FIELD_ERROR'], err.code)) {
-    // mysql error codes https://www.briandunning.com/error-codes/?source=MySQL
+  // mysql error codes https://www.briandunning.com/error-codes/?source=MySQL
+  if (!err) return httpError;
+  else if (lodash.includes(['1054', '1171', '1263', 'ER_BAD_FIELD_ERROR'], err.code))
     httpError = new errors.HttpStatusError(400, err.message);
-  } else if (err.name === 'HttpStatusError') {
-    httpError = err;
-  } else if (err.statusCode && err.message) {
-    httpError = new errors.HttpStatusError(err.statusCode, err.message);
-  } else {
-    httpError = err;
-  }
+  else if (err.name === 'HttpStatusError') httpError = err;
+  else if (err.statusCode && err.message) httpError = new errors.HttpStatusError(err.statusCode, err.message);
+  else httpError = err;
 
   return httpError;
 }
@@ -134,9 +120,7 @@ function textCleaner(str) {
 
 function encrypt(thing) {
   let clone = lodash.cloneDeep(thing);
-  if (typeof thing !== 'string') {
-    clone = JSON.stringify(clone);
-  }
+  if (typeof thing !== 'string') clone = JSON.stringify(clone);
   try {
     const result = crypto.AES.encrypt(clone, ENCRYPTION_KEY).toString();
     return result;

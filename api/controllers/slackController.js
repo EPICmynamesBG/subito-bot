@@ -28,6 +28,7 @@ function handleSlack(req, res) {
       lodash.set(req, 'body.slackUserId', action.params.user.id);
       lodash.set(req, 'body.slackUsername', action.params.user.username);
       lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
+      lodash.set(req, 'body.searchTerm', action.params.search);
       subscriberController.subscribe(req, res);
       break;
     case 'unsubscribe':

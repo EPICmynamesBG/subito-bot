@@ -35,22 +35,6 @@ function messageUser(user, message, webhookUrl, callback) {
   slack.webhook(hookSend, callback);
 }
 
-function sendError(message, callback) {
-  if (typeof callback !== 'function') {
-    // eslint-disable-next-line no-param-reassign
-    callback = (err) => {
-      if (err) logger.error(err);
-    };
-  }
-  logger.error(message);
-  if (process.env.NODE_ENV === 'test') return;
-  if (config.SLACK_NOTIFY_ERROR_USER) {
-    module.exports.messageUser(config.SLACK_NOTIFY_ERROR_USER, message, callback)
-  } else {
-    process.nextTick(callback, new Error('SLACK_NOTIFY_ERROR_USER not set'));
-  }
-}
-
 function parseRequestCommand(params) {
   const snakeParams = utils.snakeCase(params);
   let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -101,16 +85,19 @@ function _parseRequestParams(command, givenParams) {
   const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
 
   if (supportedParams.length === 1) {
-    paramObj[supportedParams[0]] = givenParams.join(' ');
+    let value = givenParams.join(' ');
+    if (typeof value === 'string' && value.length === 0) value = null;
+    paramObj[supportedParams[0]] = value;
   } else {
     if (supportedParams.length !== givenParams.length) {
       logger.warn('Slack param mapping likely to fail. ', supportedParams, givenParams);
     }
     supportedParams.forEach((param, index) => {
-      paramObj[param] = givenParams[index];
+      let value = givenParams[index];
+      if (typeof value === 'string' && value.length === 0) value = null;
+      paramObj[param] = value;
     });
   }
-
   return paramObj;
 }
 
@@ -118,7 +105,6 @@ module.exports = {
   messageUser: messageUser,
   messageChannel: messageChannel,
   utils: {
-    parseRequestCommand: parseRequestCommand,
-    sendError: sendError
+    parseRequestCommand: parseRequestCommand
   }
 };

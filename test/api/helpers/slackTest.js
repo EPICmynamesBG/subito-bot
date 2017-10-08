@@ -97,6 +97,28 @@ describe('slack helper', () => {
           teamId: '123XYZ',
           teamDomain: 'test'
         };
+        expected.params.search = null;
+        assert.deepEqual(output, expected);
+      });
+
+      it('should support "subscribe" command with search term', () => {
+        let input = {
+          text: 'subscribe corn',
+          user_id: 'ABC123',
+          user_name: 'bobbyboy',
+          team_id: '123XYZ',
+          team_domain: 'test'
+        };
+        const output = slack.utils.parseRequestCommand(input);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'subscribe';
+        expected.params.user = {
+          id: 'ABC123',
+          username: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'test'
+        };
+        expected.params.search = 'corn';
         assert.deepEqual(output, expected);
       });
 
