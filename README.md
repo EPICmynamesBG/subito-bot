@@ -23,9 +23,14 @@ OR
 
 ```text
 /subito subscribe
+
+OR
+
+/subito subscribe [search string]
 ```
 <img src="./assets/screenshots/subscribe_1.png" height="60" alt="subscribe_1" />
 <img src="./assets/screenshots/subscribe_2.png" height="60" alt="subscribe_2" />
+<img src="./assets/screenshots/subscribe_3.png" height="60" alt="subscribe_3" />
 
 ```text
 /subito unsubscribe
