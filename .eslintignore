@@ -1,8 +1,8 @@
 *.md
-*.md
 *.json
 *.yaml
 *.log
 node_modules/*
 coverage/
 bower_components/*
+LICENSE
