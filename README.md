@@ -23,14 +23,18 @@ OR
 
 ```text
 /subito subscribe
-
-OR
-
-/subito subscribe [search string]
 ```
 <img src="./assets/screenshots/subscribe_1.png" height="60" alt="subscribe_1" />
 <img src="./assets/screenshots/subscribe_2.png" height="60" alt="subscribe_2" />
+
+
+```text
+/subito subscribe [search string]
+```
 <img src="./assets/screenshots/subscribe_3.png" height="60" alt="subscribe_3" />
+
+_ *You can only be subscribed once_
+
 
 ```text
 /subito unsubscribe
@@ -42,12 +46,15 @@ OR
 ```
 <img src="./assets/screenshots/search.png" height="110" alt="search" />
 
-_In Development Commands_
-
-- Subscribe to specific soup types
 ```text
-/subito subscribe [soup name/type (ex: gouda)]
+/subito help (or anything else unrecognizable)
 ```
+
+<img src="./assets/screenshots/help.png" height="200" alt="search" />
+
+## In Development
+
+- Packaging to be a Slack App!
 
 ## Docs
 
