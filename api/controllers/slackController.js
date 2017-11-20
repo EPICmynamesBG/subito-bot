@@ -52,8 +52,14 @@ function handleSlack(req, res) {
 }
 
 function handleOAuth(req, res) {
-  if (lodash.has(req, 'query.code')) {
+  if (!lodash.has(req, 'query.code')) {
     utils.processResponse(new errors.HttpStatusError(400, 'Missing code'), null, res);
+    return;
+  }
+  if (lodash.has(req, 'query.error')) {
+    // TODO: Maybe this should disable an oauth_integration?
+    logger.warn('OAuth error', req.query.error);
+    utils.processResponse(new errors.HttpStatusError(400, req.query.error), null, res);
     return;
   }
   authService.processOAuth(req.db, req.query, (err, results) => {

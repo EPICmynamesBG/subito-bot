@@ -13,6 +13,7 @@ const utils = require('../../api/helpers/utils');
 const db = require('../../config/db');
 
 const TABLES = [
+  'oauth_integrations',
   'team_integrations',
   'soup_calendar',
   'subscribers'
@@ -62,6 +63,12 @@ function resetData(callback) {
             if (clone.metadata) {
               clone.metadata = utils.encrypt(clone.metadata);
             }
+            return clone;
+          });
+        } else if (table === 'oauth_integrations') {
+          data = data.map((entry) => {
+            let clone = Object.assign({}, entry);
+            clone.token = utils.encrypt(clone.token);
             return clone;
           });
         }
