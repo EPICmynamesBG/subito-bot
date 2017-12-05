@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS oauth_integrations (
   webhook_channel       TEXT            DEFAULT NULL,
   webhook_config_url    TEXT            DEFAULT NULL,
   created_at            TIMESTAMP       NOT NULL DEFAULT current_timestamp,
-  modified_at           TIMESTAMP       DEFAULT null,
+  modified_at           TIMESTAMP       NULL DEFAULT NULL,
   PRIMARY KEY (team_id)
 );
