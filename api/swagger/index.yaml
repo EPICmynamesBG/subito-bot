@@ -92,13 +92,19 @@ paths:
       responses:
         "200":
           description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
         "302":
           description: Success
           headers:
             Location:
               type: string
+          schema:
+            type: string
         default:
           description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /day:
     # binds a127 app logic to a route
     x-swagger-router-controller: soupCalendarController
