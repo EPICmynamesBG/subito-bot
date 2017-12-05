@@ -41,6 +41,11 @@ function createOauthIntegration(db, data, callback) {
   queryHelper.insert(db, 'oauth_integrations', insert, callback);
 }
 
+function updateOauthIntegration(db, teamId, data, callback) {
+  data.modified_at = new Date();
+  queryHelper.update(db, 'oauth_integrations', { team_id: teamId }, data, callback);
+}
+
 function upsertOauthIntegration(db, data, callback) {
   async.autoInject({
     select: (cb) => {
@@ -50,7 +55,7 @@ function upsertOauthIntegration(db, data, callback) {
       if (!select) {
         module.exports.createOauthIntegration(db, data, cb);
       } else {
-        queryHelper.update(db, 'oauth_integrations', { team_id: data.team_id }, data, cb);
+        module.exports.updateOauthIntegration(db, data.team_id, data, cb);
       }
     }
   }, (err, res) => {
@@ -139,6 +144,7 @@ function processOAuth(db, queryParams, callback) {
 module.exports = {
   validateTeamToken: validateTeamToken,
   createOauthIntegration: createOauthIntegration,
+  updateOauthIntegration: updateOauthIntegration,
   upsertOauthIntegration: upsertOauthIntegration,
   getOauthIntegrationById: getOauthIntegrationById,
   processOAuth: processOAuth
