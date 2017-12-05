@@ -3,8 +3,10 @@
 const assert = require('assert');
 const should = require('should');
 const request = require('supertest');
+const sinon = require('sinon');
 const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
+const authService = require('../../../api/services/authService');
 const async = require('async');
 
 const validAuth = {
@@ -273,4 +275,18 @@ describe('slackController', () => {
         });
     });
   });
+
+  describe.only('/slack/oauth', () => {
+    const url = '/subito/slack/oauth';
+    it('should succeed', (done) => {
+      sinon.stub(authService, 'processOAuth').yields(null, { team: { domain: 'test' }});
+      request(server)
+        .get(url.concat('?code=test'))
+        .redirects(1)
+        .end(() => {
+          authService.processOAuth.restore();
+          done();
+        });
+    });
+  })
 });

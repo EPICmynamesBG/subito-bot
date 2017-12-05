@@ -22,7 +22,8 @@ const TABLES = [
 const TABLE_DATA = {
   soup_calendar: require('../data/SoupCalendar.json'),
   subscribers: require('../data/Subscribers.json'),
-  team_integrations: require('../data/TeamIntegrations.json')
+  team_integrations: require('../data/TeamIntegrations.json'),
+  oauth_integrations: []
 };
 
 function clearData(callback) {

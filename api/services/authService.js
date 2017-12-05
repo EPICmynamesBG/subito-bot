@@ -37,7 +37,7 @@ function validateTeamToken(db, teamId, token, callback) {
 function createOauthIntegration(db, data, callback) {
   const insert = lodash.clone(data);
   insert.token = utils.encrypt(insert.token);
-  
+  insert.bot_token = utils.encrypt(insert.bot_token);
   queryHelper.insert(db, 'oauth_integrations', insert, callback);
 }
 
@@ -49,6 +49,7 @@ function getOauthIntegrationById(db, oauthId, callback) {
     }
     const parsed = lodash.cloneDeep(res);
     parsed.token = utils.decrypt(parsed.token);
+    parsed.bot_token = utils.decrypt(parsed.bot_token);
     callback(null, parsed);
   });
 }
@@ -72,7 +73,13 @@ function processOAuth(db, queryParams, callback) {
           cb(new errors.HttpStatusError(response.statusCode));
           return;
         }
-        cb(null, JSON.parse(body));
+        const parsed = JSON.parse(body);
+        if (!parsed.ok) {
+          logger.debug('OAuth Failed', parsed);
+          cb(new errors.HttpStatusError(400, `Slack error "${parsed.error}"`));
+          return;
+        }
+        cb(null, parsed);
       });
     },
     team: (auth, cb) => {
@@ -92,10 +99,13 @@ function processOAuth(db, queryParams, callback) {
       });
     },
     store: (auth, team, cb) => {
+      logger.debug('auth', auth);
+      logger.debug('team', team);
       const insertData = {
         team_id: auth.team_id,
         team_name: auth.team_name,
         token: auth.access_token,
+        bot_token: lodash.get(auth, 'bot.bot_access_token'),
         scope: auth.scope,
         installer_user_id: auth.user_id,
         domain: lodash.get(team, 'domain', null),

@@ -30,6 +30,7 @@ app.use(cors({ maxAge: 600 }));
 app.use(middleware.bindDb(app, db));
 app.use(middleware.logging);
 app.use(middleware.camelCaseBody);
+app.set('x-powered-by', false);
 
 var seConfig = { appRoot: __dirname };
 

@@ -78,6 +78,8 @@ paths:
     get:
       description: handles Slack app oauth
       operationId: handleOAuth
+      produces:
+        - text/plain
       tags:
         - Slack
       parameters:

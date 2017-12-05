@@ -1,5 +1,6 @@
 'use strict';
 
+const async = require('async');
 const assert = require('assert');
 const lodash = require('lodash');
 const sinon = require('sinon');
@@ -9,12 +10,13 @@ const authService = require('../../../api/services/authService');
 
 describe('authService', () => {
   before(testHelper.resetData);
-  after(testHelper.clearData);
+//  after(testHelper.clearData);
   
   const insertData = {
     team_id: 'ABCDEF',
     team_name: 'Test1',
     token: 'access_token',
+    bot_token: 'bot_token',
     scope: 'read',
     installer_user_id: 'ABC123123',
     domain: null,
@@ -79,22 +81,36 @@ describe('authService', () => {
 
   describe('processOAuth', () => {    
     it('should process correctly', (done) => {
-      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify({
+      const test = {
         access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX',
         scope: 'incoming-webhook,commands,bot',
-        team_name: 'Team Installing Your Hook',
+        team_name: 'Teamk',
         team_id: 'XXXXXXXXX',
         user_id: 'ABC123567',
+        bot: {
+          bot_access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX'
+        },
         incoming_webhook: {
           url: 'https://hooks.slack.com/TXXXXX/BXXXXX/XXXXXXXXXX',
           channel: '#channel-it-will-post-to',
           configuration_url: 'https://teamname.slack.com/services/BXXXXX'
         }
-      }));
+      };
+      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
       sinon.spy(authService, 'createOauthIntegration');
-      authService.processOAuth(testHelper.db, { code: 'some_code' }, (err, res) => {
+
+      async.autoInject({
+        run: (cb) => {
+          authService.processOAuth(testHelper.db, { code: 'some_code' }, cb);
+        },
+        integration: (run, cb) => {
+          authService.getOauthIntegrationById(testHelper.db, test.team_id, cb);
+        }
+      }, (err, res) => {
         assert.equal(err, null);
-        console.log(res);
+        const integration = res.integration;
+        assert.equal(integration.bot_token, test.bot.bot_access_token);
+        assert.equal(integration.token, test.access_token);
         assert(request.post.calledOnce);
         assert(authService.createOauthIntegration.calledOnce);
         authService.createOauthIntegration.restore();

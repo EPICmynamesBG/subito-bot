@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS oauth_integrations (
   team_id               VARCHAR(9)      UNIQUE NOT NULL,
   team_name             TEXT            NOT NULL,
   token                 TEXT            NOT NULL,
+  bot_token             TEXT            NOT NULL,
   scope                 TEXT            NOT NULL,
   installer_user_id     TEXT            NOT NULL,
   domain                TEXT            DEFAULT NULL,
