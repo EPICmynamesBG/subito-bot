@@ -41,6 +41,23 @@ function createOauthIntegration(db, data, callback) {
   queryHelper.insert(db, 'oauth_integrations', insert, callback);
 }
 
+function upsertOauthIntegration(db, data, callback) {
+  async.autoInject({
+    select: (cb) => {
+      queryHelper.selectOne(db, 'oauth_integrations', { team_id: data.team_id }, cb);
+    },
+    upsert: (select, cb) => {
+      if (!select) {
+        module.exports.createOauthIntegration(db, data, cb);
+      } else {
+        queryHelper.update(db, 'oauth_integrations', { team_id: data.team_id }, data, cb);
+      }
+    }
+  }, (err, res) => {
+    callback(err, res.upsert);
+  });
+}
+
 function getOauthIntegrationById(db, oauthId, callback) {
   queryHelper.selectOne(db, 'oauth_integrations', { team_id: oauthId }, (err, res) => {
     if (err) {
@@ -114,7 +131,7 @@ function processOAuth(db, queryParams, callback) {
         webhook_channel: lodash.get(auth, 'incoming_webhook.channel', null),
         webhook_config_url: lodash.get(auth, 'incoming_webhook.configuration_url', null)
       };
-      module.exports.createOauthIntegration(db, insertData, cb);
+      module.exports.upsertOauthIntegration(db, insertData, cb);
     }
   }, callback);
 }
@@ -122,6 +139,7 @@ function processOAuth(db, queryParams, callback) {
 module.exports = {
   validateTeamToken: validateTeamToken,
   createOauthIntegration: createOauthIntegration,
+  upsertOauthIntegration: upsertOauthIntegration,
   getOauthIntegrationById: getOauthIntegrationById,
   processOAuth: processOAuth
 };
