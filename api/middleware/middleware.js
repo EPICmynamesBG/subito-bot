@@ -1,5 +1,6 @@
 'use strict';
 
+const lodash = require('lodash');
 const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
@@ -30,7 +31,8 @@ function camelCaseBody(req, res, next) {
 }
 
 function adminAuth(req, res, next) {
-  const authRequired = Object.keys(req.swagger.params).includes('authorization');
+  const params = lodash.get(req, 'swagger.params', {});
+  const authRequired = Object.keys(params).includes('authorization');
   if (!authRequired) {
     next();
     return;

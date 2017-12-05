@@ -8,7 +8,7 @@ const Slack = require('slack-node');
 const queryHelper = require('../helpers/queryHelper');
 const utils = require('../helpers/utils');
 const logger = require('../helpers/logger');
-const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET } = require('../../config/config');
+const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_REDIRECT_URI } = require('../../config/config');
 
 /**
  * Validates a Slack request to a registered Team
@@ -59,6 +59,7 @@ function processOAuth(db, queryParams, callback) {
     form: {
       client_id: SLACK_CLIENT_ID,
       client_secret: SLACK_CLIENT_SECRET,
+      redirect_uri: SLACK_REDIRECT_URI,
       code: queryParams.code
     }
   };
