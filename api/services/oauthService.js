@@ -18,8 +18,11 @@ function createOauthIntegration(db, data, callback) {
 }
 
 function updateOauthIntegration(db, teamId, data, callback) {
-  data.modified_at = new Date();
-  queryHelper.update(db, 'oauth_integrations', { team_id: teamId }, data, callback);
+  const update = lodash.clone(data);
+  update.modified_at = new Date();
+  if (update.token) update.token = utils.encrypt(update.token);
+  if (update.bot_token) update.bot_token = utils.encrypt(update.bot_token);
+  queryHelper.update(db, 'oauth_integrations', update, { team_id: teamId }, callback);
 }
 
 function upsertOauthIntegration(db, data, callback) {

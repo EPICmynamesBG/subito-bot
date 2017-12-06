@@ -100,7 +100,7 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
     return;
   }
   if (!results || results.length === 0) {
-    logger.info('No results', context);
+    logger.debug('No results', context);
     callback(null, null);
     return;
   }
@@ -133,7 +133,10 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
 
 function _query(db, build, callback) {
   let paramArr = [];
-  if (build.values.length > 0 && build.queryType !== QUERY_TYPE.UPDATE) {
+  if (build.values.length === 0 && build.queryType === QUERY_TYPE.INSERT) {
+    module.exports.private.resultsHandler(null, [], callback, build);
+    return;
+  } else if (build.values.length > 0 && build.queryType !== QUERY_TYPE.UPDATE) {
     paramArr = [build.values];
   } else if (build.queryType === QUERY_TYPE.UPDATE) {
     paramArr = build.values;

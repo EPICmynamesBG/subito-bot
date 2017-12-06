@@ -10,7 +10,7 @@ const oauthService = require('../../../api/services/oauthService');
 
 describe('oauthService', () => {
   before(testHelper.resetData);
-  after(testHelper.clearData);
+  afterEach(testHelper.clearData);
 
   const insertData = {
     team_id: 'ABCDEF',
@@ -19,7 +19,7 @@ describe('oauthService', () => {
     bot_token: 'bot_token',
     scope: 'read',
     installer_user_id: 'ABC123123',
-    domain: null,
+    domain: 'null',
     webhook_url: 'some_url',
     webhook_channel: '@slackbot',
     webhook_config_url: 'some_url'
@@ -54,6 +54,27 @@ describe('oauthService', () => {
         assert.equal(err, null);
         assert.equal(res.team_id, sample.team_id);
         assert.equal(res.token, sample.token);
+        done();
+      });
+    });
+  });
+  
+  describe('updateOauthIntegration', () => {
+    let sample;
+    before((done) => {
+      const clone = lodash.clone(insertData);
+      clone.team_id = clone.team_id.concat(lodash.random(0, 999).toString());
+      sample = clone;
+      oauthService.createOauthIntegration(testHelper.db, clone, (err) => {
+        if (err) throw err;
+        done();
+      });
+    });
+    
+    it('should update an oauth integration', (done) => {
+      oauthService.updateOauthIntegration(testHelper.db, sample.team_id, { bot_token: 'new token' }, (err, res) =>{
+        assert.equal(err, null);
+        assert.equal(res.affectedRows, 1);
         done();
       });
     });
