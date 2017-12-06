@@ -9,6 +9,7 @@ const { SLACK_VERIFICATION_TOKEN } = require('../../config/config');
 const { CMD_USAGE, SUPPORTED_COMMANDS } = require('../../config/constants').SLACK_CONSTS;
 
 const authService = require('../services/authService');
+const oauthService = require('../services/oauthService');
 const soupCalendarController = require('./soupCalendarController');
 const subscriberController = require('./subscriberController');
 
@@ -62,12 +63,12 @@ function handleOAuth(req, res) {
     utils.processResponse(new errors.HttpStatusError(400, req.query.error), null, res);
     return;
   }
-  authService.processOAuth(req.db, req.query, (err, results) => {
+  oauthService.processOAuth(req.db, req.query, (err, results) => {
     if (err) {
       utils.processResponse(err, null, res);
       return;
     }
-    if (lodash.has(results, 'team.domain')) {
+    if (lodash.get(results, 'team.domain', null) !== null) {
       const domain = results.team.domain;
       res.redirect(`https://${domain}.slack.com`);
       return;
