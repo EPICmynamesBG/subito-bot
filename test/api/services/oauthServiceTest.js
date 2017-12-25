@@ -95,7 +95,8 @@ describe('oauthService', () => {
           url: 'https://hooks.slack.com/TXXXXX/BXXXXX/XXXXXXXXXX',
           channel: '#channel-it-will-post-to',
           configuration_url: 'https://teamname.slack.com/services/BXXXXX'
-        }
+        },
+        ok: true
       };
       sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
       sinon.spy(oauthService, 'createOauthIntegration');

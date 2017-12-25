@@ -1,0 +1,26 @@
+[
+  {
+    "team_id": "ABCDEF123",
+    "team_name": "abc",
+    "token": "helloworld",
+    "bot_token": "helloworld",
+    "scope": "read",
+    "installer_user_id": "ABC_123",
+    "domain": "abcdomain",
+    "webhook_url": "http://test.com",
+    "webhook_channel": "@slackbot",
+    "webhook_config_url": "http://test.com?someurl=test"
+  },
+  {    
+    "team_id": "XYZDEF123",
+    "team_name": "xyz",
+    "token": "helloworld",
+    "bot_token": "helloworld",
+    "scope": "read",
+    "installer_user_id": "ABC_123",
+    "domain": "xyzdomain",
+    "webhook_url": "http://xyz.com",
+    "webhook_channel": "@slackbot",
+    "webhook_config_url": "http://test.com?someurl=test"
+  }
+]

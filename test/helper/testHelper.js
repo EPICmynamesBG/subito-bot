@@ -23,7 +23,7 @@ const TABLE_DATA = {
   soup_calendar: require('../data/SoupCalendar.json'),
   subscribers: require('../data/Subscribers.json'),
   team_integrations: require('../data/TeamIntegrations.json'),
-  oauth_integrations: []
+  oauth_integrations: require('../data/OauthIntegrations.json')
 };
 
 function clearData(callback) {
@@ -70,6 +70,7 @@ function resetData(callback) {
           data = data.map((entry) => {
             let clone = Object.assign({}, entry);
             clone.token = utils.encrypt(clone.token);
+            clone.bot_token = utils.encrypt(clone.bot_token);
             return clone;
           });
         }
