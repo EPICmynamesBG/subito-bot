@@ -60,7 +60,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
       callback();
     });
   } else {
-    slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
+    slack.messageUserAsBot(subscriber.slack_user_id, soups.text, subscriber.slack_slash_token, (err, res) => {
       if (err || res.status === 'fail') logger.error('_processSubscriber', subscriber, err, res);
       callback();
     });
