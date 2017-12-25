@@ -40,7 +40,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
           (err, searchResults) => {
             if (err) cb(err);
             else if (searchResults.length > 0) cb(null, soups);
-            else cb(new Error(`no soups for "${subscriber.search_term}" found today`));
+            else cb({ clean: true, error: new Error(`no soups for "${subscriber.search_term}" found today`)});
           });
       },
       message: (searchResults, cb) => {
@@ -56,7 +56,8 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
         }
       }
     }, (err) => {
-      if (err) logger.error('_processSubscriber', subscriber, err);
+      if (err && err.clean) logger.debug('_processSubscriber', subscriber, err);
+      else if (err) logger.error('_processSubscriber', subscriber, err);
       callback();
     });
   } else {
