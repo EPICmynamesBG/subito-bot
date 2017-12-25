@@ -6,35 +6,7 @@ const lodash = require('lodash');
 const moment = require('moment');
 const logger = require('./logger');
 const utils  = require('./utils');
-const config = require('../../config/config');
 const SLACK_CONSTS = require('../../config/constants').SLACK_CONSTS;
-
-const slack = new Slack();
-
-//slack.setWebhook(config.SLACK_WEBHOOK_URL);
-
-const WEBHOOK_OPTS = {
-  username: config.SLACK_WEBHOOK_USERNAME || "Subito-Suboto",
-  icon_emoji: config.SLACK_WEBHOOK_ICON || ":stew:"
-};
-
-function messageChannel(channel, message, webhookUrl, callback) {
-  slack.setWebhook(webhookUrl);
-  const hookSend = Object.assign({}, WEBHOOK_OPTS, {
-    channel: '#'.concat(channel),
-    text: message
-  });
-  slack.webhook(hookSend, callback);
-}
-
-function messageUser(user, message, webhookUrl, callback) {
-  slack.setWebhook(webhookUrl);
-  const hookSend = Object.assign({}, WEBHOOK_OPTS, {
-    channel: '@'.concat(user),
-    text: message
-  });
-  slack.webhook(hookSend, callback);
-}
 
 function messageUserAsBot(userId, message, botToken, callback) {
   const slackbot = new Slack(botToken);
@@ -128,8 +100,6 @@ function _parseRequestParams(command, givenParams) {
 }
 
 module.exports = {
-  messageUser: messageUser,
-  messageChannel: messageChannel,
   messageUserAsBot: messageUserAsBot,
   utils: {
     parseRequestCommand: parseRequestCommand

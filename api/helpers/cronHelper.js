@@ -48,7 +48,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
           const message = _buildCustomText(subscriber.search_term, searchResults.soups);
           slack.messageUserAsBot(subscriber.slack_user_id, message, subscriber.slack_slash_token, (err, res) => {
             if (err) callback(err);
-            else if (res.status === 'fail') callback(res);
+            else if (!res.ok) callback(res);
             else callback(null, res);
           });
         } else {
@@ -62,7 +62,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
     });
   } else {
     slack.messageUserAsBot(subscriber.slack_user_id, soups.text, subscriber.slack_slash_token, (err, res) => {
-      if (err || res.status === 'fail') logger.error('_processSubscriber', subscriber, err, res);
+      if (err || !res.ok) logger.error('_processSubscriber', subscriber, err, res);
       callback();
     });
   }

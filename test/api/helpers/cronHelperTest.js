@@ -20,8 +20,8 @@ const testSubscribers = require('../../data/Subscribers.json');
 const testIntegrations = require('../../data/TeamIntegrations.json');
 const testHtml = fs.readFileSync(path.join(__dirname, '../../data') + '/test-calendar.html', 'utf-8');
 
-const subscriberNames = testSubscribers.map(sub => sub.slack_username);
-const integrationWebhooks = testIntegrations.map(integration => integration.slack_webhook_url);
+const subscriberIds = testSubscribers.map(sub => sub.slack_user_id);
+const integrationBotTokens = testIntegrations.map(integration => integration.slack_slash_token);
 
 describe('cronHelper', () => {
   beforeEach(testHelper.resetData);
@@ -35,7 +35,7 @@ describe('cronHelper', () => {
         should.not.exist(err);
         assert(result.rows > 0);
         assert(loggerSpy.calledWith('importCalendar complete:: '));
-        
+
         parseSubito.private.fetchSoupPage.restore();
         fs.readFile.restore();
         loggerSpy.restore();
@@ -46,7 +46,7 @@ describe('cronHelper', () => {
 
   describe('processSubscribers', () => {
     it('should not error', (done) => {
-      const slackSpy = sinon.stub(slack, 'messageUser').yields(null, { status: 'Success' });
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.spy(soupCalendarViewService, 'getSoupsForDay');
       cronHelper.processSubscribers(testHelper.db)((err) => {
@@ -54,15 +54,15 @@ describe('cronHelper', () => {
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
         assert.equal(slackSpy.getCalls().length, testSubscribers.length);
-        
+
         /* eslint-disable max-nested-callbacks */
         slackSpy.getCalls().forEach((call) => {
-          const name = call.args[0];
+          const userId = call.args[0];
           const message = call.args[1];
-          const webhookUrl = call.args[2];
-          assert(subscriberNames.includes(name));
+          const slackBotToken = call.args[2];
+          assert(subscriberIds.includes(userId));
           assert(typeof message === 'string');
-          assert(integrationWebhooks.includes(webhookUrl));
+          assert(integrationBotTokens.includes(slackBotToken));
         });
         /* eslint-enable max-nested-callbacks */
 
@@ -74,7 +74,7 @@ describe('cronHelper', () => {
     });
 
     it('should not message when there are no soups', (done) => {
-      const slackSpy = sinon.stub(slack, 'messageUser').yields(null, { status: 'Success' });
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       cronHelper.processSubscribers(testHelper.db)((err) => {
@@ -101,7 +101,7 @@ describe('cronHelper', () => {
 
   describe('private.processSubscriber', () => {
     it('should message the subscriber', (done) => {
-      const slackSpy = sinon.stub(slack, 'messageUser').yields(null, { status: 'Success' });
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         soups: (cb) => {
           soupCalendarViewService.getSoupsForDay(testHelper.db, utils.dateForText('today'), cb);
@@ -119,21 +119,21 @@ describe('cronHelper', () => {
         should.not.exist(err);
         assert(slackSpy.calledOnce);
         const call = slackSpy.getCalls()[0];
-        const name = call.args[0];
+        const userId = call.args[0];
         const message = call.args[1];
         // eslint-disable-next-line max-len
         assert.equal(message, 'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
-        const webhookUrl = call.args[2];
-        assert(subscriberNames.includes(name));
+        const slackBotToken = call.args[2];
+        assert(subscriberIds.includes(userId));
         assert(typeof message === 'string');
-        assert(integrationWebhooks.includes(webhookUrl));
+        assert(integrationBotTokens.includes(slackBotToken));
         slackSpy.restore();
         done();
       });
     });
 
     it('should message the subscriber with search term', (done) => {
-      const slackSpy = sinon.stub(slack, 'messageUser').yields(null, { status: 'Success' });
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         before: (cb) => {
           subscriberService.addSubscriber(testHelper.db, {
@@ -162,16 +162,16 @@ describe('cronHelper', () => {
         const message = call.args[1];
         // eslint-disable-next-line max-len
         assert.equal(message, 'Today\'s the day! _corn_ is on the menu! Here are the soups: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
-        const webhookUrl = call.args[2];
-        assert(integrationWebhooks.includes(webhookUrl));
+        const botToken = call.args[2];
+        assert(integrationBotTokens.includes(botToken));
         slackSpy.restore();
         done();
       });
     });
 
     it('should not message the subscriber with search term when not found on that day', (done) => {
-      const slackSpy = sinon.stub(slack, 'messageUser').yields(null, { status: 'Success' });
-      const loggerSpy = sinon.spy(logger, 'error');
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
+      const loggerSpy = sinon.spy(logger, 'debug');
       async.autoInject({
         before: (cb) => {
           subscriberService.addSubscriber(testHelper.db, {
@@ -196,11 +196,11 @@ describe('cronHelper', () => {
       }, (err, res) => {
         should.not.exist(err);
         assert(slackSpy.getCalls().length === 0);
-        assert(loggerSpy.calledOnce);
-        const call = loggerSpy.getCalls()[0];
+        const call = loggerSpy.lastCall;
         assert.equal(call.args[0], '_processSubscriber');
         assert.equal(call.args[1], res.subscriber);
-        assert(call.args[2].message.includes('no soups for "invalid" found today'));
+        assert.equal(call.args[2].clean, true);
+        assert(call.args[2].error);
         loggerSpy.restore();
         slackSpy.restore();
         done();

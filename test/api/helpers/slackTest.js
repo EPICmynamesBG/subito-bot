@@ -7,6 +7,13 @@ const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;
 
 describe('slack helper', () => {
+  describe('messageUserAsBot', () => {
+    it('should send a message', (done) => {
+      assert(false);
+      done();
+    });
+  });
+
   describe('utils', () => {
     describe('parseRequestCommand', () => {
       it('should support param as string or object', () => {
