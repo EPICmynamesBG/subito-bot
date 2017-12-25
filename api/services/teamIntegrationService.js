@@ -1,4 +1,5 @@
 'use strict';
+// FILE DEPRECATED
 
 const queryHelper = require('../helpers/queryHelper');
 const utils = require('../helpers/utils');

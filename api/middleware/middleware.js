@@ -30,6 +30,7 @@ function camelCaseBody(req, res, next) {
   next();
 }
 
+// DEPRECATED
 function adminAuth(req, res, next) {
   const params = lodash.get(req, 'swagger.params', {});
   const authRequired = Object.keys(params).includes('authorization');

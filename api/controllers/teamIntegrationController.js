@@ -3,6 +3,7 @@
 const utils = require('../helpers/utils');
 const teamIntegrationService = require('../services/teamIntegrationService');
 
+// DEPRECATED
 function addIntegration(req, res) {
   const params = req.body;
   teamIntegrationService.addIntegration(req.db, params, (err, results) => {
@@ -14,6 +15,7 @@ function addIntegration(req, res) {
   });
 }
 
+// DEPRECATED
 function getAllIntegrations(req, res) {
   teamIntegrationService.getAllIntegrations(req.db, (err, results) => {
     if (err) {
@@ -28,12 +30,14 @@ function getAllIntegrations(req, res) {
   });
 }
 
+// DEPRECATED
 function getIntegrationById(req, res) {
   const teamId = req.swagger.params.teamId.value;
   const decrypt = req.swagger.params.decrypt.value;
   teamIntegrationService.getIntegrationById(req.db, teamId, decrypt, utils.processResponseCb(res));
 }
 
+// DEPRECATED
 function updateIntegration(req, res) {
   const teamId = req.swagger.params.teamId.value;
   const params = req.body;
@@ -46,6 +50,7 @@ function updateIntegration(req, res) {
   });
 }
 
+// DEPRECATED
 function deleteIntegration(req, res) {
   const teamId = req.swagger.params.teamId.value;
   teamIntegrationService.removeIntegration(req.db, teamId, (err, results) => {
