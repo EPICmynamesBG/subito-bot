@@ -1,5 +1,6 @@
 'use strict';
 
+const async = require('async');
 const Slack = require('slack-node');
 const lodash = require('lodash');
 const moment = require('moment');
@@ -33,6 +34,28 @@ function messageUser(user, message, webhookUrl, callback) {
     text: message
   });
   slack.webhook(hookSend, callback);
+}
+
+function messageUserAsBot(userId, message, botToken, callback) {
+  const slackbot = new Slack(botToken);
+  async.autoInject({
+    channel: (cb) => {
+      slackbot.api('im.open', {
+        user: userId,
+        return_im: true
+      }, cb);
+    },
+    message: (channel, cb) => {
+      logger.debug(channel);
+      slackbot.api('chat.postMessage', {
+        text: message,
+        channel: channel.id
+      }, cb);
+    }
+  }, (err, res) => {
+    logger.debug(res.message);
+    callback(err, res.message);
+  });
 }
 
 function parseRequestCommand(params) {
@@ -104,6 +127,7 @@ function _parseRequestParams(command, givenParams) {
 module.exports = {
   messageUser: messageUser,
   messageChannel: messageChannel,
+  messageUserAsBot: messageUserAsBot,
   utils: {
     parseRequestCommand: parseRequestCommand
   }

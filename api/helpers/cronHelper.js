@@ -46,7 +46,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
       message: (searchResults, cb) => {
         if (searchResults) {
           const message = _buildCustomText(subscriber.search_term, searchResults.soups);
-          slack.messageUser(subscriber.slack_username, message, subscriber.slack_webhook_url, (err, res) => {
+          slack.messageUserAsBot(subscriber.slack_user_id, message, subscriber.slack_slash_token, (err, res) => {
             if (err) callback(err);
             else if (res.status === 'fail') callback(res);
             else callback(null, res);
