@@ -38,7 +38,8 @@ let sslConfig = null;
 if (config.USE_SSL) {
   sslConfig = {
     key: config.SSL_PRIV_KEY,
-    cert: config.SSL_CERT
+    cert: config.SSL_CERT,
+    ca: config.SSL_CA
   };
 }
 

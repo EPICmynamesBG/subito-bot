@@ -7,6 +7,7 @@ const sinon = require('sinon');
 const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
 const authService = require('../../../api/services/authService');
+const oauthService = require('../../../api/services/oauthService');
 const async = require('async');
 
 const validAuth = {
@@ -276,15 +277,15 @@ describe('slackController', () => {
     });
   });
 
-  describe.only('/slack/oauth', () => {
+  describe('/slack/oauth', () => {
     const url = '/subito/slack/oauth';
     it('should succeed', (done) => {
-      sinon.stub(authService, 'processOAuth').yields(null, { team: { domain: 'test' }});
+      sinon.stub(oauthService, 'processOAuth').yields(null, { team: { domain: 'test' }});
       request(server)
         .get(url.concat('?code=test'))
         .redirects(1)
         .end(() => {
-          authService.processOAuth.restore();
+          oauthService.processOAuth.restore();
           done();
         });
     });

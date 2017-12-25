@@ -24,7 +24,7 @@ describe('oauthService', () => {
     webhook_channel: '@slackbot',
     webhook_config_url: 'some_url'
   };
-  
+
   describe('createOauthIntegration', () => {
     it('should create an oauth integration', (done) => {
       const clone = lodash.clone(insertData);
@@ -48,7 +48,7 @@ describe('oauthService', () => {
         done();
       });
     });
-    
+
     it('should get an oauth integration', (done) => {
       oauthService.getOauthIntegrationById(testHelper.db, sample.team_id, (err, res) =>{
         assert.equal(err, null);
@@ -58,7 +58,7 @@ describe('oauthService', () => {
       });
     });
   });
-  
+
   describe('updateOauthIntegration', () => {
     let sample;
     before((done) => {
@@ -70,7 +70,7 @@ describe('oauthService', () => {
         done();
       });
     });
-    
+
     it('should update an oauth integration', (done) => {
       oauthService.updateOauthIntegration(testHelper.db, sample.team_id, { bot_token: 'new token' }, (err, res) =>{
         assert.equal(err, null);
@@ -80,7 +80,7 @@ describe('oauthService', () => {
     });
   });
 
-  describe('processOAuth', () => {    
+  describe('processOAuth', () => {
     it('should process correctly', (done) => {
       const test = {
         access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX',
