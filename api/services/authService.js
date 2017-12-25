@@ -11,6 +11,7 @@ const logger = require('../helpers/logger');
  * @param {string} teamId   Slack team id
  * @param {string} token    the Slack slash command token
  * @param {function} callback callback function with 1 param: true/false
+ * @deprecated
  */
 function validateTeamToken(db, teamId, token, callback) {
   queryHelper.selectOne(db, 'team_integrations',

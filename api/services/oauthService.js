@@ -8,7 +8,8 @@ const Slack = require('slack-node');
 const queryHelper = require('../helpers/queryHelper');
 const utils = require('../helpers/utils');
 const logger = require('../helpers/logger');
-const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_REDIRECT_URI } = require('../../config/config');
+const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_REDIRECT_URI,
+  SLACK_VERIFICATION_TOKEN } = require('../../config/config');
 
 function createOauthIntegration(db, data, callback) {
   const insert = lodash.clone(data);
@@ -120,10 +121,15 @@ function processOAuth(db, queryParams, callback) {
   }, callback);
 }
 
+function validateTeamToken(requestToken) {
+  return requestToken === SLACK_VERIFICATION_TOKEN;
+}
+
 module.exports = {
   createOauthIntegration: createOauthIntegration,
   updateOauthIntegration: updateOauthIntegration,
   upsertOauthIntegration: upsertOauthIntegration,
   getOauthIntegrationById: getOauthIntegrationById,
-  processOAuth: processOAuth
+  processOAuth: processOAuth,
+  validateTeamToken: validateTeamToken
 };

@@ -6,13 +6,14 @@ const request = require('supertest');
 const sinon = require('sinon');
 const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
-const authService = require('../../../api/services/authService');
 const oauthService = require('../../../api/services/oauthService');
 const async = require('async');
 
+const { SLACK_VERIFICATION_TOKEN } = require('../../../config/config');
+
 const validAuth = {
   team_id: 'ABCDEF123',
-  token: 'helloworld'
+  token: SLACK_VERIFICATION_TOKEN
 };
 
 describe('slackController', () => {

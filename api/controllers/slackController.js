@@ -5,55 +5,52 @@ const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const slackUtils = require('../helpers/slack').utils;
-const { SLACK_VERIFICATION_TOKEN } = require('../../config/config');
 const { CMD_USAGE, SUPPORTED_COMMANDS } = require('../../config/constants').SLACK_CONSTS;
 
-const authService = require('../services/authService');
 const oauthService = require('../services/oauthService');
 const soupCalendarController = require('./soupCalendarController');
 const subscriberController = require('./subscriberController');
 
 function handleSlack(req, res) {
   const params = utils.camelCase(req.body);
-  authService.validateTeamToken(req.db, params.teamId, params.token, (valid) => {
-    if (!valid) {
-      logger.warn('Bad auth', params);
-      utils.processResponse(new errors.HttpStatusError(403, 'Invalid Slack token'), null, res);
-      return;
-    }
 
-    const action = slackUtils.parseRequestCommand(params);
-    lodash.set(req, 'fromSlack', true);
-    switch (action.command) {
-    case 'subscribe':
-      lodash.set(req, 'body.slackUserId', action.params.user.id);
-      lodash.set(req, 'body.slackUsername', action.params.user.username);
-      lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
-      lodash.set(req, 'body.searchTerm', action.params.search);
-      subscriberController.subscribe(req, res);
-      break;
-    case 'unsubscribe':
-      lodash.set(req, 'body.slackUserId', action.params.user.id);
-      lodash.set(req, 'body.slackUsername', action.params.user.username);
-      lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
-      subscriberController.unsubscribe(req, res);
-      break;
-    case 'search':
-      lodash.set(req, 'swagger.params.search.value', action.params.search);
-      soupCalendarController.search(req, res);
-      break;
-    case 'day':
-      lodash.set(req, 'swagger.params.day.value', action.params.day);
-      soupCalendarController.getSoupsForDay(req, res);
-      break;
-    default: {
-      logger.warn('Unsupported command', action.command);
-      let message = "Whoops, I don't recognize that command. Try one of these instead!";
-      SUPPORTED_COMMANDS.forEach((cmd) => message += `\n>${cmd} ${CMD_USAGE[cmd]}`);
-      utils.processResponse(null, { text: message }, res);
-    }
-    }
-  });
+  if (!oauthService.validateTeamToken(params.token)) {
+    logger.warn('Bad auth', params);
+    utils.processResponse(new errors.HttpStatusError(403, 'Invalid Slack token'), null, res);
+    return;
+  }
+
+  const action = slackUtils.parseRequestCommand(params);
+  lodash.set(req, 'fromSlack', true);
+  switch (action.command) {
+  case 'subscribe':
+    lodash.set(req, 'body.slackUserId', action.params.user.id);
+    lodash.set(req, 'body.slackUsername', action.params.user.username);
+    lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
+    lodash.set(req, 'body.searchTerm', action.params.search);
+    subscriberController.subscribe(req, res);
+    break;
+  case 'unsubscribe':
+    lodash.set(req, 'body.slackUserId', action.params.user.id);
+    lodash.set(req, 'body.slackUsername', action.params.user.username);
+    lodash.set(req, 'body.slackTeamId', action.params.user.teamId);
+    subscriberController.unsubscribe(req, res);
+    break;
+  case 'search':
+    lodash.set(req, 'swagger.params.search.value', action.params.search);
+    soupCalendarController.search(req, res);
+    break;
+  case 'day':
+    lodash.set(req, 'swagger.params.day.value', action.params.day);
+    soupCalendarController.getSoupsForDay(req, res);
+    break;
+  default: {
+    logger.warn('Unsupported command', action.command);
+    let message = "Whoops, I don't recognize that command. Try one of these instead!";
+    SUPPORTED_COMMANDS.forEach((cmd) => message += `\n>${cmd} ${CMD_USAGE[cmd]}`);
+    utils.processResponse(null, { text: message }, res);
+  }
+  }
 }
 
 function handleOAuth(req, res) {
