@@ -4,6 +4,7 @@ const assert = require('assert');
 const should = require('should');
 const request = require('supertest');
 const sinon = require('sinon');
+const errors = require('common-errors');
 const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
 const oauthService = require('../../../api/services/oauthService');
@@ -286,6 +287,36 @@ describe('slackController', () => {
         .get(url.concat('?code=test'))
         .redirects(1)
         .end(() => {
+          oauthService.processOAuth.restore();
+          done();
+        });
+    });
+
+    it('should succeed, but without redirect', (done) => {
+      sinon.stub(oauthService, 'processOAuth').yields(null, { team: null });
+      request(server)
+        .get(url.concat('?code=test'))
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .redirects(0)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.text, 'Subito-Suboto registered!');
+          oauthService.processOAuth.restore();
+          done();
+        });
+    });
+
+    it('should error', (done) => {
+      sinon.stub(oauthService, 'processOAuth').yields(new errors.HttpStatusError(400, 'Slack error'));
+      request(server)
+        .get(url.concat('?code=test'))
+        .expect(400)
+        .expect('Content-Type', /json/)
+        .redirects(0)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.text, 'Slack error');
           oauthService.processOAuth.restore();
           done();
         });
