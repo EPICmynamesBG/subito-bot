@@ -6,7 +6,6 @@ const queryHelper = require('../helpers/queryHelper');
 function _mapDecrypt(row) {
   if (!row) return;
   row.slack_slash_token = utils.decrypt(row.slack_slash_token);
-  // row.slack_webhook_url = utils.decrypt(row.slack_webhook_url);
   return row;
 }
 
