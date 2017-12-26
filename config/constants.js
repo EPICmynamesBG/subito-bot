@@ -4,20 +4,22 @@ const lodash = require('lodash');
 
 module.exports = {
   SLACK_CONSTS: {
-    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe']),
-    
+    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback']),
+
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       search: '[soup name/type (example: gouda | gf)]',
       subscribe: '[search (example: corn)]',
-      unsubscribe: ''
+      unsubscribe: '',
+      feedback: '<https://github.com/EPICmynamesBG/subito-bot/issues|Submit feedback on GitHub>'
     },
 
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
       search: ['search'],
       subscribe: ['search'],
-      unsubscribe: []
+      unsubscribe: [],
+      feedback: []
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({
