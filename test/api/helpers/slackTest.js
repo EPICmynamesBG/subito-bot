@@ -2,15 +2,45 @@
 
 const assert = require('assert');
 const lodash = require('lodash');
-const slack = require('../../../api/helpers/slack');
+const SlackNode = require('slack-node');
+const sinon = require('sinon');
 
+const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;
 
 describe('slack helper', () => {
   describe('messageUserAsBot', () => {
     it('should send a message', (done) => {
-      assert(false);
-      done();
+      sinon.stub(SlackNode.prototype, 'api')
+        .onCall(0).yields(null, { ok: true, channel: { id: 'channel-id' } })
+        .onCall(1).yields(null, { ok: true });
+      slack.messageUserAsBot('user', 'some message', 'bot-token', (err, res) => {
+        assert(!err, err);
+        assert(res.ok);
+        SlackNode.prototype.api.restore();
+        done();
+      });
+    });
+
+    it('should error on im.open', (done) => {
+      sinon.stub(SlackNode.prototype, 'api')
+        .onCall(0).yields(null, { ok: false, error: 'some-error' });
+      slack.messageUserAsBot('user', 'some message', 'bot-token', (err) => {
+        assert.equal(err.message, 'An unexpected error occurred');
+        SlackNode.prototype.api.restore();
+        done();
+      });
+    });
+
+    it('should error on chat.postMessage', (done) => {
+      sinon.stub(SlackNode.prototype, 'api')
+        .onCall(0).yields(null, { ok: true, channel: { id: 'channel-id' } })
+        .onCall(1).yields(null, { ok: false, error: 'some-error' });
+      slack.messageUserAsBot('user', 'some message', 'bot-token', (err) => {
+        assert.equal(err.message, 'An unexpected error occurred');
+        SlackNode.prototype.api.restore();
+        done();
+      });
     });
   });
 

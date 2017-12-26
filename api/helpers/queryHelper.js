@@ -93,6 +93,7 @@ function _queryBuilder(table, queryType, valuesParam, whereParams = {}) {
   };
 }
 
+/* eslint-disable complexity */
 function _resultsHandler(err, results, callback, context = 'No context provided') {
   if (err) {
     logger.error(err, context);
@@ -130,6 +131,7 @@ function _resultsHandler(err, results, callback, context = 'No context provided'
   }
   callback(null, lodash.toPlainObject(results));
 }
+/* eslint-enable complexity */
 
 function _query(db, build, callback) {
   let paramArr = [];

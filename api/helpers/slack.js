@@ -29,6 +29,11 @@ function messageUserAsBot(userId, message, botToken, callback) {
       }, cb);
     }
   }, (err, res) => {
+    if (!lodash.get(res, 'message.ok', false)) {
+      logger.warn('chat.postMessage error', res.message);
+      callback(new Error('An unexpected error occurred'));
+      return;
+    }
     callback(err, res.message);
   });
 }
