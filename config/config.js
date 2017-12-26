@@ -15,25 +15,33 @@ const config = {
   
   USE_SSL: false,
   
-  TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost',
+  TEST_DATABASE_HOST: process.env.TEST_DATABASE_HOST || 'localhost', // TODO: Deprecated?
 
-  TEST_DATABASE_USER: process.env.TEST_DATABASE_USER || '',
+  TEST_DATABASE_USER: process.env.TEST_DATABASE_USER || '', // TODO: Deprecated?
 
-  TEST_DATABASE_PASSWORD: process.env.TEST_DATABASE_PASSWORD || '',
+  TEST_DATABASE_PASSWORD: process.env.TEST_DATABASE_PASSWORD || '', // TODO: Deprecated?
 
-  TEST_DATABASE_NAME: process.env.TEST_DATABASE_NAME || '',
+  TEST_DATABASE_NAME: process.env.TEST_DATABASE_NAME || '', // TODO: Deprecated?
 
-  SLACK_SLASH_TOKEN: process.env.SLACK_SLASH_TOKEN || '',
+  SLACK_SLASH_TOKEN: process.env.SLACK_SLASH_TOKEN || '', // TODO: Deprecated?
 
-  SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '',
+  SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || '', // TODO: Deprecated?
 
-  SLACK_API_TOKEN: process.env.SLACK_API_TOKEN || '',
+  SLACK_API_TOKEN: process.env.SLACK_API_TOKEN || '', // TODO: Deprecated?
 
-  SLACK_NOTIFY_ERROR_USER : process.env.SLACK_NOTIFY_ERROR_USER,
+  SLACK_NOTIFY_ERROR_USER : process.env.SLACK_NOTIFY_ERROR_USER, // TODO: Deprecated?
+  
+  SLACK_CLIENT_ID: process.env.SLACK_CLIENT_ID,
+  
+  SLACK_CLIENT_SECRET: process.env.SLACK_CLIENT_SECRET,
+    
+  SLACK_VERIFICATION_TOKEN: process.env.SLACK_VERIFICATION_TOKEN,
+  
+  SLACK_REDIRECT_URI: process.env.SLACK_REDIRECT_URI,
 
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
   
-  ADMIN_AUTH_SECRET: process.env.ADMIN_AUTH_SECRET,
+  ADMIN_AUTH_SECRET: process.env.ADMIN_AUTH_SECRET, // TODO: deprecate
 
   NODE_ENV: process.env.NODE_ENV || 'development',
 
@@ -43,7 +51,7 @@ const config = {
   
   SWAGGER: {
     
-    APP_VERSION: '5.0.0',
+    APP_VERSION: '6.0.0',
     
     HOSTNAME: process.env.HOST || 'localhost',
     

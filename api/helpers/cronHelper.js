@@ -40,15 +40,15 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
           (err, searchResults) => {
             if (err) cb(err);
             else if (searchResults.length > 0) cb(null, soups);
-            else cb(new Error(`no soups for "${subscriber.search_term}" found today`));
+            else cb({ clean: true, error: new Error(`no soups for "${subscriber.search_term}" found today`)});
           });
       },
       message: (searchResults, cb) => {
         if (searchResults) {
           const message = _buildCustomText(subscriber.search_term, searchResults.soups);
-          slack.messageUser(subscriber.slack_username, message, subscriber.slack_webhook_url, (err, res) => {
+          slack.messageUserAsBot(subscriber.slack_user_id, message, subscriber.slack_slash_token, (err, res) => {
             if (err) callback(err);
-            else if (res.status === 'fail') callback(res);
+            else if (!res.ok) callback(res);
             else callback(null, res);
           });
         } else {
@@ -56,12 +56,13 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
         }
       }
     }, (err) => {
-      if (err) logger.error('_processSubscriber', subscriber, err);
+      if (err && err.clean) logger.debug('_processSubscriber', subscriber, err);
+      else if (err) logger.error('_processSubscriber', subscriber, err);
       callback();
     });
   } else {
-    slack.messageUser(subscriber.slack_username, soups.text, subscriber.slack_webhook_url, (err, res) => {
-      if (err || res.status === 'fail') logger.error('_processSubscriber', subscriber, err, res);
+    slack.messageUserAsBot(subscriber.slack_user_id, soups.text, subscriber.slack_slash_token, (err, res) => {
+      if (err || !res.ok) logger.error('_processSubscriber', subscriber, err, res);
       callback();
     });
   }

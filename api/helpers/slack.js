@@ -1,38 +1,41 @@
 'use strict';
 
+const async = require('async');
 const Slack = require('slack-node');
 const lodash = require('lodash');
 const moment = require('moment');
 const logger = require('./logger');
 const utils  = require('./utils');
-const config = require('../../config/config');
 const SLACK_CONSTS = require('../../config/constants').SLACK_CONSTS;
 
-const slack = new Slack();
-
-//slack.setWebhook(config.SLACK_WEBHOOK_URL);
-
-const WEBHOOK_OPTS = {
-  username: config.SLACK_WEBHOOK_USERNAME || "Subito-Suboto",
-  icon_emoji: config.SLACK_WEBHOOK_ICON || ":stew:"
-};
-
-function messageChannel(channel, message, webhookUrl, callback) {
-  slack.setWebhook(webhookUrl);
-  const hookSend = Object.assign({}, WEBHOOK_OPTS, {
-    channel: '#'.concat(channel),
-    text: message
+function messageUserAsBot(userId, message, botToken, callback) {
+  const slackbot = new Slack(botToken);
+  async.autoInject({
+    im: (cb) => {
+      slackbot.api('im.open', {
+        user: userId,
+        return_im: true
+      }, cb);
+    },
+    message: (im, cb) => {
+      if (!im.ok) {
+        logger.warn('im.open error', im);
+        cb(new Error('An unexpected error occurred'));
+        return;
+      }
+      slackbot.api('chat.postMessage', {
+        text: message,
+        channel: im.channel.id
+      }, cb);
+    }
+  }, (err, res) => {
+    if (!lodash.get(res, 'message.ok', false)) {
+      logger.warn('chat.postMessage error', res.message);
+      callback(new Error('An unexpected error occurred'));
+      return;
+    }
+    callback(err, res.message);
   });
-  slack.webhook(hookSend, callback);
-}
-
-function messageUser(user, message, webhookUrl, callback) {
-  slack.setWebhook(webhookUrl);
-  const hookSend = Object.assign({}, WEBHOOK_OPTS, {
-    channel: '@'.concat(user),
-    text: message
-  });
-  slack.webhook(hookSend, callback);
 }
 
 function parseRequestCommand(params) {
@@ -102,8 +105,7 @@ function _parseRequestParams(command, givenParams) {
 }
 
 module.exports = {
-  messageUser: messageUser,
-  messageChannel: messageChannel,
+  messageUserAsBot: messageUserAsBot,
   utils: {
     parseRequestCommand: parseRequestCommand
   }

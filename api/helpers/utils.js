@@ -8,6 +8,10 @@ const logger = require('./logger');
 
 const ENCRYPTION_KEY = require('../../config/config').ENCRYPTION_KEY;
 
+moment.createFromInputFallback = function (config) {
+  config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+}
+
 function trimChar(str, char) {
   let regx = new RegExp('^'+ char + '+|' + char + '+$', 'g');
   return str.replace(regx, '');

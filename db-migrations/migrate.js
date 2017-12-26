@@ -4,6 +4,7 @@ require('dotenv').config({
   silent: true
 });
 
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
@@ -35,13 +36,13 @@ function processMigrationsFolder(callback) {
       const temp = idNameMapRegex.exec(filename);
       return {
         filename: temp[0],
-        id: temp[1],
+        id: parseInt(temp[1]),
         name: temp[2],
         direction: temp[3],
         applied: false
       };
     });
-    callback(null, mapped);
+    callback(null, _.sortBy(mapped, 'id'));
   });
 }
 
@@ -77,6 +78,7 @@ function query(db, queryStr, callback) {
       logger.error('Callback is not a function!', err);
     };
   }
+
   const qryArr = queryStr.trim().split(/\n{2,}/g);
   async.eachSeries(qryArr, (queryTodo, cb) => {
     logger.info(queryTodo);
@@ -100,6 +102,7 @@ function migrateUp() {
         if (migration.applied) {
           return cb2();
         } else {
+          logger.info(`Processing migration ${migration.id}`);
           async.waterfall([
             (cb3) => {
               fs.readFile(path.join(`./db-migrations/sql/${migration.filename}`), 'utf8', cb3);

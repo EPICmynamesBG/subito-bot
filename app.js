@@ -30,6 +30,7 @@ app.use(cors({ maxAge: 600 }));
 app.use(middleware.bindDb(app, db));
 app.use(middleware.logging);
 app.use(middleware.camelCaseBody);
+app.set('x-powered-by', false);
 
 var seConfig = { appRoot: __dirname };
 
@@ -37,7 +38,8 @@ let sslConfig = null;
 if (config.USE_SSL) {
   sslConfig = {
     key: config.SSL_PRIV_KEY,
-    cert: config.SSL_CERT
+    cert: config.SSL_CERT,
+    ca: config.SSL_CA
   };
 }
 
@@ -46,7 +48,6 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
 
   app.use(swaggerMetadata(swaggerExpress.runner.swagger))
   app.use(swaggerUi(swaggerExpress.runner.swagger));
-  app.use(middleware.adminAuth);
   // install middleware
   swaggerExpress.register(app);
 

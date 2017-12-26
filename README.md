@@ -6,6 +6,8 @@
 
 A slash command Slack bot for getting the daily soup selection from Indianapolis' [_Subito_](http://www.subitosoups.com/)
 
+<a href="https://slack.com/oauth/authorize?client_id=19000326018.274092194038&scope=commands,chat:write:bot,bot,team:read"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
+
 ## Usage
 ```text
 /subito - what's on the menu today!
@@ -54,7 +56,8 @@ _ *You can only be subscribed once_
 
 ## In Development
 
-- Packaging to be a Slack App!
+- Customizable subscription notification time
+- Subscribe to multiple criteria
 
 ## Docs
 
@@ -77,7 +80,7 @@ _ *You can only be subscribed once_
 
  - mysql
  - node/npm (recommend using nvm)
- 
+
 #### Setup
 
 - `mysql -e "CREATE DATABASE IF NOT EXISTS subito;" -u root -p`
@@ -104,8 +107,8 @@ PORT=3000
 SSL_PORT=443
 SSL_PRIV_KEY=[absolute path to key]
 SSL_CERT=[absolute path to cert]
+SSL_CA=[absolute path to ca/chain]
 ENCRYPTION_KEY=[random key]
-ADMIN_AUTH_SECRET=[random string]
 TEST_LOGGING_LEVEL=fatal
 LOGGING_LEVEL=debug
 NODE_ENV=development
@@ -117,7 +120,7 @@ By design, the `swagger.yaml` file is git-ignored. This is to leverge dynamic va
 
 #### Database Changes
 
-Database changes should be added in the `db-migrations/sql` folder. File names should be something like `[migration id]-[hyphen case description]-[up | down].sql`, with a corresponding up and down file. 
+Database changes should be added in the `db-migrations/sql` folder. File names should be something like `[migration id]-[hyphen case description]-[up | down].sql`, with a corresponding up and down file.
 
 Migrations can be ran via `npm run migrate-up:[local | test]`. This command will process and run _all_ up migrations.
 `npm run migrate-down:[local | test]` will run _only the last_ migration down script, so undoing a migration will happen one at a time.
@@ -130,7 +133,7 @@ Migrations can be ran via `npm run migrate-up:[local | test]`. This command will
 - `mysql -e "CREATE USER 'test'@'localhost' IDENTIFIED BY '[password]';" -u root -p`
 - `mysql -e "GRANT ALL PRIVILEGES ON subito_test . * TO 'test'@'localhost';" -u root -p`
 - `mysql -D subito_test < ddl/ddl.sql -u root -p`
- 
+
 ## License
 
 [GNU General Public License v3.0](http://www.gnu.org/licenses/gpl-3.0.txt)
