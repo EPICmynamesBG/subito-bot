@@ -5,6 +5,7 @@ const assert = require('assert');
 const lodash = require('lodash');
 const sinon = require('sinon');
 const request = require('request');
+const SlackNode = require('slack-node');
 const testHelper = require('../../helper/testHelper');
 const oauthService = require('../../../api/services/oauthService');
 
@@ -100,6 +101,7 @@ describe('oauthService', () => {
       };
       sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
       sinon.spy(oauthService, 'createOauthIntegration');
+      sinon.stub(SlackNode.prototype, 'api').yields(null, { team: {  domain: 'test.com' } });
 
       async.autoInject({
         run: (cb) => {
@@ -116,6 +118,115 @@ describe('oauthService', () => {
         assert(request.post.calledOnce);
         assert(oauthService.createOauthIntegration.calledOnce);
         oauthService.createOauthIntegration.restore();
+        SlackNode.prototype.api.restore();
+        request.post.restore();
+        done();
+      });
+    });
+
+    it('should request error on code', (done) => {
+      const test = {
+        error_message: 'Server Error',
+        ok: false
+      };
+      sinon.stub(request, 'post').yields(null, { statusCode: 500 }, JSON.stringify(test));
+
+      oauthService.processOAuth(testHelper.db, { code: 'some_code' }, (err) => {
+        assert(err);
+        assert.equal(err.statusCode, 500);
+        assert(request.post.calledOnce);
+        request.post.restore();
+        done();
+      });
+    });
+
+    it('should slack error on code', (done) => {
+      const test = {
+        error_message: 'Some random error',
+        ok: false
+      };
+      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
+
+      oauthService.processOAuth(testHelper.db, { code: 'some_code' }, (err) => {
+        assert(err);
+        assert.equal(err.statusCode, 400);
+        assert(request.post.calledOnce);
+        request.post.restore();
+        done();
+      });
+    });
+
+    it('should succeed when team pull errors', (done) => {
+      const test = {
+        access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX',
+        scope: 'incoming-webhook,commands,bot',
+        team_name: 'Teamk',
+        team_id: 'XXXXXXXXX',
+        user_id: 'ABC123567',
+        bot: {
+          bot_access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX'
+        },
+        incoming_webhook: {
+          url: 'https://hooks.slack.com/TXXXXX/BXXXXX/XXXXXXXXXX',
+          channel: '#channel-it-will-post-to',
+          configuration_url: 'https://teamname.slack.com/services/BXXXXX'
+        },
+        ok: true
+      };
+      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
+      sinon.stub(SlackNode.prototype, 'api').yields(new Error('Some Error'));
+
+      async.autoInject({
+        run: (cb) => {
+          oauthService.processOAuth(testHelper.db, { code: 'some_code' }, cb);
+        },
+        integration: (run, cb) => {
+          oauthService.getOauthIntegrationById(testHelper.db, test.team_id, cb);
+        }
+      }, (err, res) => {
+        assert.equal(err, null);
+        const integration = res.integration;
+        assert.equal(integration.domain, null);
+
+        SlackNode.prototype.api.restore();
+        request.post.restore();
+        done();
+      });
+    });
+
+    it('should succeed when team pull errors via slack', (done) => {
+      const test = {
+        access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX',
+        scope: 'incoming-webhook,commands,bot',
+        team_name: 'Teamk',
+        team_id: 'XXXXXXXXX',
+        user_id: 'ABC123567',
+        bot: {
+          bot_access_token: 'xoxp-XXXXXXXX-XXXXXXXX-XXXXX'
+        },
+        incoming_webhook: {
+          url: 'https://hooks.slack.com/TXXXXX/BXXXXX/XXXXXXXXXX',
+          channel: '#channel-it-will-post-to',
+          configuration_url: 'https://teamname.slack.com/services/BXXXXX'
+        },
+        ok: true
+      };
+      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, JSON.stringify(test));
+      sinon.stub(SlackNode.prototype, 'api').yields(null, { ok: false, error_message: 'Not Allowed' });
+
+      async.autoInject({
+        run: (cb) => {
+          oauthService.processOAuth(testHelper.db, { code: 'some_code' }, cb);
+        },
+        integration: (run, cb) => {
+          oauthService.getOauthIntegrationById(testHelper.db, test.team_id, cb);
+        }
+      }, (err, res) => {
+        assert.equal(err, null);
+        const integration = res.integration;
+        assert.equal(integration.domain, null);
+
+        SlackNode.prototype.api.restore();
         request.post.restore();
         done();
       });

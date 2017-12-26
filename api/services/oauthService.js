@@ -93,7 +93,7 @@ function processOAuth(db, queryParams, callback) {
           cb(null, null);
           return;
         }
-        if (response.error) {
+        if (response.error || !response.ok) {
           logger.info(`No extra team info for ${auth.team_id} - ${response.error}`);
           cb(null, null);
           return;
