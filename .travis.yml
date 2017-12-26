@@ -1,5 +1,6 @@
 language: node_js
 dist: trusty
+sudo: false
 node_js:
   - "8.0.0"
 services:
@@ -10,9 +11,6 @@ env:
     - DATABASE_HOST=localhost
     - DATABASE_USER=root
     - DATABASE_NAME=subito_test
-    - ENCRYPTION_KEY=test_key_123
-    - ADMIN_AUTH_SECRET=helloworld
-    - TEST_LOGGING_LEVEL=fatal
 addons:
   mysql: "5.7.19"
 before_install:
@@ -22,9 +20,8 @@ install:
   - npm install -g swagger
 before_script:
   - mysql -D subito_test < ddl/ddl.sql
-  - npm run migrate-up:local
   - npm run migrate-up:test
 script:
   - npm run eslint
-  - npm run coverage
   - npm run test
+  - npm run coverage
