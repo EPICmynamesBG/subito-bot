@@ -14,7 +14,6 @@ const db = require('../../config/db');
 
 const TABLES = [
   'oauth_integrations',
-  'team_integrations',
   'soup_calendar',
   'subscribers'
 ];
@@ -22,7 +21,6 @@ const TABLES = [
 const TABLE_DATA = {
   soup_calendar: require('../data/SoupCalendar.json'),
   subscribers: require('../data/Subscribers.json'),
-  team_integrations: require('../data/TeamIntegrations.json'),
   oauth_integrations: require('../data/OauthIntegrations.json')
 };
 
@@ -54,16 +52,6 @@ function resetData(callback) {
             clone.day = Number.isInteger(clone.day) ?
               moment().add(clone.day, 'd').format('YYYY-MM-DD') :
               clone.day;
-            return clone;
-          });
-        } else if (table === 'team_integrations') {
-          data = data.map((entry) => {
-            let clone = Object.assign({}, entry);
-            clone.slack_slash_token = utils.encrypt(clone.slack_slash_token);
-            clone.slack_webhook_url = utils.encrypt(clone.slack_webhook_url);
-            if (clone.metadata) {
-              clone.metadata = utils.encrypt(clone.metadata);
-            }
             return clone;
           });
         } else if (table === 'oauth_integrations') {

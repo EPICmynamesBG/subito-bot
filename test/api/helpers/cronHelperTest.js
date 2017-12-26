@@ -17,11 +17,11 @@ const soupCalendarViewService = require('../../../api/services/soupCalendarViewS
 const integrationSubscriberViewService = require('../../../api/services/integrationSubscriberViewService');
 
 const testSubscribers = require('../../data/Subscribers.json');
-const testIntegrations = require('../../data/TeamIntegrations.json');
+const testIntegrations = require('../../data/OauthIntegrations.json');
 const testHtml = fs.readFileSync(path.join(__dirname, '../../data') + '/test-calendar.html', 'utf-8');
 
 const subscriberIds = testSubscribers.map(sub => sub.slack_user_id);
-const integrationBotTokens = testIntegrations.map(integration => integration.slack_slash_token);
+const integrationBotTokens = testIntegrations.map(integration => integration.bot_token);
 
 describe('cronHelper', () => {
   beforeEach(testHelper.resetData);

@@ -48,7 +48,6 @@ SwaggerExpress.create(seConfig, function(err, swaggerExpress) {
 
   app.use(swaggerMetadata(swaggerExpress.runner.swagger))
   app.use(swaggerUi(swaggerExpress.runner.swagger));
-  app.use(middleware.adminAuth);
   // install middleware
   swaggerExpress.register(app);
 
