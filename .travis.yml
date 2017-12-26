@@ -8,9 +8,9 @@ services:
 env:
   global:
     - PORT=3000
-    - DATABASE_HOST=localhost
-    - DATABASE_USER=root
-    - DATABASE_NAME=subito_test
+    - TEST_DATABASE_HOST=localhost
+    - TEST_DATABASE_USER=root
+    - TEST_DATABASE_NAME=subito_test
 addons:
   mysql: "5.7.19"
 before_install:
