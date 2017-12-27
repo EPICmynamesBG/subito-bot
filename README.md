@@ -142,4 +142,16 @@ Migrations can be ran via `npm run migrate-up:[local | test]`. This command will
 
 <a href="https://github.com/EPICmynamesBG/subito-bot/blob/master/PRIVACY">Privacy Policy</a>
 
-_Disclaimer: This privacy policy is only guaranteed for the instance of Subito hosted at dev.brandongroff.com_
+
+## Disclaimers
+
+_This privacy policy is only guaranteed for the instance of Subito hosted at dev.brandongroff.com_
+
+_While Subito bot was built to use the Subito soup schedule, this app is completely
+unassociated with the Subito business. The logo and all content existing at [subitosoups.com](http://www.subitosoups.com/)
+are property of Subito. This application exists solely as an alternate way to view and be notified
+of their soup calendar and was independently developed._
+
+_The use of the Subito logo in the Slack App store submission is currently being discussed with
+Subito management. While completely unassociated with the Subito business, the submission will not
+be made fully public until/unless Subito soups approves the project._
