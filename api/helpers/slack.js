@@ -38,6 +38,24 @@ function messageUserAsBot(userId, message, botToken, callback) {
   });
 }
 
+function fetchUserInfo(userId, token, callback) {
+  const slack = new Slack(token);
+  slack.api('users.info', {
+    user: userId
+  }, (err, res) => {
+    if (err) {
+      logger.error(err);
+      callback(new Error('An unexpected error occurred'));
+      return;
+    } else if (!res.ok) {
+      logger.info(res);
+      callback(new Error(res.error));
+      return;
+    }
+    callback(null, res.user);
+  });
+}
+
 function parseRequestCommand(params) {
   const snakeParams = utils.snakeCase(params);
   let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -106,6 +124,7 @@ function _parseRequestParams(command, givenParams) {
 
 module.exports = {
   messageUserAsBot: messageUserAsBot,
+  fetchUserInfo: fetchUserInfo,
   utils: {
     parseRequestCommand: parseRequestCommand
   }

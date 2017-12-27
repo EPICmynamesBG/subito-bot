@@ -2,13 +2,46 @@
 
 const async = require('async');
 const lodash = require('lodash');
+const logger = require('../helpers/logger');
 const queryHelper = require('../helpers/queryHelper');
+const slack = require('../helpers/slack');
+const oauthService = require('./oauthService');
+const utils = require('../helpers/utils');
+
+function _addUser(db, userObj, callback) {
+  async.autoInject({
+    team: (cb) => {
+      oauthService.getOauthIntegrationById(db, userObj.slack_team_id, cb);
+    },
+    extendedInfo: (team, cb) => {
+      slack.fetchUserInfo(userObj.slack_user_id, team.bot_token, (err, res) => {
+        if (err) {
+          logger.debug(err);
+          cb(null, null);
+        } else {
+          cb(null, res);
+        }
+      });
+    },
+    insert: (extendedInfo, cb) => {
+      const insertObj = lodash.clone(userObj);
+      insertObj.timezone = JSON.stringify({
+        name: lodash.get(extendedInfo, 'tz', null),
+        label: lodash.get(extendedInfo, 'tz_label', null),
+        offset: lodash.get(extendedInfo, 'tz_offset', null)
+      });
+      queryHelper.insert(db, 'subscribers', insertObj, cb);
+    }
+  }, (err, res) => {
+    callback(err, res.insert);
+  });
+}
 
 function addSubscriber(db, user, callback) {
   const mappedUser = {
     slack_user_id: lodash.get(user, 'slackUserId', null),
     slack_username: lodash.get(user, 'slackUsername', null),
-    slack_team_id: lodash.get(user, 'slackTeamId', null)
+    slack_team_id: lodash.get(user, 'slackTeamId', null) // TODO: add notify_time ?
   };
   const searchTerm = lodash.get(user, 'searchTerm', null);
   if (searchTerm) {
@@ -28,7 +61,7 @@ function addSubscriber(db, user, callback) {
       });
     },
     (cb) => {
-      queryHelper.insert(db, 'subscribers', mappedUser, cb);
+      _addUser(db, mappedUser, cb);
     },
     (inserted, cb) => {
       module.exports.getSubscriberById(db, inserted.insertId, cb)
@@ -48,24 +81,55 @@ function addSubscriber(db, user, callback) {
   });
 }
 
+function _mapSubscriber(callback) {
+  return (err, res) => {
+    if (err) callback(err);
+    else if (Array.isArray(res)) {
+      const mapped = lodash.map(res, (obj) => {
+        const clone = lodash.clone(obj);
+        if (typeof lodash.get(obj, 'timezone', null) === 'string') {
+          lodash.set(obj, 'timezone', JSON.parse(clone.timezone));
+        }
+        return obj;
+      });
+      callback(null, mapped);
+    } else {
+      const clone = lodash.clone(res);
+      if (typeof lodash.get(clone, 'timezone', null) === 'string') {
+        lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
+      }
+      callback(null, clone);
+    }
+  };
+}
+
 function getSubscribers(db, callback) {
-  queryHelper.select(db, 'subscribers', callback);
+  queryHelper.select(db, 'subscribers', _mapSubscriber(callback));
 }
 
 function getSubscribersForTeam(db, teamId, callback) {
-  queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, callback);
+  queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, _mapSubscriber(callback));
 }
 
 function getSubscriberById(db, id, callback) {
-  queryHelper.selectOne(db, 'subscribers', { id: id }, callback);
+  queryHelper.selectOne(db, 'subscribers', { id: id }, _mapSubscriber(callback));
 }
 
 function getSubscriberBySlackUserId(db, slackId, callback) {
-  queryHelper.selectOne(db, 'subscribers', { slack_user_id: slackId }, callback);
+  queryHelper.selectOne(db, 'subscribers', { slack_user_id: slackId }, _mapSubscriber(callback));
 }
 
 function getSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
-  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId }, callback);
+  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId },
+    _mapSubscriber(callback));
+}
+
+function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
+  const clone = lodash.clone(updateObj);
+  if (clone.notify_time) {
+    clone.notify_time = utils.parseTime(clone.notify_time);
+  }
+  queryHelper.update(db, 'subscribers', { slack_user_id: slackId }, clone, callback);
 }
 
 function deleteSubscriberById(db, id, callback) {
@@ -87,6 +151,7 @@ module.exports = {
   getSubscriberById: getSubscriberById,
   getSubscriberBySlackUserId: getSubscriberBySlackUserId,
   getSubscriberBySlackUsername: getSubscriberBySlackUsername,
+  updateSubscriberBySlackUserId: updateSubscriberBySlackUserId,
   deleteSubscriberById: deleteSubscriberById,
   deleteSubscriberBySlackUserId: deleteSubscriberBySlackUserId,
   deleteSubscriberBySlackUsername: deleteSubscriberBySlackUsername

@@ -150,6 +150,11 @@ function decrypt(thing) {
   }
 }
 
+function parseTime (text) {
+  throw new Error('TODO'); // TODO: implement time parsing from ie: 1:00PM -> 13:00:00
+  return text;
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
@@ -163,5 +168,6 @@ module.exports = {
   processResponseCb: processResponseCb,
   textCleaner: textCleaner,
   encrypt: encrypt,
-  decrypt: decrypt
+  decrypt: decrypt,
+  parseTime: parseTime
 };

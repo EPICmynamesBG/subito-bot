@@ -17,9 +17,9 @@ module.exports = {
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
       search: ['search'],
-      subscribe: ['search'],
+      subscribe: ['search'], // TODO: add notify_time ?
       unsubscribe: [],
-      feedback: []
+      feedback: [] // TODO: add settings: ['notification time']
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({
