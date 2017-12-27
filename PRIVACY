@@ -1,0 +1,43 @@
+PRIVACY POLICY
+
+SCOPE OF THIS PRIVACY STATEMENT
+Being an open-source project, while user
+security is a primary focus in development, the actual hosting
+done by other users cannot be guaranteed. For all intensive purposes,
+this document only ensures accuracy and coverage for the Slack store
+submission of Subito bot hosted at dev.brandongroff.com.
+
+THE PERSONAL INFORMATION WE COLLECT
+Subito bot collects as little personal information as possible. When the
+app is connected to a Slack team, the following info is stored:
+- Slack Team Id
+- Slack Team Name
+- the Installer's Slack User Id
+- Slack Team Domain
+- a Slack Access Token (encrypted)
+- a Slack Bot Token (encrypted)
+
+When a user subscribes to notifications from Subito bot, the following
+information is stored:
+- the user's Slack Team Id
+- the user's Slack Id
+- the user's Team Username
+
+HOW WE USE YOUR PERSONAL INFORMATION
+Subito bot uses the above information for application use cases only. No outside
+access or access should ever be granted.
+
+HOW WE SHARE YOUR PERSONAL INFORMATION
+Your Slack info is not shared and never will be.
+
+SECURITY
+For the security of all users, Subito bot hosting takes advantage of https encryption.
+Server access is limited to only one user, and necessary security provisions are in place
+to prevent unauthorized user access, both on a server and database level.
+
+CHANGES TO THIS PRIVACY STATEMENT
+This document may be updated at any time.
+
+HOW TO CONTACT US
+All feedback should be submitted as an Issue on GitHub at
+https://github.com/EPICmynamesBG/subito-bot/issues.

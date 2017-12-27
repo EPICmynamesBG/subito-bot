@@ -137,3 +137,9 @@ Migrations can be ran via `npm run migrate-up:[local | test]`. This command will
 ## License
 
 [GNU General Public License v3.0](http://www.gnu.org/licenses/gpl-3.0.txt)
+
+## Privacy
+
+<a href="https://github.com/EPICmynamesBG/subito-bot/blob/master/PRIVACY">Privacy Policy</a>
+
+_Disclaimer: This privacy policy is only guaranteed for the instance of Subito hosted at dev.brandongroff.com_

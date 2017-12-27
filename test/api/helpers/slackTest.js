@@ -188,6 +188,14 @@ describe('slack helper', () => {
         assert.deepEqual(output, expected);
       });
 
+      it('should support "feedback" command', () => {
+        const text = 'feedback';
+        const output = slack.utils.parseRequestCommand(text);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'feedback';
+        assert.deepEqual(output, expected);
+      });
+
       it('should return command with params.unknown when unsupported', () => {
         const text = 'hello bob barker';
         const output = slack.utils.parseRequestCommand(text);
