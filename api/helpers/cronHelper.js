@@ -1,7 +1,9 @@
 'use strict';
 
 const async = require('async');
-const moment = require('moment');
+const lodash = require('lodash');
+const moment = require('moment-timezone');
+const { DEFAULT_TIMEZONE } = require('../../config/config');
 
 const logger = require('./logger');
 const parseSubito = require('./parseSubito');
@@ -32,7 +34,26 @@ const _buildCustomText = (searchStr, soups) => {
   return `Today's the day! _${searchStr}_ is on the menu! Here are the soups: \n>${soups[0]}\n>${soups[1]}`;
 };
 
+const _isTimeToNotify = (subscriber) => {
+  const timezone = lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE);
+  const notifyTime = moment(subscriber.notify_time, 'HH:mm:ss').tz(timezone);
+  const lowerTime = moment().tz(timezone).subtract('7.5', 'minute');
+  const upperTime = moment().tz(timezone).add('7.5', 'minute');
+
+  return notifyTime.isBetween(lowerTime, upperTime);
+};
+
 const _processSubscriber = (db, subscriber, soups, callback) => {
+  if (!_isTimeToNotify(subscriber)) {
+    logger.debug({
+      message: 'Notification time outside of notification range',
+      timezone: lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE),
+      notify_time: subscriber.notify_time
+    })
+    callback();
+    return;
+  }
+
   if (subscriber.search_term) {
     async.autoInject({
       searchResults: (cb) => {
@@ -71,7 +92,6 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
 const processSubscribers = (db) => {
   return (callback) => {
     logger.info('Running processSubscribers:: ', moment().toDate());
-    const cleanExit = { clean: true };
     async.autoInject({
       soups: (cb) => {
         soupCalendarViewService.getSoupsForDay(db, utils.dateForText('today'), cb);
@@ -81,7 +101,7 @@ const processSubscribers = (db) => {
       },
       process: (soups, subscribers, cb) => {
         if (!soups) {
-          cb(cleanExit);
+          cb({ clean: true, message: 'no soups for today' });
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
@@ -90,7 +110,7 @@ const processSubscribers = (db) => {
       }
     }, (err) => {
       if (err && err.clean) {
-        logger.info('processSubscribers complete', 'no soups for today');
+        logger.info('processSubscribers complete', err.message);
       } else if (err) {
         logger.error(err); // should never occur
       } else {
@@ -106,6 +126,7 @@ module.exports = {
   processSubscribers: processSubscribers,
   private: {
     processSubscriber: _processSubscriber,
-    buildCustomTest: _buildCustomText
+    buildCustomTest: _buildCustomText,
+    isTimeToNotify: _isTimeToNotify
   }
 };

@@ -49,6 +49,8 @@ const config = {
 
   LOG_DIR: './logs',
 
+  DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/Indiana/Indianapolis',
+
   SWAGGER: {
 
     APP_VERSION: '6.1.0',

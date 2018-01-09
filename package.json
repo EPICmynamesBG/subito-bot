@@ -21,6 +21,7 @@
     "express": "^4.16.2",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
+    "moment-timezone": "^0.5.14",
     "mysql": "^2.15.0",
     "node-cron": "^1.2.1",
     "node-html-parser": "^1.1.6",

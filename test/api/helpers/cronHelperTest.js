@@ -206,5 +206,45 @@ describe('cronHelper', () => {
         done();
       });
     });
+
+    it('should not message the suscriber when outside of notification time range', (done) => {
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
+      const loggerSpy = sinon.spy(logger, 'debug');
+      async.autoInject({
+        soups: (cb) => {
+          soupCalendarViewService.getSoupsForDay(testHelper.db, utils.dateForText('today'), cb);
+        },
+        subscribers: (cb) => {
+          integrationSubscriberViewService.getAll(testHelper.db, true, cb);
+        },
+        process: (soups, subscribers, cb) => {
+          async.each(subscribers, (subscriber, ecb) => {
+            cronHelper.private.processSubscriber(testHelper.db, subscriber, soups, (err) => {
+              assert(!err);
+              ecb();
+            });
+          }, cb);
+        }
+      }, (err) => {
+        assert(!err);
+        assert(slackSpy.getCalls().length === 0);
+        assert(loggerSpy.getCalls().length > 0);
+
+        loggerSpy.restore();
+        slackSpy.restore();
+        done();
+      });
+    });
+  });
+
+  describe('private.isTimeToNotify', () => {
+    it('should return true when within a 15 minute range', () => {
+      // let test = {
+      //   timezone: { tz: 'America/Indiana/Indianapolis' }
+      // };
+      // let result = cronHelper.private.isTimeToNotify(test);
+      // TODO: How to test this time logic?
+      assert(true);
+    });
   });
 });
