@@ -11,7 +11,8 @@ module.exports = {
       search: '[soup name/type (example: gouda | gf)]',
       subscribe: '[search (example: corn)]',
       unsubscribe: '',
-      feedback: '<https://github.com/EPICmynamesBG/subito-bot/issues|Submit feedback on GitHub>'
+      feedback: '<https://github.com/EPICmynamesBG/subito-bot/issues|Submit feedback on GitHub>',
+      settings: '[notify (example: 8:00 am)]'
     },
 
     CMD_PARAM_MAP: lodash.cloneDeep({
@@ -19,7 +20,8 @@ module.exports = {
       search: ['search'],
       subscribe: ['search'], // TODO: add notify_time ?
       unsubscribe: [],
-      feedback: [] // TODO: add settings: ['notification time']
+      feedback: [],
+      settings: ['notification time']
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({

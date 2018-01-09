@@ -87,15 +87,15 @@ function _mapSubscriber(callback) {
     else if (Array.isArray(res)) {
       const mapped = lodash.map(res, (obj) => {
         const clone = lodash.clone(obj);
-        if (typeof lodash.get(obj, 'timezone', null) === 'string') {
-          lodash.set(obj, 'timezone', JSON.parse(clone.timezone));
+        if (!lodash.isPlainObject(clone.timezone)) {
+          lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
         }
-        return obj;
+        return clone;
       });
       callback(null, mapped);
     } else {
       const clone = lodash.clone(res);
-      if (typeof lodash.get(clone, 'timezone', null) === 'string') {
+      if (!lodash.isPlainObject(clone.timezone)) {
         lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
       }
       callback(null, clone);
@@ -126,6 +126,11 @@ function getSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
 
 function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
   const clone = lodash.clone(updateObj);
+  if (clone.timezone) {
+    if (!lodash.isPlainObject(clone.timezone)) {
+      clone.timezone = JSON.stringify(clone.timezone);
+    }
+  }
   if (clone.notify_time) {
     clone.notify_time = utils.parseTime(clone.notify_time);
   }

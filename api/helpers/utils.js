@@ -1,6 +1,6 @@
 'use strict';
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const lodash = require('lodash');
 const errors = require('common-errors');
 const crypto = require('crypto-js');
@@ -151,8 +151,11 @@ function decrypt(thing) {
 }
 
 function parseTime (text) {
-  throw new Error('TODO'); // TODO: implement time parsing from ie: 1:00PM -> 13:00:00
-  return text;
+  const time = moment(text, 'h:mm A');
+  if (!time.isValid()) {
+    logger.warn('Invalid time parsed', text, time.format('HH:mm:ss'));
+  }
+  return time.format('HH:mm:ss');
 }
 
 module.exports = {

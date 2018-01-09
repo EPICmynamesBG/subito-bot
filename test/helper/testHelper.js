@@ -61,6 +61,12 @@ function resetData(callback) {
             clone.bot_token = utils.encrypt(clone.bot_token);
             return clone;
           });
+        } else if (table === 'subscribers') {
+          data = data.map((entry) => {
+            let clone = Object.assign({}, entry);
+            clone.timezone = JSON.stringify(clone.timezone);
+            return clone;
+          });
         }
         queryHelper.insert(db, table, data, eachCb);
       }, cb);

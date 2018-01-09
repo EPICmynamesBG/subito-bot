@@ -225,4 +225,20 @@ describe('utils', () => {
       crypto.AES.decrypt.restore();
     });
   });
+
+  describe('parseTime', () => {
+    it('should work', () => {
+      let time = utils.parseTime('11:00');
+      assert.equal(time, '11:00:00');
+
+      time = utils.parseTime('2:00 pm');
+      assert.equal(time, '14:00:00');
+
+      time = utils.parseTime('06:00 pm');
+      assert.equal(time, '18:00:00');
+
+      time = utils.parseTime('8:30');
+      assert.equal(time, '08:30:00');
+    });
+  });
 });
