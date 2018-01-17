@@ -7,3 +7,5 @@ coverage/
 bower_components/*
 LICENSE
 PRIVACY
+data-model/*
+Pipfile*
