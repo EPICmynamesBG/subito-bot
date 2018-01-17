@@ -37,3 +37,4 @@ pipe/*
 
 .env
 api/swagger/swagger.yaml
+data-model/model.pkl

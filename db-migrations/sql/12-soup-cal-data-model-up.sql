@@ -1,0 +1,2 @@
+ALTER TABLE soup_calendar ADD COLUMN `is_soup` BOOLEAN DEFAULT NULL;
+ALTER TABLE soup_calendar ADD COLUMN `estimated_is_soup` BOOLEAN NOT NULL DEFAULT FALSE;
