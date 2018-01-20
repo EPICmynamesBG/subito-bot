@@ -4,7 +4,7 @@ const lodash = require('lodash');
 
 module.exports = {
   SLACK_CONSTS: {
-    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback']),
+    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'settings']),
 
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
@@ -18,10 +18,12 @@ module.exports = {
     CMD_PARAM_MAP: lodash.cloneDeep({
       day: ['day'],
       search: ['search'],
-      subscribe: ['search'], // TODO: add notify_time ?
+      subscribe: ['search'],
       unsubscribe: [],
       feedback: [],
-      settings: ['notify']
+      settings: {
+        notify: ['time']
+      }
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({

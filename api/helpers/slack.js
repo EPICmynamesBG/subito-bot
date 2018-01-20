@@ -105,7 +105,22 @@ function _parseRequestParams(command, givenParams) {
   const paramObj = {};
   const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
 
-  if (supportedParams.length === 1) {
+  if (lodash.isObject(supportedParams)) {
+    const subCommand = givenParams[0];
+    if (supportedParams[subCommand]) {
+      const supportedSubParams = SLACK_CONSTS.CMD_PARAM_MAP[command][subCommand];
+      const remParams = lodash.clone(givenParams);
+      remParams.splice(0, 1);
+      supportedSubParams.forEach((param, index) => {
+        let value = remParams[index];
+        if (typeof value === 'string' && value.length === 0) value = null;
+        lodash.set(paramObj, [subCommand, param], value);
+      });
+    } else {
+      logger.warn('Slack sub-commain mapping failed. ', supportedParams, givenParams);
+      return paramObj;
+    }
+  } else if (supportedParams.length === 1) {
     let value = givenParams.join(' ');
     if (typeof value === 'string' && value.length === 0) value = null;
     paramObj[supportedParams[0]] = value;

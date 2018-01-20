@@ -37,8 +37,29 @@ function unsubscribe(req, res) {
   }
 }
 
+function updateSettings(req, res) {
+  const notificationTime = req.swagger.params.notificationTime.value;
+  const slackUserId = req.swagger.params.slackUserId.value;
+
+  subscriberService.updateSubscriberBySlackUserId(req.db, slackUserId, { notify_time: notificationTime },
+    (err, results) => {
+      if (req.fromSlack) {
+        if (results.affectedRows === 0) {
+          utils.processResponse(err, { text: "Something unexpected occurred :fearful:" }, res);
+          return;
+        }
+        utils.processResponse(err, {
+          text: `Your subscription notification time has been updated to ${notificationTime}`
+        }, res);
+        return;
+      }
+      utils.processResponse(err, { text: results.text }, res);
+    });
+}
+
 module.exports = {
   subscribe: subscribe,
   unsubscribe: unsubscribe,
-  unsubscribe2: unsubscribe
+  unsubscribe2: unsubscribe,
+  updateSettings: updateSettings
 };

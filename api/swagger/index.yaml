@@ -204,6 +204,36 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /subscription:
+    x-swagger-router-controller: subscriberController
+    put:
+      description: Update subscrition settings
+      operationId: updateSettings
+      tags:
+        - Subscribe
+      parameters:
+        - name: body
+          in: body
+          description: subscription settings request body
+          required: true
+          schema:
+            required:
+              - slackUserId
+              - notificationTime
+            properties:
+              slackUserId:
+                type: string
+              notificationTime:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /unsubscribe:
     x-swagger-router-controller: subscriberController
     post:

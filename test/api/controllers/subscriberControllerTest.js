@@ -102,4 +102,23 @@ describe('subscriberController', () => {
         });
     });
   });
+
+  describe('PUT /subito/subscription', (done) => {
+    request(server)
+      .put('/subito/subscription')
+      .type('form')
+      .send({
+        slackUserId: testUser.slackUserId,
+        notificationTime: '8:00'
+      })
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, res) => {
+        should.not.exist(err);
+        res.body.should.have.property('text', '1 subscribers UPDATED');
+        done();
+      });
+  });
 });

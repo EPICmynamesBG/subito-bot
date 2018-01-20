@@ -196,6 +196,15 @@ describe('slack helper', () => {
         assert.deepEqual(output, expected);
       });
 
+      it('should support "settings" command', () => {
+        const text = 'settings notify 8:00';
+        const output = slack.utils.parseRequestCommand(text);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'settings';
+        expected.params.notify = { time: '8:00' };
+        assert.deepEqual(output, expected);
+      });
+
       it('should return command with params.unknown when unsupported', () => {
         const text = 'hello bob barker';
         const output = slack.utils.parseRequestCommand(text);

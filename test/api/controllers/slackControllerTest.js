@@ -278,6 +278,27 @@ describe('slackController', () => {
         });
     });
 
+    it('should 200 and return text for "settings"', (done) => {
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: validAuth.token,
+          text: 'settings notify 8:00',
+          user_id: 'ABC123',
+          user_name: 'testuser',
+          team_id: validAuth.team_id
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.text, 'Your subscription notification time has been updated to 8:00');
+          done();
+        });
+    });
+
     it('should 200 and return a usage description when given an unknown command', (done) => {
       request(server)
         .post(url)
