@@ -3,7 +3,7 @@
 const async = require('async');
 const lodash = require('lodash');
 const moment = require('moment-timezone');
-const { DEFAULT_TIMEZONE } = require('../../config/config');
+const { DEFAULT_TIMEZONE, CRON_NOTIFICATION_CHECK } = require('../../config/config');
 
 const logger = require('./logger');
 const parseSubito = require('./parseSubito');
@@ -37,19 +37,19 @@ const _buildCustomText = (searchStr, soups) => {
 const _isTimeToNotify = (subscriber) => {
   const timezone = lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE);
   const notifyTime = moment(subscriber.notify_time, 'HH:mm:ss').tz(timezone);
-  const lowerTime = moment().tz(timezone).subtract('7.5', 'minute');
-  const upperTime = moment().tz(timezone).add('7.5', 'minute');
+  const lowerTime = moment().tz(timezone).subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const upperTime = moment().tz(timezone).add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
 
   return notifyTime.isBetween(lowerTime, upperTime);
 };
 
 const _processSubscriber = (db, subscriber, soups, callback) => {
-  if (!_isTimeToNotify(subscriber)) {
+  if (!module.exports.private.isTimeToNotify(subscriber)) {
     logger.debug({
       message: 'Notification time outside of notification range',
       timezone: lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE),
       notify_time: subscriber.notify_time
-    })
+    });
     callback();
     return;
   }

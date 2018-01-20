@@ -21,7 +21,7 @@ module.exports = {
       subscribe: ['search'], // TODO: add notify_time ?
       unsubscribe: [],
       feedback: [],
-      settings: ['notification time']
+      settings: ['notify']
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({

@@ -51,6 +51,8 @@ const config = {
 
   DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/Indiana/Indianapolis',
 
+  CRON_NOTIFICATION_CHECK: process.env.CRON_NOTIFICATION_CHECK || 15.00, // minutes
+
   SWAGGER: {
 
     APP_VERSION: '6.1.0',
@@ -65,6 +67,12 @@ const config = {
 
   }
 };
+
+if (config.CRON_NOTIFICATION_CHECK > 60) {
+  config.CRON_NOTIFICATION_CHECK = 60;
+} else if (config.CRON_NOTIFICATION_CHECK <= 0) {
+  config.CRON_NOTIFICATION_CHECK = 1;
+}
 
 if (config.NODE_ENV === 'test') {
   // eslint-disable-next-line global-require

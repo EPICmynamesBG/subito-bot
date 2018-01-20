@@ -41,7 +41,7 @@ function addSubscriber(db, user, callback) {
   const mappedUser = {
     slack_user_id: lodash.get(user, 'slackUserId', null),
     slack_username: lodash.get(user, 'slackUsername', null),
-    slack_team_id: lodash.get(user, 'slackTeamId', null) // TODO: add notify_time ?
+    slack_team_id: lodash.get(user, 'slackTeamId', null)
   };
   const searchTerm = lodash.get(user, 'searchTerm', null);
   if (searchTerm) {
