@@ -49,8 +49,8 @@ function handleSlack(req, res) {
       { text: 'Submit feedback <https://github.com/EPICmynamesBG/subito-bot/issues|here>!' }, res);
     break;
   case 'settings':
-    lodash.set(req, 'swagger.params.slackUserId.value', action.params.user.id);
-    lodash.set(req, 'swagger.params.notificationTime.value', lodash.get(action, 'params.notify.time'));
+    lodash.set(req, 'swagger.params.body.value.slackUserId.value', action.params.user.id);
+    lodash.set(req, 'swagger.params.body.value.notificationTime.value', lodash.get(action, 'params.notify.time'));
     subscriberController.updateSettings(req, res);
     break;
   default: {

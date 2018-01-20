@@ -38,8 +38,9 @@ function unsubscribe(req, res) {
 }
 
 function updateSettings(req, res) {
-  const notificationTime = req.swagger.params.notificationTime.value;
-  const slackUserId = req.swagger.params.slackUserId.value;
+  console.log(req.swagger.params);
+  const notificationTime = req.swagger.params.body.value.notificationTime.value;
+  const slackUserId = req.swagger.params.body.value.slackUserId.value;
 
   subscriberService.updateSubscriberBySlackUserId(req.db, slackUserId, { notify_time: notificationTime },
     (err, results) => {
