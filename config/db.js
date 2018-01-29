@@ -73,6 +73,7 @@ DB.prototype.query = function (query, paramArr, callback) {
   ], (err, results) => {
     if (dbConnection) dbConnection.release();
     if (err) {
+      if (config.NODE_ENV === 'test') throw err;
       logger.error('DB.Query', err);
       callback(err);
       return;
