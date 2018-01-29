@@ -24,19 +24,19 @@ const TABLE_DATA = {
   oauth_integrations: require('../data/OauthIntegrations.json')
 };
 
-function clearData(callback) {
+function clearData(done) {
   const fkChecks = 'SET foreign_key_checks = ?';
   const deleteQry = 'TRUNCATE TABLE ??';
-  async.each(TABLES, (table, eachCb) => {
+  async.eachSeries(TABLES, (table, eachCb) => {
     db.query(`${fkChecks}; ${deleteQry}; ${fkChecks};`, [0, table, 1], eachCb);
   }, (err) => {
     if (err) logger.error('clearData', err);
-    callback();
+    done(err);
   });
 }
 
-function resetData(callback) {
-  if (typeof callback !== 'function') {
+function resetData(done) {
+  if (typeof done !== 'function') {
     logger.error('No callback provided');
   }
   async.waterfall([
@@ -44,7 +44,7 @@ function resetData(callback) {
       module.exports.clearData(cb);
     },
     (cb) => {
-      async.each(TABLES, (table, eachCb) => {
+      async.eachSeries(TABLES, (table, eachCb) => {
         let data = TABLE_DATA[table];
         if (table === 'soup_calendar') {
           data = data.map((entry) => {
@@ -73,7 +73,7 @@ function resetData(callback) {
     }
   ], (err) => {
     if (err) logger.error('resetData', err);
-    callback();
+    done(err);
   });
 }
 

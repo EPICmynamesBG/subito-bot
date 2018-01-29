@@ -22,7 +22,7 @@ function DB() {
       if (options.clean) logger.debug('Clean pool close');
       if (poolErr) logger.error(poolErr);
       if (err) logger.error(err);
-      if (options.exit) process.exit();
+      if (options.exit) process.exit(options.code || 0);
     });
   };
 
@@ -30,17 +30,20 @@ function DB() {
 
   //do something when app is closing
   process.on('exit', onEnd.bind(this, {
-    clean: true
+    clean: true,
+    code: 0
   }));
 
   //catches ctrl+c event
   process.on('SIGINT', onEnd.bind(this, {
-    exit: true
+    exit: true,
+    code: 0
   }));
 
   //catches uncaught exceptions
   process.on('uncaughtException', onEnd.bind(this, {
-    exit: true
+    exit: true,
+    code: 1
   }));
 
   this.pool.on('acquire', (connection) => {
@@ -73,8 +76,8 @@ DB.prototype.query = function (query, paramArr, callback) {
   ], (err, results) => {
     if (dbConnection) dbConnection.release();
     if (err) {
-      if (config.NODE_ENV === 'test') throw err;
       logger.error('DB.Query', err);
+      logger.debug('DB.Query.Error', query, paramArr);
       callback(err);
       return;
     }

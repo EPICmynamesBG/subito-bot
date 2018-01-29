@@ -105,7 +105,7 @@ function _parseRequestParams(command, givenParams) {
   const paramObj = {};
   const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
 
-  if (lodash.isObject(supportedParams)) {
+  if (lodash.isPlainObject(supportedParams)) {
     const subCommand = givenParams[0];
     if (supportedParams[subCommand]) {
       const supportedSubParams = SLACK_CONSTS.CMD_PARAM_MAP[command][subCommand];
@@ -117,7 +117,7 @@ function _parseRequestParams(command, givenParams) {
         lodash.set(paramObj, [subCommand, param], value);
       });
     } else {
-      logger.warn('Slack sub-commain mapping failed. ', supportedParams, givenParams);
+      logger.warn('Slack sub-command mapping failed. ', supportedParams, givenParams);
       return paramObj;
     }
   } else if (supportedParams.length === 1) {

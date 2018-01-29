@@ -9,6 +9,7 @@ const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
 const oauthService = require('../../../api/services/oauthService');
 const async = require('async');
+const slack = require('../../../api/helpers/slack');
 
 const { SLACK_VERIFICATION_TOKEN } = require('../../../config/config');
 
@@ -141,27 +142,6 @@ describe('slackController', () => {
                 'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
               cb();
             });
-        },
-        (cb) => {
-          request(server)
-            .post(url)
-            .type('form')
-            .send({
-              token: validAuth.token,
-              text: 'day 2017-07-31',
-              user_id: '123ABC',
-              user_name: 'bobthebuilder',
-              team_id: validAuth.team_id
-            })
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .end((err, res) => {
-              should.not.exist(err);
-              assert.equal(res.body.text, // eslint-disable-next-line max-len
-                'Here are the soups for _Monday, Jul 31_: \n>Chicken, Bacon, Local Corn Chowder (gf)\n>Italian Wedding (df)');
-              cb();
-            });
         }
       ], () => {
         done();
@@ -191,6 +171,9 @@ describe('slackController', () => {
     });
 
     it('should forward "subscribe" to /subito/subscribe', (done) => {
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/Indiana/Indianapolis'
+      });
       request(server)
         .post(url)
         .type('form')
@@ -209,11 +192,15 @@ describe('slackController', () => {
           assert.equal(res.body.slackUserId, 'ABC123');
           assert.equal(res.body.slackUsername, 'testuser');
           assert.equal(res.body.text, 'You\'re subscribed! :tada:');
+          slack.fetchUserInfo.restore();
           done();
         });
     });
 
     it('should forward "subscribe" to /subito/subscribe with search string', (done) => {
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/Indiana/Indianapolis'
+      });
       request(server)
         .post(url)
         .type('form')
@@ -232,11 +219,15 @@ describe('slackController', () => {
           assert.equal(res.body.slackUserId, 'ABCD123');
           assert.equal(res.body.slackUsername, 'testuser2');
           assert.equal(res.body.text, 'You\'re subscribed to _corn_! :tada:');
+          slack.fetchUserInfo.restore();
           done();
         });
     });
 
     it('should forward "unsubscribe" to /subito/unsubscribe', (done) => {
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/Indiana/Indianapolis'
+      });
       request(server)
         .post(url)
         .type('form')
@@ -253,6 +244,7 @@ describe('slackController', () => {
         .end((err, res) => {
           should.not.exist(err);
           assert.equal(res.body.text, 'You\'ve been unsubscribed :disappointed:');
+          slack.fetchUserInfo.restore();
           done();
         });
     });
@@ -279,13 +271,16 @@ describe('slackController', () => {
     });
 
     it('should 200 and return text for "settings"', (done) => {
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/Indiana/Indianapolis'
+      });
       request(server)
         .post(url)
         .type('form')
         .send({
           token: validAuth.token,
           text: 'settings notify 8:00',
-          user_id: 'ABC123',
+          user_id: 'ABC_123',
           user_name: 'testuser',
           team_id: validAuth.team_id
         })
@@ -295,6 +290,7 @@ describe('slackController', () => {
         .end((err, res) => {
           should.not.exist(err);
           assert.equal(res.body.text, 'Your subscription notification time has been updated to 8:00');
+          slack.fetchUserInfo.restore();
           done();
         });
     });

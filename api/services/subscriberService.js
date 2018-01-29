@@ -93,12 +93,14 @@ function _mapSubscriber(callback) {
         return clone;
       });
       callback(null, mapped);
-    } else {
+    } else if (lodash.isObject(res)) {
       const clone = lodash.clone(res);
       if (!lodash.isPlainObject(clone.timezone)) {
         lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
       }
       callback(null, clone);
+    } else {
+      callback(null, res);
     }
   };
 }
@@ -134,7 +136,8 @@ function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
   if (clone.notify_time) {
     clone.notify_time = utils.parseTime(clone.notify_time);
   }
-  queryHelper.update(db, 'subscribers', { slack_user_id: slackId }, clone, callback);
+  logger.debug(clone, slackId);
+  queryHelper.update(db, 'subscribers', clone, { slack_user_id: slackId }, callback);
 }
 
 function deleteSubscriberById(db, id, callback) {
