@@ -45,7 +45,7 @@ describe('soupCalendarService', () => {
       const searchStr = 'corn';
       soupCalendarService.searchForSoup(testHelper.db, searchStr, (err, res) => {
         assert.equal(err, null);
-        assert(res.length > 1, 'should have results');
+        assert(res.length > 0, 'should have results');
         let last = null;
         /* eslint-disable max-nested-callbacks */
         res.forEach((result) => {

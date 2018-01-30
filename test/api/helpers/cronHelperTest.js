@@ -4,6 +4,7 @@ const assert = require('assert');
 const should = require('should');
 const sinon = require('sinon');
 const fs = require('fs');
+const moment = require('moment');
 const path = require('path');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');
@@ -45,6 +46,21 @@ describe('cronHelper', () => {
   });
 
   describe('processSubscribers', () => {
+    let clock;
+    before(() => {
+      clock = sinon.useFakeTimers({
+        now: moment().startOf('week').add(1, 'day').set({
+          hour: 8,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+    });
+
+    after(() => {
+      clock.restore();
+    });
+
     it('should not error', (done) => {
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
@@ -53,7 +69,7 @@ describe('cronHelper', () => {
         should.not.exist(err);
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
-        assert.equal(slackSpy.getCalls().length, testSubscribers.length);
+        assert.equal(slackSpy.getCalls().length, 1, 'should message 1 user');
 
         /* eslint-disable max-nested-callbacks */
         slackSpy.getCalls().forEach((call) => {
@@ -74,11 +90,19 @@ describe('cronHelper', () => {
     });
 
     it('should not message when there are no soups', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment().startOf('week').set({
+          hour: 8,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       cronHelper.processSubscribers(testHelper.db)((err) => {
-        assert.deepEqual(err, { clean: true });
+        assert.deepEqual(err, { clean: true, message: 'no soups for today' });
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
         assert.equal(slackSpy.getCalls().length, 0);
@@ -100,6 +124,21 @@ describe('cronHelper', () => {
   });
 
   describe('private.processSubscriber', () => {
+    let clock;
+    before(() => {
+      clock = sinon.useFakeTimers({
+        now: moment().startOf('week').add(1, 'day').set({
+          hour: 10,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+    });
+
+    after(() => {
+      clock.restore();
+    });
+
     it('should message the subscriber', (done) => {
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
@@ -208,6 +247,13 @@ describe('cronHelper', () => {
     });
 
     it('should not message the suscriber when outside of notification time range', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment().subtract(1, 'day').set({
+          hour: 7,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'debug');
       async.autoInject({
@@ -238,13 +284,67 @@ describe('cronHelper', () => {
   });
 
   describe('private.isTimeToNotify', () => {
-    it('should return true when within a 15 minute range', () => {
-      // let test = {
-      //   timezone: { tz: 'America/Indiana/Indianapolis' }
-      // };
-      // let result = cronHelper.private.isTimeToNotify(test);
-      // TODO: How to test this time logic?
-      assert(true);
+    let clock;
+    beforeEach(() => {
+      clock = sinon.useFakeTimers({
+        now: moment().subtract(1, 'day').set({
+          hour: 7,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+    });
+
+    after(() => {
+      clock.restore();
+    });
+
+    it('should return true when within a 15 (±7.5) minute range', () => {
+      let test = {
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '07:00:00'
+      };
+      let result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+
+      test.notify_time = '06:52:31';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+
+      test.notify_time = '07:07:29';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+
+      test = {
+        timezone: { name: 'America/Los_Angeles' },
+        notify_time: '04:00:00'
+      };
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+    });
+
+    it('should return false when outside a 15 (±7.5) minute range', () => {
+      let test = {
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '08:00:00'
+      };
+      let result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
+
+      test.notify_time = '06:52:00';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
+
+      test.notify_time = '07:07:35';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
+
+      test = {
+        timezone: { name: 'America/Los_Angeles' },
+        notify_time: '04:30:00'
+      };
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
     });
   });
 });

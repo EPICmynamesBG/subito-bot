@@ -108,7 +108,9 @@ describe('subscriberService', () => {
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
-        search_term: null
+        search_term: null,
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '10:00:00'
       };
       subscriberService.getSubscriberById(testHelper.db, expected.id, (err, subscriber) => {
         should.not.exist(err);
@@ -125,7 +127,9 @@ describe('subscriberService', () => {
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
-        search_term: null
+        search_term: null,
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '10:00:00'
       };
       subscriberService.getSubscriberBySlackUserId(testHelper.db, expected.slack_user_id, (err, subscriber) => {
         should.not.exist(err);
@@ -142,7 +146,9 @@ describe('subscriberService', () => {
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
-        search_term: null
+        search_term: null,
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '10:00:00'
       };
       subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, expected.slack_team_id,
         (err, subscriber) => {
@@ -160,7 +166,9 @@ describe('subscriberService', () => {
         slack_user_id: 'ABC_123',
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
-        search_term: null
+        search_term: null,
+        timezone: { name: 'America/Indiana/Indianapolis' },
+        notify_time: '10:00:00'
       };
       subscriberService.deleteSubscriberById(testHelper.db, subscriber.id, (err, subscriber) => {
         should.not.exist(err);

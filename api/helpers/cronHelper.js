@@ -35,10 +35,10 @@ const _buildCustomText = (searchStr, soups) => {
 };
 
 const _isTimeToNotify = (subscriber) => {
-  const timezone = lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE);
-  const notifyTime = moment(subscriber.notify_time, 'HH:mm:ss').tz(timezone);
-  const lowerTime = moment().tz(timezone).subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
-  const upperTime = moment().tz(timezone).add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const timezone = lodash.get(subscriber, 'timezone.name') || DEFAULT_TIMEZONE; // This ensures even null is replaced
+  const notifyTime = moment.tz(subscriber.notify_time, 'HH:mm:ss', timezone);
+  const lowerTime = moment.tz(DEFAULT_TIMEZONE).subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const upperTime = moment.tz(DEFAULT_TIMEZONE).add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
 
   return notifyTime.isBetween(lowerTime, upperTime);
 };
@@ -47,7 +47,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
   if (!module.exports.private.isTimeToNotify(subscriber)) {
     logger.debug({
       message: 'Notification time outside of notification range',
-      timezone: lodash.get(subscriber, 'timezone.tz', DEFAULT_TIMEZONE),
+      timezone: lodash.get(subscriber, 'timezone.name', DEFAULT_TIMEZONE),
       notify_time: subscriber.notify_time
     });
     callback();
