@@ -1,10 +1,7 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
 const fs = require('fs');
-const moment = require('moment');
 const path = require('path');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');

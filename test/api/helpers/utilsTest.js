@@ -1,8 +1,5 @@
 'use strict';
 
-const assert = require('assert');
-const moment = require('moment');
-const sinon = require('sinon');
 const crypto = require('crypto-js');
 const utils = require('../../../api/helpers/utils');
 

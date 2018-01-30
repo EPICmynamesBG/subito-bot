@@ -1,11 +1,7 @@
 'use strict';
 
-const sinon = require('sinon');
 const should = require('should');
-const request = require('supertest');
-const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
-
 const subscriberService = require('../../../api/services/subscriberService');
 const slack = require('../../../api/helpers/slack');
 

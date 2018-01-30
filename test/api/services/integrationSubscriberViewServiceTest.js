@@ -1,8 +1,7 @@
 'use strict';
 
-const assert = require('assert');
-const lodash = require('lodash');
 const should = require('should');
+
 const testHelper = require('../../helper/testHelper');
 const integrationSubscriberViewService = require('../../../api/services/integrationSubscriberViewService');
 

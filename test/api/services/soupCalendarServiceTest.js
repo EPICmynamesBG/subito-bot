@@ -1,9 +1,6 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const moment = require('moment');
-const lodash = require('lodash');
 
 const testHelper = require('../../helper/testHelper');
 const soupCalendarService = require('../../../api/services/soupCalendarService');

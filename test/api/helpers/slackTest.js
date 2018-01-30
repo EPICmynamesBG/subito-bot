@@ -1,9 +1,6 @@
 'use strict';
 
-const assert = require('assert');
-const lodash = require('lodash');
 const SlackNode = require('slack-node');
-const sinon = require('sinon');
 
 const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;

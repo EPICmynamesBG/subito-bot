@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');

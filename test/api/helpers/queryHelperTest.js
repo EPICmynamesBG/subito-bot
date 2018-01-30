@@ -1,9 +1,6 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
-const moment = require('moment');
 
 const testHelper = require('../../helper/testHelper');
 const logger = require('../../../api/helpers/logger');
@@ -126,7 +123,7 @@ describe('queryHelper', () => {
         assert(queryBuilderSpy.calledOnce);
         assert(querySpy.calledOnce);
         assert(resultsHandlerSpy.calledOnce);
-        
+
         done();
       });
     });
@@ -208,7 +205,7 @@ describe('queryHelper', () => {
         day: day,
         soup: 'Test Soup'
       };
-      
+
       queryHelper.insert(testHelper.db, 'soup_calendar', newSoup, (err, res) => {
         should.not.exist(err);
         res.should.have.property('insertId');
@@ -247,7 +244,7 @@ describe('queryHelper', () => {
         day: day,
         soup: 'Test Soup 2'
       };
-      
+
       queryHelper.insert(testHelper.db, 'soup_calendar', [newSoup1, newSoup2], (err, res) => {
         should.not.exist(err);
         res.should.have.property('insertId');
@@ -280,7 +277,7 @@ describe('queryHelper', () => {
       querySpy = sinon.spy(queryHelper.private, 'query');
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
       const newSoup = 'Test Soup Update';
-      
+
       queryHelper.update(testHelper.db, 'soup_calendar', { soup: newSoup }, { id: 1001 }, (err, res) => {
         should.not.exist(err);
         res.should.have.property('changedRows', 1);
@@ -312,7 +309,7 @@ describe('queryHelper', () => {
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
       const newSoup = 'Test Soup Update';
       const day = moment().add(3, 'd').format('YYYY-MM-DD');
-      
+
       queryHelper.update(testHelper.db, 'soup_calendar', { day: day, soup: newSoup }, { id: 1001 }, (err, res) => {
         should.not.exist(err);
         res.should.have.property('changedRows', 1);
@@ -344,7 +341,7 @@ describe('queryHelper', () => {
       queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
       querySpy = sinon.spy(queryHelper.private, 'query');
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
-      
+
       queryHelper.delete(testHelper.db, 'soup_calendar', { id: 1001 }, (err, res) => {
         should.not.exist(err);
         res.should.have.property('text', '1 soup_calendars DELETED');
@@ -374,7 +371,7 @@ describe('queryHelper', () => {
       querySpy = sinon.spy(queryHelper.private, 'query');
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
       const day = moment().add(-1, 'd').format('YYYY-MM-DD');
-      
+
       queryHelper.delete(testHelper.db, 'soup_calendar', { day: day }, (err, res) => {
         should.not.exist(err);
         res.should.have.property('text', '2 soup_calendars DELETED');
@@ -406,7 +403,7 @@ describe('queryHelper', () => {
       queryBuilderSpy = sinon.spy(queryHelper.private, 'queryBuilder');
       querySpy = sinon.spy(queryHelper.private, 'query');
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
-      
+
       queryHelper.deleteOne(testHelper.db, 'soup_calendar', { id: 1003 }, (err, res) => {
         should.not.exist(err);
         res.should.have.property('text', '1 soup_calendars DELETED');
@@ -423,7 +420,7 @@ describe('queryHelper', () => {
       querySpy = sinon.spy(queryHelper.private, 'query');
       resultsHandlerSpy = sinon.spy(queryHelper.private, 'resultsHandler');
       const day = moment().add(-1, 'd').format('YYYY-MM-DD');
-      
+
       queryHelper.deleteOne(testHelper.db, 'soup_calendar', { day: day }, (err, res) => {
         should.exist(err);
         assert.equal(err.message, 'Multiple results found when expecting one');

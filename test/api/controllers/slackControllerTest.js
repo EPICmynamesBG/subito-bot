@@ -1,14 +1,11 @@
 'use strict';
 
-const assert = require('assert');
-const should = require('should');
-const request = require('supertest');
-const sinon = require('sinon');
+const async = require('async');
 const errors = require('common-errors');
-const server = require('../../../app');
+const should = require('should');
+
 const testHelper = require('../../helper/testHelper');
 const oauthService = require('../../../api/services/oauthService');
-const async = require('async');
 const slack = require('../../../api/helpers/slack');
 
 const { SLACK_VERIFICATION_TOKEN } = require('../../../config/config');

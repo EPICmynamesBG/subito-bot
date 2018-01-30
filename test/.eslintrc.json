@@ -1,0 +1,10 @@
+{
+  "globals": {
+    "assert": true,
+    "sinon": true,
+    "request": true,
+    "moment": true,
+    "server": true,
+    "lodash": true
+  }
+}
