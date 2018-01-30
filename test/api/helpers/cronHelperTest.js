@@ -69,7 +69,8 @@ describe('cronHelper', () => {
         should.not.exist(err);
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
-        assert.equal(slackSpy.getCalls().length, 1, 'should message 1 user');
+        const calls = slackSpy.getCalls();
+        assert.equal(calls.length, 1, `should message 1 user, messaged ${calls.length}`);
 
         /* eslint-disable max-nested-callbacks */
         slackSpy.getCalls().forEach((call) => {
