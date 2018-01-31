@@ -44,21 +44,20 @@ describe('cronHelper', () => {
 
   describe('processSubscribers', () => {
     let clock;
-    beforeEach(() => {
+
+    afterEach(() => {
+      if (clock) clock.restore();
+    });
+
+    it('should not error', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment().startOf('week').add(1, 'day').set({
+        now: moment().set({
           hour: 8,
           minute: 0,
           second: 0
         }).valueOf()
       });
-    });
 
-    afterEach(() => {
-      clock.restore();
-    });
-
-    it('should not error', (done) => {
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.spy(soupCalendarViewService, 'getSoupsForDay');
@@ -126,7 +125,7 @@ describe('cronHelper', () => {
     let clock;
     beforeEach(() => {
       clock = sinon.useFakeTimers({
-        now: moment().startOf('week').add(1, 'day').set({
+        now: moment.tz('America/Indiana/Indianapolis').set({
           hour: 10,
           minute: 0,
           second: 0
