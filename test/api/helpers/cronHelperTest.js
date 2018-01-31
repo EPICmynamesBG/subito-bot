@@ -50,6 +50,7 @@ describe('cronHelper', () => {
     });
 
     it('should not error', (done) => {
+      logger.debug('Before clock set', moment().format());
       clock = sinon.useFakeTimers({
         now: moment().set({
           hour: 8,
@@ -57,6 +58,7 @@ describe('cronHelper', () => {
           second: 0
         }).valueOf()
       });
+      logger.debug('After clock set', moment().format());
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');

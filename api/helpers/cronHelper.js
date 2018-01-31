@@ -93,7 +93,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
 
 const processSubscribers = (db) => {
   return (callback) => {
-    logger.info('Running processSubscribers:: ', moment().toDate());
+    logger.info('Running processSubscribers:: ', moment().format());
     async.autoInject({
       soups: (cb) => {
         soupCalendarViewService.getSoupsForDay(db, utils.dateForText('today'), cb);
