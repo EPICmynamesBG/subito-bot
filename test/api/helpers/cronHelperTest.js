@@ -44,7 +44,7 @@ describe('cronHelper', () => {
 
   describe('processSubscribers', () => {
     let clock;
-    before(() => {
+    beforeEach(() => {
       clock = sinon.useFakeTimers({
         now: moment().startOf('week').add(1, 'day').set({
           hour: 8,
@@ -54,7 +54,7 @@ describe('cronHelper', () => {
       });
     });
 
-    after(() => {
+    afterEach(() => {
       clock.restore();
     });
 
@@ -123,7 +123,7 @@ describe('cronHelper', () => {
 
   describe('private.processSubscriber', () => {
     let clock;
-    before(() => {
+    beforeEach(() => {
       clock = sinon.useFakeTimers({
         now: moment().startOf('week').add(1, 'day').set({
           hour: 10,
@@ -133,7 +133,7 @@ describe('cronHelper', () => {
       });
     });
 
-    after(() => {
+    afterEach(() => {
       clock.restore();
     });
 
@@ -252,6 +252,7 @@ describe('cronHelper', () => {
           second: 0
         }).valueOf()
       });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'debug');
       async.autoInject({
@@ -293,7 +294,7 @@ describe('cronHelper', () => {
       });
     });
 
-    after(() => {
+    afterEach(() => {
       clock.restore();
     });
 

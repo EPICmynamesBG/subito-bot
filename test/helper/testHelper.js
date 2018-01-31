@@ -4,7 +4,6 @@ require('dotenv').config({
   silent: true
 });
 
-const moment = require('moment');
 const async = require('async');
 const logger = require('../../api/helpers/logger');
 const queryHelper = require('../../api/helpers/queryHelper');
