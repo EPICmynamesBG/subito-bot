@@ -6,8 +6,9 @@ const errors = require('common-errors');
 const crypto = require('crypto-js');
 const logger = require('./logger');
 
-const ENCRYPTION_KEY = require('../../config/config').ENCRYPTION_KEY;
+const { ENCRYPTION_KEY, DEFAULT_TIMEZONE } = require('../../config/config');
 
+moment.tz.setDefault(DEFAULT_TIMEZONE);
 moment.createFromInputFallback = function (config) {
   config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
 }
