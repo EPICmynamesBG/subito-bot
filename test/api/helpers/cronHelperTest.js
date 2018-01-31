@@ -100,7 +100,8 @@ describe('cronHelper', () => {
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       cronHelper.processSubscribers(testHelper.db)((err) => {
-        assert.deepEqual(err, { clean: true, message: 'no soups for today' });
+        err.should.have.property('clean', true);
+        assert(err.message.includes('no soups for today'));
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
         assert.equal(slackSpy.getCalls().length, 0);

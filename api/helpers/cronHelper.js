@@ -101,7 +101,7 @@ const processSubscribers = (db) => {
       },
       process: (soups, subscribers, cb) => {
         if (!soups) {
-          cb({ clean: true, message: 'no soups for today' });
+          cb({ clean: true, message: `no soups for today (${utils.dateForText('today')})` });
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
