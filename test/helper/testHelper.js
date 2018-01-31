@@ -80,5 +80,6 @@ function resetData(done) {
 module.exports = {
   db: db,
   resetData: resetData,
-  clearData: clearData
+  clearData: clearData,
+  testSubscriber: require('../data/Subscribers.json')[0]
 };

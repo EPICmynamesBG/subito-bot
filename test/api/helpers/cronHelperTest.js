@@ -50,15 +50,13 @@ describe('cronHelper', () => {
     });
 
     it('should not error', (done) => {
-      logger.debug('Before clock set', moment().format());
       clock = sinon.useFakeTimers({
-        now: moment().set({
+        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name).set({
           hour: 8,
           minute: 0,
           second: 0
         }).valueOf()
       });
-      logger.debug('After clock set', moment().format());
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
@@ -90,7 +88,7 @@ describe('cronHelper', () => {
 
     it('should not message when there are no soups', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment().startOf('week').set({
+        now: moment.tz().startOf('week').set({
           hour: 8,
           minute: 0,
           second: 0
@@ -248,7 +246,7 @@ describe('cronHelper', () => {
 
     it('should not message the suscriber when outside of notification time range', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment().subtract(1, 'day').set({
+        now: moment.tz().subtract(1, 'day').set({
           hour: 7,
           minute: 0,
           second: 0
