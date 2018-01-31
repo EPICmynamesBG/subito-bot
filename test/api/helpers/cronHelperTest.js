@@ -4,6 +4,7 @@ const should = require('should');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
+const { DEFAULT_TIMEZONE } = require('../../../config/config');
 const testHelper = require('../../helper/testHelper');
 const cronHelper = require('../../../api/helpers/cronHelper');
 const parseSubito = require('../../../api/helpers/parseSubito');
@@ -51,11 +52,8 @@ describe('cronHelper', () => {
 
     it('should not error', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name).set({
-          hour: 8,
-          minute: 0,
-          second: 0
-        }).valueOf()
+        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
+          .valueOf()
       });
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
@@ -123,21 +121,17 @@ describe('cronHelper', () => {
 
   describe('private.processSubscriber', () => {
     let clock;
-    beforeEach(() => {
-      clock = sinon.useFakeTimers({
-        now: moment.tz('America/Indiana/Indianapolis').set({
-          hour: 10,
-          minute: 0,
-          second: 0
-        }).valueOf()
-      });
-    });
 
     afterEach(() => {
-      clock.restore();
+      if (clock) clock.restore();
     });
 
     it('should message the subscriber', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
+          .valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         soups: (cb) => {
@@ -158,8 +152,12 @@ describe('cronHelper', () => {
         const call = slackSpy.getCalls()[0];
         const userId = call.args[0];
         const message = call.args[1];
-        // eslint-disable-next-line max-len
-        assert.equal(message, 'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+
+        logger.debug(message);
+        assert(message.includes('Here are the soups for _today_'));
+        assert(message.includes('Great-Grandma Hoffman’s Beef Ribley (df)'));
+        assert(message.includes('Local Corn Maque Choux'));
+
         const slackBotToken = call.args[2];
         assert(subscriberIds.includes(userId));
         assert(typeof message === 'string');
@@ -170,6 +168,11 @@ describe('cronHelper', () => {
     });
 
     it('should message the subscriber with search term', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment.tz('10:00:00', 'HH:mm:ss', DEFAULT_TIMEZONE)
+          .valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         before: (cb) => {
@@ -177,7 +180,9 @@ describe('cronHelper', () => {
             slackUserId: 'XZYWVV',
             slackUsername: 'crontest',
             slackTeamId: 'XYZDEF123',
-            searchTerm: 'corn'
+            searchTerm: 'corn',
+            timezone: { name: DEFAULT_TIMEZONE },
+            notify_time: '10:00'
           }, cb);
         },
         soups: (before, cb) => {
@@ -198,7 +203,10 @@ describe('cronHelper', () => {
         const call = slackSpy.getCalls()[0];
         const message = call.args[1];
         // eslint-disable-next-line max-len
-        assert.equal(message, 'Today\'s the day! _corn_ is on the menu! Here are the soups: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+        assert(message.includes('Today\'s the day! _corn_ is on the menu!'));
+        assert(message.includes('Great-Grandma Hoffman’s Beef Ribley (df)'));
+        assert(message.includes('Local Corn Maque Choux'));
+
         const botToken = call.args[2];
         assert(integrationBotTokens.includes(botToken));
         slackSpy.restore();
@@ -207,6 +215,11 @@ describe('cronHelper', () => {
     });
 
     it('should not message the subscriber with search term when not found on that day', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
+          .valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'debug');
       async.autoInject({

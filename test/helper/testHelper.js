@@ -8,6 +8,7 @@ const async = require('async');
 const logger = require('../../api/helpers/logger');
 const queryHelper = require('../../api/helpers/queryHelper');
 const utils = require('../../api/helpers/utils');
+const { SUBITO_TIMEZONE } = require('../../config/config');
 
 const db = require('../../config/db');
 
@@ -49,7 +50,7 @@ function resetData(done) {
           data = data.map((entry) => {
             let clone = Object.assign({}, entry);
             clone.day = Number.isInteger(clone.day) ?
-              moment().add(clone.day, 'd').format('YYYY-MM-DD') :
+              moment.tz(SUBITO_TIMEZONE).add(clone.day, 'd').format('YYYY-MM-DD') :
               clone.day;
             return clone;
           });

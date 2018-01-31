@@ -51,6 +51,8 @@ const config = {
 
   DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/Indiana/Indianapolis',
 
+  SUBITO_TIMEZONE: 'America/Indiana/Indianapolis',
+
   CRON_NOTIFICATION_CHECK: process.env.CRON_NOTIFICATION_CHECK || 15.00, // minutes
 
   SWAGGER: {

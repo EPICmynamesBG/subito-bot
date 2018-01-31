@@ -3,6 +3,7 @@
 const moment = require('moment');
 const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
+const { SUBITO_TIMEZONE } = require('../../config/config');
 
 function _textForSlack(row) {
   let soups = row.soups.split(';');
@@ -15,7 +16,7 @@ function _parseViewRow(row) {
   }
   return {
     text: _textForSlack(row),
-    day: moment(row.day).format('YYYY-MM-DD'),
+    day: moment.tz(row.day, SUBITO_TIMEZONE).format('YYYY-MM-DD'),
     soups: row.soups.split(';'),
     soupsStr: row.soups.replace(';', ' and ')
   };
@@ -28,7 +29,7 @@ function getAllSoups(db, callback) {
 }
 
 function getSoupsForDay(db, day, callback) {
-  queryHelper.selectOne(db, 'soup_calendar_view', { day: moment(day).format('YYYY/MM/DD') },
+  queryHelper.selectOne(db, 'soup_calendar_view', { day: moment.tz(day, SUBITO_TIMEZONE).format('YYYY/MM/DD') },
     (err, row) => {
       callback(err, _parseViewRow(row));
     });
