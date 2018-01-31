@@ -21,6 +21,8 @@ module.exports = {
 
   ADMIN_AUTH_SECRET: 'HelloWorld',
 
+  DEFAULT_TIMEZONE: process.env.TEST_DEFAULT_TIMEZONE || 'UTC',
+
   SWAGGER: {
 
     APP_VERSION: '0.0.1',

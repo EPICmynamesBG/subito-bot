@@ -12,12 +12,9 @@ env:
     - TEST_DATABASE_USER=root
     - TEST_DATABASE_NAME=subito_test
     - SLACK_VERIFICATION_TOKEN=token
-    - DEFAULT_TIMEZONE=America/Indiana/Indianapolis
-    - TZ=America/Indiana/Indianapolis
 addons:
   mysql: "5.7.19"
 before_install:
-  - export TZ=America/Indiana/Indianapolis
   - mysql -e 'CREATE DATABASE IF NOT EXISTS subito_test;'
 install:
   - npm install
