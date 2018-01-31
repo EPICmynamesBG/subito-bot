@@ -13,6 +13,8 @@ const soupCalendarService = require('../services/soupCalendarService');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const integrationSubscriberViewService = require('../services/integrationSubscriberViewService');
 
+moment.tz.setDefault(DEFAULT_TIMEZONE);
+
 const importCalendar = (db) => {
   return (cb) => {
     logger.info('Running importCalendar:: ', moment().format());
