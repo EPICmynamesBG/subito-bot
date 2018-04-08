@@ -1,7 +1,4 @@
 ALTER TABLE subscribers
-ADD COLUMN `timezone` TEXT DEFAULT NULL COMMENT 'Stringified JSON object';
-
-ALTER TABLE subscribers
 ADD COLUMN `notify_time` TIME DEFAULT '10:00:00';
 
 CREATE OR REPLACE VIEW integration_subscriber_view AS (
@@ -10,7 +7,6 @@ CREATE OR REPLACE VIEW integration_subscriber_view AS (
     subscribers.slack_username,
     subscribers.slack_team_id,
     subscribers.search_term,
-    subscribers.timezone,
     subscribers.notify_time,
     oauth_integrations.domain AS slack_team_domain,
     oauth_integrations.bot_token AS slack_slash_token,

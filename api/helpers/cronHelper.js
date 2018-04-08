@@ -1,9 +1,8 @@
 'use strict';
 
 const async = require('async');
-const lodash = require('lodash');
-const moment = require('moment-timezone');
-const { DEFAULT_TIMEZONE, CRON_NOTIFICATION_CHECK } = require('../../config/config');
+const moment = require('moment');
+const { CRON_NOTIFICATION_CHECK } = require('../../config/config');
 
 const logger = require('./logger');
 const parseSubito = require('./parseSubito');
@@ -12,8 +11,6 @@ const slack = require('./slack');
 const soupCalendarService = require('../services/soupCalendarService');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const integrationSubscriberViewService = require('../services/integrationSubscriberViewService');
-
-moment.tz.setDefault(DEFAULT_TIMEZONE);
 
 const importCalendar = (db) => {
   return (cb) => {
@@ -37,10 +34,9 @@ const _buildCustomText = (searchStr, soups) => {
 };
 
 const _isTimeToNotify = (subscriber) => {
-  const timezone = lodash.get(subscriber, 'timezone.name') || DEFAULT_TIMEZONE; // This ensures even null is replaced
-  const notifyTime = moment.tz(subscriber.notify_time, 'HH:mm:ss', timezone);
-  const lowerTime = moment.tz(DEFAULT_TIMEZONE).subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
-  const upperTime = moment.tz(DEFAULT_TIMEZONE).add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const notifyTime = moment(subscriber.notify_time, 'HH:mm:ss');
+  const lowerTime = moment().subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const upperTime = moment().add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
 
   return notifyTime.isBetween(lowerTime, upperTime);
 };
@@ -49,7 +45,6 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
   if (!module.exports.private.isTimeToNotify(subscriber)) {
     logger.debug({
       message: 'Notification time outside of notification range',
-      timezone: lodash.get(subscriber, 'timezone.name', DEFAULT_TIMEZONE),
       notify_time: subscriber.notify_time
     });
     callback();

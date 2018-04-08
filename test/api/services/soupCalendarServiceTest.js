@@ -4,7 +4,6 @@ const should = require('should');
 
 const testHelper = require('../../helper/testHelper');
 const soupCalendarService = require('../../../api/services/soupCalendarService');
-const { DEFAULT_TIMEZONE, SUBITO_TIMEZONE } = require('../../../config/config');
 
 describe('soupCalendarService', () => {
   before(testHelper.resetData);
@@ -180,7 +179,7 @@ describe('soupCalendarService', () => {
       let expectedEndDate;
       for (var i = 0; i < generateDays; i++) {
         const soups = lodash.clone(soupOptions).splice(lodash.random(0, soupOptions.length - 2), 2);
-        const date = moment.tz(SUBITO_TIMEZONE).add(lodash.random(-10, 10), 'd');
+        const date = moment().add(lodash.random(-10, 10), 'd');
 
         if (!expectedStartDate) expectedStartDate = date;
         else if (date < expectedStartDate) expectedStartDate = date;
@@ -195,7 +194,6 @@ describe('soupCalendarService', () => {
 
       soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
         should.not.exist(err);
-        console.log(updated);
         updated.should.have.property('rows', updates.length * 2);
         updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD Z'));
         updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD Z'));

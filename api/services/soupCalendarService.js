@@ -1,19 +1,16 @@
 'use strict';
 
 const async = require('async');
-const moment = require('moment-timezone');
+const moment = require('moment');
 const logger = require('../helpers/logger');
 const queryHelper = require('../helpers/queryHelper');
-const { SUBITO_TIMEZONE, DEFAULT_TIMEZONE } = require('../../config/config');
-
-moment.tz.setDefault(DEFAULT_TIMEZONE);
 
 function _parseRow(row) {
   if (!row) {
     return row;
   }
   return {
-    day: moment.tz(row.day, SUBITO_TIMEZONE).format('YYYY-MM-DD'),
+    day: moment(row.day).format('YYYY-MM-DD'),
     soup: row.soup
   };
 }
@@ -41,7 +38,7 @@ function searchForSoupOnDay(db, searchStr, day, callback) {
     WHERE LOWER(\`soup\`) LIKE LOWER(?)
 	   AND \`day\` = DATE(?)
     ORDER BY \`day\`, LOCATE(LOWER(\`soup\`), LOWER(?));`;
-  const formattedDate = moment(day).tz(SUBITO_TIMEZONE).format('YYYY/MM/DD');
+  const formattedDate = moment(day).format('YYYY/MM/DD');
   queryHelper.custom(db, queryStr, [`%${searchStr.trim()}%`, formattedDate, searchStr.trim()], (err, rows) => {
     callback(err, Array.isArray(rows) ? rows.map(_parseRow) : []);
   });
@@ -51,14 +48,14 @@ function massUpdate(db, soupDays, callback) {
   let updatedCount = 0;
   let updatedRange = { start: null, end: null };
   async.each(soupDays, (soupDay, eachCb) => {
-    let day = moment.tz(soupDay.date, SUBITO_TIMEZONE).format('YYYY/MM/DD');
+    let day = moment(soupDay.date).format('YYYY/MM/DD');
     if (updatedRange.start === null ||
-      moment.tz(updatedRange.start, SUBITO_TIMEZONE) > moment.tz(soupDay.date, SUBITO_TIMEZONE)) {
-      updatedRange.start = moment.tz(soupDay.date, SUBITO_TIMEZONE);
+      moment(updatedRange.start) > moment(soupDay.date)) {
+      updatedRange.start = moment(soupDay.date);
     }
     if (updatedRange.end === null ||
-      moment.tz(updatedRange.end, SUBITO_TIMEZONE) < moment.tz(soupDay.date, SUBITO_TIMEZONE)) {
-      updatedRange.end = moment.tz(soupDay.date, SUBITO_TIMEZONE);
+      moment(updatedRange.end) < moment(soupDay.date)) {
+      updatedRange.end = moment(soupDay.date);
     }
     const insertArr = soupDay.soups.map((soup) => {
       return {

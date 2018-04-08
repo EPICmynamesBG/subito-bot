@@ -12,7 +12,4 @@ CREATE OR REPLACE VIEW integration_subscriber_view AS (
 );
 
 ALTER TABLE subscribers
-DROP COLUMN `timezone`;
-
-ALTER TABLE subscribers
 DROP COLUMN `notify_time`;

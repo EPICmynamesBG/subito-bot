@@ -24,8 +24,6 @@ describe('integrationSubscriberViewService', () => {
           assert.notEqual(entry.slack_slash_token, 'helloworld');
           entry.should.have.property('slack_webhook_url');
           entry.should.have.property('search_term');
-          entry.should.have.property('timezone');
-          assert(lodash.isPlainObject(entry.timezone));
           entry.should.have.property('notify_time');
         });
         /* eslint-enable max-nested-callbacks */
@@ -48,8 +46,6 @@ describe('integrationSubscriberViewService', () => {
           assert.equal(entry.slack_slash_token, 'helloworld');
           entry.should.have.property('slack_webhook_url');
           entry.should.have.property('search_term');
-          entry.should.have.property('timezone');
-          assert(lodash.isPlainObject(entry.timezone));
           entry.should.have.property('notify_time');
         });
         /* eslint-enable max-nested-callbacks */

@@ -4,7 +4,6 @@ const should = require('should');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
-const { DEFAULT_TIMEZONE } = require('../../../config/config');
 const testHelper = require('../../helper/testHelper');
 const cronHelper = require('../../../api/helpers/cronHelper');
 const parseSubito = require('../../../api/helpers/parseSubito');
@@ -52,8 +51,7 @@ describe('cronHelper', () => {
 
     it('should not error', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
-          .valueOf()
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
       });
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
@@ -86,7 +84,7 @@ describe('cronHelper', () => {
 
     it('should not message when there are no soups', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz().startOf('week').set({
+        now: moment().startOf('week').set({
           hour: 8,
           minute: 0,
           second: 0
@@ -128,8 +126,7 @@ describe('cronHelper', () => {
 
     it('should message the subscriber', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
-          .valueOf()
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
       });
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
@@ -169,8 +166,7 @@ describe('cronHelper', () => {
 
     it('should message the subscriber with search term', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz('10:00:00', 'HH:mm:ss', DEFAULT_TIMEZONE)
-          .valueOf()
+        now: moment('10:00:00', 'HH:mm:ss').valueOf()
       });
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
@@ -181,7 +177,6 @@ describe('cronHelper', () => {
             slackUsername: 'crontest',
             slackTeamId: 'XYZDEF123',
             searchTerm: 'corn',
-            timezone: { name: DEFAULT_TIMEZONE },
             notify_time: '10:00'
           }, cb);
         },
@@ -216,8 +211,7 @@ describe('cronHelper', () => {
 
     it('should not message the subscriber with search term when not found on that day', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz(testHelper.testSubscriber.notify_time, 'HH:mm:ss', testHelper.testSubscriber.timezone.name)
-          .valueOf()
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
       });
 
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
@@ -259,7 +253,7 @@ describe('cronHelper', () => {
 
     it('should not message the suscriber when outside of notification time range', (done) => {
       clock = sinon.useFakeTimers({
-        now: moment.tz().subtract(1, 'day').set({
+        now: moment().subtract(1, 'day').set({
           hour: 7,
           minute: 0,
           second: 0
@@ -313,7 +307,6 @@ describe('cronHelper', () => {
 
     it('should return true when within a 15 (±7.5) minute range', () => {
       let test = {
-        timezone: { name: 'America/New_York' },
         notify_time: '07:00:00'
       };
       let result = cronHelper.private.isTimeToNotify(test);
@@ -326,18 +319,10 @@ describe('cronHelper', () => {
       test.notify_time = '07:07:29';
       result = cronHelper.private.isTimeToNotify(test);
       assert.equal(true, result);
-
-      test = {
-        timezone: { name: 'America/Los_Angeles' },
-        notify_time: '04:00:00'
-      };
-      result = cronHelper.private.isTimeToNotify(test);
-      assert.equal(true, result);
     });
 
     it('should return false when outside a 15 (±7.5) minute range', () => {
       let test = {
-        timezone: { name: 'America/New_York' },
         notify_time: '08:00:00'
       };
       let result = cronHelper.private.isTimeToNotify(test);
@@ -348,13 +333,6 @@ describe('cronHelper', () => {
       assert.equal(false, result);
 
       test.notify_time = '07:07:35';
-      result = cronHelper.private.isTimeToNotify(test);
-      assert.equal(false, result);
-
-      test = {
-        timezone: { name: 'America/Los_Angeles' },
-        notify_time: '04:30:00'
-      };
       result = cronHelper.private.isTimeToNotify(test);
       assert.equal(false, result);
     });

@@ -11,8 +11,7 @@ const dbConfig = {
   user: config.DATABASE_USER,
   password: config.DATABASE_PASSWORD,
   database: config.DATABASE_NAME,
-  multipleStatements: config.NODE_ENV === 'test',
-  timezone: config.SUBITO_TIMEZONE
+  multipleStatements: config.NODE_ENV === 'test'
 };
 
 function DB() {

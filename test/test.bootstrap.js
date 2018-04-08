@@ -1,9 +1,6 @@
 process.env.NODE_ENV='test';
 
-const { DEFAULT_TIMEZONE } = require('../config/config');
-const moment = require('moment-timezone');
-
-moment.tz.setDefault(DEFAULT_TIMEZONE);
+const moment = require('moment');
 
 global.assert = require('assert');
 global.sinon = require('sinon');

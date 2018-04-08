@@ -12,7 +12,6 @@ env:
     - TEST_DATABASE_USER=root
     - TEST_DATABASE_NAME=subito_test
     - SLACK_VERIFICATION_TOKEN=token
-    - TEST_DEFAULT_TIMEZONE=America/New_York
     - TEST_LOGGING_LEVEL=debug
 addons:
   mysql: "5.7.19"

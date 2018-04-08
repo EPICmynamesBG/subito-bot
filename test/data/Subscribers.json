@@ -4,9 +4,6 @@
     "slack_user_id": "ABC_123",
     "slack_username": "benjamin",
     "slack_team_id": "ABCDEF123",
-    "timezone": {
-      "name": "America/New_York"
-    },
     "notify_time": "10:00:00"
   },
   {
@@ -14,9 +11,6 @@
     "slack_user_id": "ABC_XYZ",
     "slack_username": "bennyboy",
     "slack_team_id": "ABCDEF123",
-    "timezone": {
-      "name": "America/Los_Angeles"
-    },
     "notify_time": "14:00:00"
   },
   {
@@ -24,9 +18,6 @@
     "slack_user_id": "BBQHJZ",
     "slack_username": "bobbarker",
     "slack_team_id": "XYZDEF123",
-    "timezone": {
-      "name": "America/New_York"
-    },
     "notify_time": "8:00:00"
   }
 ]

@@ -9,32 +9,7 @@ const oauthService = require('./oauthService');
 const utils = require('../helpers/utils');
 
 function _addUser(db, userObj, callback) {
-  async.autoInject({
-    team: (cb) => {
-      oauthService.getOauthIntegrationById(db, userObj.slack_team_id, cb);
-    },
-    extendedInfo: (team, cb) => {
-      slack.fetchUserInfo(userObj.slack_user_id, team.bot_token, (err, res) => {
-        if (err) {
-          logger.debug(err);
-          cb(null, null);
-        } else {
-          cb(null, res);
-        }
-      });
-    },
-    insert: (extendedInfo, cb) => {
-      const insertObj = lodash.clone(userObj);
-      insertObj.timezone = JSON.stringify({
-        name: lodash.get(extendedInfo, 'tz', null),
-        label: lodash.get(extendedInfo, 'tz_label', null),
-        offset: lodash.get(extendedInfo, 'tz_offset', null)
-      });
-      queryHelper.insert(db, 'subscribers', insertObj, cb);
-    }
-  }, (err, res) => {
-    callback(err, res.insert);
-  });
+  queryHelper.insert(db, 'subscribers', userObj, callback);
 }
 
 function addSubscriber(db, user, callback) {
@@ -81,62 +56,32 @@ function addSubscriber(db, user, callback) {
   });
 }
 
-function _mapSubscriber(callback) {
-  return (err, res) => {
-    if (err) callback(err);
-    else if (Array.isArray(res)) {
-      const mapped = lodash.map(res, (obj) => {
-        const clone = lodash.clone(obj);
-        if (!lodash.isPlainObject(clone.timezone)) {
-          lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
-        }
-        return clone;
-      });
-      callback(null, mapped);
-    } else if (lodash.isObject(res)) {
-      const clone = lodash.clone(res);
-      if (!lodash.isPlainObject(clone.timezone)) {
-        lodash.set(clone, 'timezone', JSON.parse(clone.timezone));
-      }
-      callback(null, clone);
-    } else {
-      callback(null, res);
-    }
-  };
-}
-
 function getSubscribers(db, callback) {
-  queryHelper.select(db, 'subscribers', _mapSubscriber(callback));
+  queryHelper.select(db, 'subscribers', callback);
 }
 
 function getSubscribersForTeam(db, teamId, callback) {
-  queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, _mapSubscriber(callback));
+  queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, callback);
 }
 
 function getSubscriberById(db, id, callback) {
-  queryHelper.selectOne(db, 'subscribers', { id: id }, _mapSubscriber(callback));
+  queryHelper.selectOne(db, 'subscribers', { id: id }, callback);
 }
 
 function getSubscriberBySlackUserId(db, slackId, callback) {
-  queryHelper.selectOne(db, 'subscribers', { slack_user_id: slackId }, _mapSubscriber(callback));
+  queryHelper.selectOne(db, 'subscribers', { slack_user_id: slackId }, callback);
 }
 
 function getSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
   queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId },
-    _mapSubscriber(callback));
+    callback);
 }
 
 function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
   const clone = lodash.clone(updateObj);
-  if (clone.timezone) {
-    if (!lodash.isPlainObject(clone.timezone)) {
-      clone.timezone = JSON.stringify(clone.timezone);
-    }
-  }
   if (clone.notify_time) {
     clone.notify_time = utils.parseTime(clone.notify_time);
   }
-  logger.debug(clone, slackId);
   queryHelper.update(db, 'subscribers', clone, { slack_user_id: slackId }, callback);
 }
 
