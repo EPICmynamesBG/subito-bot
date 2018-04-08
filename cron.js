@@ -12,11 +12,12 @@ if (config.NODE_ENV === 'development' ||
 const db = require('./config/db');
 
 const runOnStart = () => {
-  cronHelper.importCalendar(db)();
+  cronHelper.processSubscribers(db)();
+  // cronHelper.importCalendar(db)();
 };
 
 // Weekly, runs as midnight on Sundays
-cron.schedule('0 0 0 * * Sunday', cronHelper.importCalendar(db), true);
+// cron.schedule('0 0 0 * * Sunday', cronHelper.importCalendar(db), true);
 
 // Runs at every X minutes
 cron.schedule(`0 */${60 / config.CRON_NOTIFICATION_CHECK} * * * *`,

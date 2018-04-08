@@ -72,7 +72,7 @@ _ *You can only be subscribed once_
 | Soup Calendar Importer | 12:00am Sunday   | Fetches the latest soup calendar, parses, and updates the soup calendar database |
 | Subscriber Messaging   | 10:00am Weekdays | Handles messaging all subscribers the day's soups                                |
 
-\* _Hosted server timezone runs in [EST](https://time.is/EST)_
+\* _Hosted server timezone runs in [EDT](https://time.is/EDT)_
 
 ## Development
 
