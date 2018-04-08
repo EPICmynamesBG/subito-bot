@@ -84,8 +84,8 @@ function massUpdate(db, soupDays, callback) {
     }
     callback(err, {
       rows: updatedCount,
-      startDate: updatedRange.start.format('YYYY/MM/DD Z'),
-      endDate: updatedRange.end.format('YYYY/MM/DD Z')
+      startDate: updatedRange.start.format('YYYY/MM/DD'),
+      endDate: updatedRange.end.format('YYYY/MM/DD')
     });
   });
 }

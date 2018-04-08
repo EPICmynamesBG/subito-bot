@@ -5,9 +5,6 @@ const lodash = require('lodash');
 const queryHelper = require('../helpers/queryHelper');
 const utils = require('../helpers/utils');
 
-function _addUser(db, userObj, callback) {
-  queryHelper.insert(db, 'subscribers', userObj, callback);
-}
 
 function addSubscriber(db, user, callback) {
   const mappedUser = {
@@ -33,7 +30,7 @@ function addSubscriber(db, user, callback) {
       });
     },
     (cb) => {
-      _addUser(db, mappedUser, cb);
+      queryHelper.insert(db, 'subscribers', mappedUser, cb);
     },
     (inserted, cb) => {
       module.exports.getSubscriberById(db, inserted.insertId, cb)

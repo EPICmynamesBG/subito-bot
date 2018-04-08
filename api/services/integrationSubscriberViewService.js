@@ -3,10 +3,6 @@
 const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
-function _map(row) {
-  if (!row) return;
-  return row;
-}
 
 function _mapDecrypt(row) {
   if (!row) return;
@@ -21,7 +17,7 @@ function getAll(db, decrypt = false, callback) {
   }
   queryHelper.select(db, 'integration_subscriber_view', (err, rows) => {
     if (decrypt) callback(err, rows ? rows.map(_mapDecrypt) : []);
-    else callback(err, rows ? rows.map(_map) : []);
+    else callback(err, rows ? rows : []);
   });
 }
 
