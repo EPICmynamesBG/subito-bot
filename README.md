@@ -49,14 +49,19 @@ _ *You can only be subscribed once_
 <img src="./assets/screenshots/search.png" height="110" alt="search" />
 
 ```text
+/subito settings notify [time]
+```
+<img src="./assets/screenshots/settings_time.png" height="120" alt="settings" />
+
+```text
 /subito help (or anything else unrecognizable)
 ```
 
-<img src="./assets/screenshots/help.png" height="200" alt="search" />
+<img src="./assets/screenshots/help.png" height="200" alt="help" />
+
 
 ## In Development
 
-- Customizable subscription notification time
 - Subscribe to multiple criteria
 
 ## Docs
