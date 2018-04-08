@@ -313,7 +313,7 @@ describe('cronHelper', () => {
 
     it('should return true when within a 15 (±7.5) minute range', () => {
       let test = {
-        timezone: { name: 'America/Indiana/Indianapolis' },
+        timezone: { name: 'America/New_York' },
         notify_time: '07:00:00'
       };
       let result = cronHelper.private.isTimeToNotify(test);
@@ -337,7 +337,7 @@ describe('cronHelper', () => {
 
     it('should return false when outside a 15 (±7.5) minute range', () => {
       let test = {
-        timezone: { name: 'America/Indiana/Indianapolis' },
+        timezone: { name: 'America/New_York' },
         notify_time: '08:00:00'
       };
       let result = cronHelper.private.isTimeToNotify(test);

@@ -49,9 +49,9 @@ const config = {
 
   LOG_DIR: './logs',
 
-  DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/Indiana/Indianapolis',
+  DEFAULT_TIMEZONE: process.env.DEFAULT_TIMEZONE || 'America/New_York',
 
-  SUBITO_TIMEZONE: 'America/Indiana/Indianapolis',
+  SUBITO_TIMEZONE: 'America/New_York',
 
   CRON_NOTIFICATION_CHECK: process.env.CRON_NOTIFICATION_CHECK || 15.00, // minutes
 

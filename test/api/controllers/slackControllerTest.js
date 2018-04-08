@@ -169,7 +169,7 @@ describe('slackController', () => {
 
     it('should forward "subscribe" to /subito/subscribe', (done) => {
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .post(url)
@@ -196,7 +196,7 @@ describe('slackController', () => {
 
     it('should forward "subscribe" to /subito/subscribe with search string', (done) => {
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .post(url)
@@ -223,7 +223,7 @@ describe('slackController', () => {
 
     it('should forward "unsubscribe" to /subito/unsubscribe', (done) => {
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .post(url)
@@ -269,7 +269,7 @@ describe('slackController', () => {
 
     it('should 200 and return text for "settings"', (done) => {
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .post(url)

@@ -5,7 +5,7 @@
     "slack_username": "benjamin",
     "slack_team_id": "ABCDEF123",
     "timezone": {
-      "name": "America/Indiana/Indianapolis"
+      "name": "America/New_York"
     },
     "notify_time": "10:00:00"
   },

@@ -17,7 +17,7 @@ describe('subscriberController', () => {
   describe('POST /subito/subscribe', () => {
     it('should add a subscriber', (done) => {
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .post('/subito/subscribe')
@@ -109,7 +109,7 @@ describe('subscriberController', () => {
     it('should update the notification time', (done) => {
       const userId = 'ABC_123';
       sinon.stub(slack, 'fetchUserInfo').yields(null, {
-        tz: 'America/Indiana/Indianapolis'
+        tz: 'America/New_York'
       });
       request(server)
         .put('/subito/subscription')
