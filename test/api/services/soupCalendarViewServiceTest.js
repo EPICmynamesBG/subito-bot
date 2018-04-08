@@ -53,4 +53,32 @@ describe('soupCalendarViewService', () => {
       });
     });
   });
+
+  describe('getSoupsForWeek', () => {
+    it('should get soup calendar entires for the week', (done) => {
+      const day = 'today';
+      const date = utils.dateForText(day);
+      soupCalendarViewService.getSoupsForWeek(testHelper.db, date, (err, soups) => {
+        should.not.exist(err);
+        soups.should.have.property('text');
+        soups.should.have.property('soups');
+        soups.should.have.property('start');
+        soups.should.have.property('end');
+        done();
+      });
+    });
+
+    it('should not find any soups', (done) => {
+      const day = '12/12/1995';
+      const date = utils.dateForText(day);
+      soupCalendarViewService.getSoupsForWeek(testHelper.db, date, (err, soups) => {
+        should.not.exist(err);
+        soups.should.have.property('text');
+        soups.should.have.property('soups', []);
+        soups.should.have.property('start');
+        soups.should.have.property('end');
+        done();
+      });
+    });
+  });
 });

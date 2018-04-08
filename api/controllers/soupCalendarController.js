@@ -22,6 +22,24 @@ function getSoupsForDay(req, res) {
   });
 }
 
+function getSoupsForWeek(req, res) {
+  const params = utils.getSwaggerParams(req);
+  const date = utils.dateForText(params.day);
+  soupCalendarViewService.getSoupsForWeek(req.db, date, (err, soups) => {
+    if (err) {
+      utils.processResponse(err, null, res);
+      return;
+    }
+    if (!soups || soups.length === 0) {
+      const message = `Soups for week of ${utils.textForDate(date)} not found`;
+      utils.processResponse(null, { text: message }, res);
+      return;
+    }
+
+    utils.processResponse(null, soups, res);
+  });
+}
+
 function getAllSoups(req, res) {
   soupCalendarViewService.getAllSoups(req.db, (err, soups) => {
     utils.processResponse(err, soups, res);
@@ -58,5 +76,7 @@ module.exports = {
   getSoupsForToday: getSoupsForDay,
   getSoupsForDay: getSoupsForDay,
   getAllSoups: getAllSoups,
-  search: search
+  search: search,
+  getSoupsForWeekToday: getSoupsForWeek,
+  getSoupsForWeek: getSoupsForWeek
 };

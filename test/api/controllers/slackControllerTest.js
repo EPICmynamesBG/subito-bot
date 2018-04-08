@@ -257,6 +257,27 @@ describe('slackController', () => {
         });
     });
 
+    it('should forward "week" to /subito/week', (done) => {
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: validAuth.token,
+          text: 'week',
+          user_id: 'ABC123',
+          user_name: 'testuser',
+          team_id: validAuth.team_id
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          done();
+        });
+    });
+
     it('should 200 and return text for "feedback"', (done) => {
       request(server)
         .post(url)

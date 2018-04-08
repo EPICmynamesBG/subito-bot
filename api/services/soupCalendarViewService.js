@@ -1,5 +1,6 @@
 'use strict';
 
+const lodash = require('lodash');
 const moment = require('moment');
 const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
@@ -34,7 +35,42 @@ function getSoupsForDay(db, day, callback) {
     });
 }
 
+function getSoupsForWeek(db, dayInWeek, callback) {
+  const day = moment(dayInWeek);
+  const startOfWeek = day.startOf('week').format('YYYY/MM/DD');
+  const endOfWeek = day.endOf('week').format('YYYY/MM/DD');
+  const queryStr = `SELECT * FROM soup_calendar_view
+    WHERE \`day\` > DATE(?) AND \`day\` < DATE(?)
+    ORDER BY \`day\`;`;
+  queryHelper.custom(db, queryStr, [startOfWeek, endOfWeek], (err, rows) => {
+    if (err) callback (err, []);
+    else if (!Array.isArray(rows)) callback(null, {
+      text: `No soups for week of ${day}`,
+      soups: [],
+      start: startOfWeek,
+      end: endOfWeek
+    });
+    else {
+      const obj = rows.reduce((accumulatorObj, row) => {
+        const soups = row.soups.split(';');
+        accumulatorObj.text.push(`_${utils.textForDate(row.day)}_: ${row.soups.replace(';', ', ')}`);
+        accumulatorObj.soups = accumulatorObj.soups.concat(soups);
+        return accumulatorObj;
+      }, {
+        text: [],
+        soups: [],
+        start: startOfWeek,
+        end: endOfWeek
+      });
+      obj.text = obj.text.join('\n');
+      obj.soups = lodash.uniq(obj.soups);
+      callback(null, obj);
+    }
+  });
+}
+
 module.exports = {
   getAllSoups: getAllSoups,
-  getSoupsForDay: getSoupsForDay
+  getSoupsForDay: getSoupsForDay,
+  getSoupsForWeek: getSoupsForWeek
 }
