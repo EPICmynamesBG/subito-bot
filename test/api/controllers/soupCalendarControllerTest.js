@@ -259,7 +259,7 @@ describe('soupCalendarController', () => {
     });
   });
 
-  describe.only('GET /subito/week/{day}', () => {
+  describe('GET /subito/week/{day}', () => {
     it('should default to today', (done) => {
       request(server)
         .get('/subito/week')
