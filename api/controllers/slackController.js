@@ -44,6 +44,10 @@ function handleSlack(req, res) {
     lodash.set(req, 'swagger.params.day.value', action.params.day);
     soupCalendarController.getSoupsForDay(req, res);
     break;
+  case 'week':
+    lodash.set(req, 'swagger.params.day.value', action.params.day);
+    soupCalendarController.getSoupsForWeek(req, res);
+    break;
   case 'feedback':
     utils.processResponse(null,
       { text: 'Submit feedback <https://github.com/EPICmynamesBG/subito-bot/issues|here>!' }, res);

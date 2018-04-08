@@ -151,6 +151,70 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /week:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: get the soups for this week
+      # used as the method name of the controller
+      operationId: getSoupsForWeekToday
+      tags:
+        - SoupCalendar
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+              soups:
+                type: array
+                items:
+                  type: string
+              start:
+                type: string
+              end:
+                type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /week/{day}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: soupCalendarController
+    get:
+      description: get the soups for a week, given a day in a week
+      # used as the method name of the controller
+      operationId: getSoupsForWeek
+      tags:
+        - SoupCalendar
+      parameters:
+        - name: day
+          in: path
+          description: "the day to get soups for :: example - tomorrow | 12-08-2017"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+              soups:
+                type: array
+                items:
+                  type: string
+              start:
+                type: string
+              end:
+                type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /all:
     x-swagger-router-controller: soupCalendarController
     get:

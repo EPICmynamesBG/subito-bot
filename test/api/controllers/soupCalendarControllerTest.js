@@ -253,4 +253,101 @@ describe('soupCalendarController', () => {
         });
     });
   });
+
+  describe('GET /subito/week/{day}', () => {
+    it('should default to today', (done) => {
+      request(server)
+        .get('/subito/week')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          res.body.should.have.property('soups');
+          res.body.should.have.property('start');
+          res.body.should.have.property('end');
+          done();
+        });
+    });
+
+    it('should handle string date: today', (done) => {
+      request(server)
+        .get('/subito/week/today')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          res.body.should.have.property('soups');
+          res.body.should.have.property('start');
+          res.body.should.have.property('end');
+          done();
+        });
+    });
+
+    it('should handle string date: tomorrow', (done) => {
+      request(server)
+        .get('/subito/week/tomorrow')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          res.body.should.have.property('soups');
+          res.body.should.have.property('start');
+          res.body.should.have.property('end');
+          done();
+        });
+    });
+
+    it('should handle string date: yesterday', (done) => {
+      request(server)
+        .get('/subito/week/yesterday')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          res.body.should.have.property('soups');
+          res.body.should.have.property('start');
+          res.body.should.have.property('end');
+          done();
+        });
+    });
+
+    it('should handle string date: 2017-07-31', (done) => {
+      request(server)
+        .get('/subito/week/2017-07-31')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          res.body.should.have.property('soups');
+          res.body.should.have.property('start');
+          res.body.should.have.property('end');
+          done();
+        });
+    });
+
+    it('should say server error', (done) => {
+      sinon.stub(soupCalendarViewService, 'getSoupsForWeek').yields(new Error(), null);
+      request(server)
+        .get('/subito/week/today')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(500)
+        .end(function (err, res) {
+          should.not.exist(err);
+          res.body.should.have.property('text', 'Whoops, something unexpected happened...');
+          soupCalendarViewService.getSoupsForWeek.restore();
+          done();
+        });
+    });
+  });
 });

@@ -4,7 +4,7 @@ const lodash = require('lodash');
 
 module.exports = {
   SLACK_CONSTS: {
-    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'settings']),
+    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'week', 'settings']),
 
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
@@ -12,6 +12,7 @@ module.exports = {
       subscribe: '[search (example: corn)]',
       unsubscribe: '',
       feedback: '<https://github.com/EPICmynamesBG/subito-bot/issues|Submit feedback on GitHub>',
+      week: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       settings: '[notify (example: 8:00 am)]'
     },
 
@@ -21,6 +22,7 @@ module.exports = {
       subscribe: ['search'],
       unsubscribe: [],
       feedback: [],
+      week: ['day'],
       settings: {
         notify: ['time']
       }

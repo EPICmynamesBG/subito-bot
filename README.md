@@ -24,6 +24,15 @@ OR
 <img src="./assets/screenshots/screenshot_2.png" height="60" alt="screenshot_2" />
 
 ```text
+/subito week
+
+OR
+
+/subito week [today | tomorrow | yesterday | YYYY-MM-DD]
+```
+<img src="./assets/screenshots/week_view.png" height="110" alt="week" />
+
+```text
 /subito subscribe
 ```
 <img src="./assets/screenshots/subscribe_1.png" height="60" alt="subscribe_1" />
@@ -35,7 +44,7 @@ OR
 ```
 <img src="./assets/screenshots/subscribe_3.png" height="60" alt="subscribe_3" />
 
-_ *You can only be subscribed once_
+_ \*You can only be subscribed once_
 
 
 ```text
