@@ -53,7 +53,7 @@ function getSoupsForWeek(db, dayInWeek, callback) {
     else {
       const obj = rows.reduce((accumulatorObj, row) => {
         const soups = row.soups.split(';');
-        accumulatorObj.text.push(`_${utils.textForDate(row.day)}_: ${row.soups.replace(';', ', ')}`);
+        accumulatorObj.text.push(`_${utils.textForDate(row.day)}_:\t${row.soups.replace(';', ', ')}`);
         accumulatorObj.soups = accumulatorObj.soups.concat(soups);
         return accumulatorObj;
       }, {
