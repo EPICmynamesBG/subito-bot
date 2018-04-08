@@ -195,8 +195,8 @@ describe('soupCalendarService', () => {
       soupCalendarService.massUpdate(testHelper.db, updates, (err, updated) => {
         should.not.exist(err);
         updated.should.have.property('rows', updates.length * 2);
-        updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD Z'));
-        updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD Z'));
+        updated.should.have.property('startDate', expectedStartDate.format('YYYY/MM/DD'));
+        updated.should.have.property('endDate', expectedEndDate.format('YYYY/MM/DD'));
         done();
       });
     });
