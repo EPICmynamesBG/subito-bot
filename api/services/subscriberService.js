@@ -2,10 +2,7 @@
 
 const async = require('async');
 const lodash = require('lodash');
-const logger = require('../helpers/logger');
 const queryHelper = require('../helpers/queryHelper');
-const slack = require('../helpers/slack');
-const oauthService = require('./oauthService');
 const utils = require('../helpers/utils');
 
 function _addUser(db, userObj, callback) {
