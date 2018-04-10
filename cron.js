@@ -19,8 +19,8 @@ const runOnStart = () => {
 // Weekly, runs as midnight on Sundays
 // cron.schedule('0 0 0 * * Sunday', cronHelper.importCalendar(db), true);
 
-// Runs at every X minutes
-cron.schedule(`0 */${60 / config.CRON_NOTIFICATION_CHECK} * * * *`,
+// Runs at set 15 minute intervals
+cron.schedule('0 0,15,30,45 * * * *',
   cronHelper.processSubscribers(db), true);
 
 // Run now
