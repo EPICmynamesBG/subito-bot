@@ -12,7 +12,6 @@ if (config.NODE_ENV === 'development' ||
 const db = require('./config/db');
 
 const runOnStart = () => {
-  cronHelper.processSubscribers(db)();
   // cronHelper.importCalendar(db)();
 };
 
