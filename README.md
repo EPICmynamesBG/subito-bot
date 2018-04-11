@@ -81,10 +81,10 @@ _ \*You can only be subscribed once_
 
 ## Cron Schedule
 
-|         Job            |  Runtime         |    Description                                                                   |
-|------------------------|------------------|----------------------------------------------------------------------------------|
-| Soup Calendar Importer | 12:00am Sunday   | Fetches the latest soup calendar, parses, and updates the soup calendar database |
-| Subscriber Messaging   | 10:00am Weekdays | Handles messaging all subscribers the day's soups                                |
+|         Job            |  Runtime         |    Description                                                                           |
+|------------------------|------------------|------------------------------------------------------------------------------------------|
+| Soup Calendar Importer | 12:00am Sunday   | Fetches the latest soup calendar, parses, and updates the soup calendar database         |
+| Subscriber Messaging   | Every 15 Minutes | Handles messaging subscribers whose notification setting is within that 15 minute range  |
 
 \* _Hosted server timezone runs in [EDT](https://time.is/EDT)_
 
@@ -130,7 +130,7 @@ NODE_ENV=development
 
 ### Swagger Building
 
-By design, the `swagger.yaml` file is git-ignored. This is to leverge dynamic variables per environment, as can be seen in `config/[env].js`. While the _buildSwagger_ command is included at the start of a standard run and test, it does not run when `swagger project start` is used to start the server, nor `node app.js`. So be aware when changes are made to index.yaml that `npm run buildSwagger` needs to run or you won't be up to date.
+By design, the `swagger.yaml` file is git-ignored. This is to leverage dynamic variables per environment, as can be seen in `config/[env].js`. While the _buildSwagger_ command is included at the start of a standard run and test, it does not run when `swagger project start` is used to start the server, nor `node app.js`. So be aware when changes are made to index.yaml that `npm run buildSwagger` needs to run or you won't be up to date.
 
 #### Database Changes
 
