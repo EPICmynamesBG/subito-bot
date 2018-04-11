@@ -19,7 +19,7 @@ module.exports = {
 
   SWAGGER: {
 
-    APP_VERSION: '7.0.0',
+    APP_VERSION: '7.0.1',
 
     HOSTNAME: process.env.HOST || 'localhost',
 
