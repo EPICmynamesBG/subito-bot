@@ -2,6 +2,7 @@
 
 const async = require('async');
 const moment = require('moment');
+const { CRON_NOTIFICATION_CHECK } = require('../../config/config');
 
 const logger = require('./logger');
 const parseSubito = require('./parseSubito');
@@ -32,7 +33,24 @@ const _buildCustomText = (searchStr, soups) => {
   return `Today's the day! _${searchStr}_ is on the menu! Here are the soups: \n>${soups[0]}\n>${soups[1]}`;
 };
 
+const _isTimeToNotify = (subscriber) => {
+  const notifyTime = moment(subscriber.notify_time, 'HH:mm:ss');
+  const lowerTime = moment().subtract(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+  const upperTime = moment().add(CRON_NOTIFICATION_CHECK / 2.0, 'minute');
+
+  return notifyTime.isBetween(lowerTime, upperTime);
+};
+
 const _processSubscriber = (db, subscriber, soups, callback) => {
+  if (!module.exports.private.isTimeToNotify(subscriber)) {
+    logger.debug({
+      message: 'Notification time outside of notification range',
+      notify_time: subscriber.notify_time
+    });
+    callback();
+    return;
+  }
+
   if (subscriber.search_term) {
     async.autoInject({
       searchResults: (cb) => {
@@ -70,8 +88,7 @@ const _processSubscriber = (db, subscriber, soups, callback) => {
 
 const processSubscribers = (db) => {
   return (callback) => {
-    logger.info('Running processSubscribers:: ', moment().toDate());
-    const cleanExit = { clean: true };
+    logger.info('Running processSubscribers:: ', moment().format());
     async.autoInject({
       soups: (cb) => {
         soupCalendarViewService.getSoupsForDay(db, utils.dateForText('today'), cb);
@@ -81,7 +98,7 @@ const processSubscribers = (db) => {
       },
       process: (soups, subscribers, cb) => {
         if (!soups) {
-          cb(cleanExit);
+          cb({ clean: true, message: `no soups for today (${utils.dateForText('today')})` });
           return;
         }
         async.each(subscribers, (subscriber, eachCb) => {
@@ -90,7 +107,7 @@ const processSubscribers = (db) => {
       }
     }, (err) => {
       if (err && err.clean) {
-        logger.info('processSubscribers complete', 'no soups for today');
+        logger.info('processSubscribers complete', err.message);
       } else if (err) {
         logger.error(err); // should never occur
       } else {
@@ -106,6 +123,7 @@ module.exports = {
   processSubscribers: processSubscribers,
   private: {
     processSubscriber: _processSubscriber,
-    buildCustomTest: _buildCustomText
+    buildCustomTest: _buildCustomText,
+    isTimeToNotify: _isTimeToNotify
   }
 };

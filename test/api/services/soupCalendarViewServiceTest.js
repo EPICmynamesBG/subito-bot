@@ -1,8 +1,7 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const moment = require('moment');
+
 const testHelper = require('../../helper/testHelper');
 const utils = require('../../../api/helpers/utils');
 const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');

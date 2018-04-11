@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('assert');
 const logger = require('../../../api/helpers/logger');
 
 describe('logger', () => {

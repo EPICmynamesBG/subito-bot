@@ -6,7 +6,7 @@ const errors = require('common-errors');
 const crypto = require('crypto-js');
 const logger = require('./logger');
 
-const ENCRYPTION_KEY = require('../../config/config').ENCRYPTION_KEY;
+const { ENCRYPTION_KEY } = require('../../config/config');
 
 moment.createFromInputFallback = function (config) {
   config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
@@ -150,6 +150,14 @@ function decrypt(thing) {
   }
 }
 
+function parseTime (text) {
+  const time = moment(text, 'h:mm A');
+  if (!time.isValid()) {
+    logger.warn('Invalid time parsed', text, time.format('HH:mm:ss'));
+  }
+  return time.format('HH:mm:ss');
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
@@ -163,5 +171,6 @@ module.exports = {
   processResponseCb: processResponseCb,
   textCleaner: textCleaner,
   encrypt: encrypt,
-  decrypt: decrypt
+  decrypt: decrypt,
+  parseTime: parseTime
 };

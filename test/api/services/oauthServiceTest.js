@@ -1,9 +1,6 @@
 'use strict';
 
 const async = require('async');
-const assert = require('assert');
-const lodash = require('lodash');
-const sinon = require('sinon');
 const request = require('request');
 const SlackNode = require('slack-node');
 const testHelper = require('../../helper/testHelper');

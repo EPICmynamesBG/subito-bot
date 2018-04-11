@@ -49,10 +49,12 @@ function massUpdate(db, soupDays, callback) {
   let updatedRange = { start: null, end: null };
   async.each(soupDays, (soupDay, eachCb) => {
     let day = moment(soupDay.date).format('YYYY/MM/DD');
-    if (updatedRange.start === null || moment(updatedRange.start) > moment(soupDay.date)) {
+    if (updatedRange.start === null ||
+      moment(updatedRange.start) > moment(soupDay.date)) {
       updatedRange.start = moment(soupDay.date);
     }
-    if (updatedRange.end === null || moment(updatedRange.end) < moment(soupDay.date)) {
+    if (updatedRange.end === null ||
+      moment(updatedRange.end) < moment(soupDay.date)) {
       updatedRange.end = moment(soupDay.date);
     }
     const insertArr = soupDay.soups.map((soup) => {

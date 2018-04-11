@@ -1,11 +1,6 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const request = require('supertest');
-const moment = require('moment');
-const server = require('../../../app');
-const sinon = require('sinon');
 const testHelper = require('../../helper/testHelper');
 
 const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');

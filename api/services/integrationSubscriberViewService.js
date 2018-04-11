@@ -3,6 +3,7 @@
 const utils = require('../helpers/utils');
 const queryHelper = require('../helpers/queryHelper');
 
+
 function _mapDecrypt(row) {
   if (!row) return;
   row.slack_slash_token = utils.decrypt(row.slack_slash_token);

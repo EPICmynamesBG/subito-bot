@@ -1,8 +1,6 @@
 'use strict';
 
-const assert = require('assert');
 const should = require('should');
-const sinon = require('sinon');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
@@ -45,7 +43,17 @@ describe('cronHelper', () => {
   });
 
   describe('processSubscribers', () => {
+    let clock;
+
+    afterEach(() => {
+      if (clock) clock.restore();
+    });
+
     it('should not error', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.spy(soupCalendarViewService, 'getSoupsForDay');
@@ -53,7 +61,8 @@ describe('cronHelper', () => {
         should.not.exist(err);
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
-        assert.equal(slackSpy.getCalls().length, testSubscribers.length);
+        const calls = slackSpy.getCalls();
+        assert.equal(calls.length, 1, `should message 1 user, messaged ${calls.length}`);
 
         /* eslint-disable max-nested-callbacks */
         slackSpy.getCalls().forEach((call) => {
@@ -74,11 +83,20 @@ describe('cronHelper', () => {
     });
 
     it('should not message when there are no soups', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment().startOf('week').set({
+          hour: 8,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'info');
       const soupCalSpy = sinon.stub(soupCalendarViewService, 'getSoupsForDay').yields(null, null);
       cronHelper.processSubscribers(testHelper.db)((err) => {
-        assert.deepEqual(err, { clean: true });
+        err.should.have.property('clean', true);
+        assert(err.message.includes('no soups for today'));
         assert(soupCalSpy.calledOnce);
         assert(loggerSpy.calledWith('processSubscribers complete'));
         assert.equal(slackSpy.getCalls().length, 0);
@@ -100,7 +118,17 @@ describe('cronHelper', () => {
   });
 
   describe('private.processSubscriber', () => {
+    let clock;
+
+    afterEach(() => {
+      if (clock) clock.restore();
+    });
+
     it('should message the subscriber', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         soups: (cb) => {
@@ -121,8 +149,12 @@ describe('cronHelper', () => {
         const call = slackSpy.getCalls()[0];
         const userId = call.args[0];
         const message = call.args[1];
-        // eslint-disable-next-line max-len
-        assert.equal(message, 'Here are the soups for _today_: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+
+        logger.debug(message);
+        assert(message.includes('Here are the soups for _today_'));
+        assert(message.includes('Great-Grandma Hoffman’s Beef Ribley (df)'));
+        assert(message.includes('Local Corn Maque Choux'));
+
         const slackBotToken = call.args[2];
         assert(subscriberIds.includes(userId));
         assert(typeof message === 'string');
@@ -133,6 +165,10 @@ describe('cronHelper', () => {
     });
 
     it('should message the subscriber with search term', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment('10:00:00', 'HH:mm:ss').valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       async.autoInject({
         before: (cb) => {
@@ -140,7 +176,8 @@ describe('cronHelper', () => {
             slackUserId: 'XZYWVV',
             slackUsername: 'crontest',
             slackTeamId: 'XYZDEF123',
-            searchTerm: 'corn'
+            searchTerm: 'corn',
+            notify_time: '10:00'
           }, cb);
         },
         soups: (before, cb) => {
@@ -161,7 +198,10 @@ describe('cronHelper', () => {
         const call = slackSpy.getCalls()[0];
         const message = call.args[1];
         // eslint-disable-next-line max-len
-        assert.equal(message, 'Today\'s the day! _corn_ is on the menu! Here are the soups: \n>Great-Grandma Hoffman’s Beef Ribley (df)\n>Local Corn Maque Choux');
+        assert(message.includes('Today\'s the day! _corn_ is on the menu!'));
+        assert(message.includes('Great-Grandma Hoffman’s Beef Ribley (df)'));
+        assert(message.includes('Local Corn Maque Choux'));
+
         const botToken = call.args[2];
         assert(integrationBotTokens.includes(botToken));
         slackSpy.restore();
@@ -170,6 +210,10 @@ describe('cronHelper', () => {
     });
 
     it('should not message the subscriber with search term when not found on that day', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment(testHelper.testSubscriber.notify_time, 'HH:mm:ss').valueOf()
+      });
+
       const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
       const loggerSpy = sinon.spy(logger, 'debug');
       async.autoInject({
@@ -205,6 +249,92 @@ describe('cronHelper', () => {
         slackSpy.restore();
         done();
       });
+    });
+
+    it('should not message the suscriber when outside of notification time range', (done) => {
+      clock = sinon.useFakeTimers({
+        now: moment().subtract(1, 'day').set({
+          hour: 7,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+
+      const slackSpy = sinon.stub(slack, 'messageUserAsBot').yields(null, { ok: true });
+      const loggerSpy = sinon.spy(logger, 'debug');
+      async.autoInject({
+        soups: (cb) => {
+          soupCalendarViewService.getSoupsForDay(testHelper.db, utils.dateForText('today'), cb);
+        },
+        subscribers: (cb) => {
+          integrationSubscriberViewService.getAll(testHelper.db, true, cb);
+        },
+        process: (soups, subscribers, cb) => {
+          async.each(subscribers, (subscriber, ecb) => {
+            cronHelper.private.processSubscriber(testHelper.db, subscriber, soups, (err) => {
+              assert(!err);
+              ecb();
+            });
+          }, cb);
+        }
+      }, (err) => {
+        assert(!err);
+        assert(slackSpy.getCalls().length === 0);
+        assert(loggerSpy.getCalls().length > 0);
+
+        loggerSpy.restore();
+        slackSpy.restore();
+        done();
+      });
+    });
+  });
+
+  describe('private.isTimeToNotify', () => {
+    let clock;
+    beforeEach(() => {
+      clock = sinon.useFakeTimers({
+        now: moment().subtract(1, 'day').set({
+          hour: 7,
+          minute: 0,
+          second: 0
+        }).valueOf()
+      });
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it('should return true when within a 15 (±7.5) minute range', () => {
+      let test = {
+        notify_time: '07:00:00'
+      };
+      let result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+
+      test.notify_time = '06:52:31';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+
+      test.notify_time = '07:07:29';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(true, result);
+    });
+
+    it('should return false when outside a 15 (±7.5) minute range', () => {
+      let test = {
+        notify_time: '08:00:00'
+      };
+      let result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
+
+      test.notify_time = '06:52:00';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
+
+      test.notify_time = '07:07:35';
+      result = cronHelper.private.isTimeToNotify(test);
+      assert.equal(false, result);
     });
   });
 });

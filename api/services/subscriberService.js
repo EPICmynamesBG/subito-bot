@@ -3,6 +3,8 @@
 const async = require('async');
 const lodash = require('lodash');
 const queryHelper = require('../helpers/queryHelper');
+const utils = require('../helpers/utils');
+
 
 function addSubscriber(db, user, callback) {
   const mappedUser = {
@@ -65,7 +67,16 @@ function getSubscriberBySlackUserId(db, slackId, callback) {
 }
 
 function getSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
-  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId }, callback);
+  queryHelper.selectOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId },
+    callback);
+}
+
+function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
+  const clone = lodash.clone(updateObj);
+  if (clone.notify_time) {
+    clone.notify_time = utils.parseTime(clone.notify_time);
+  }
+  queryHelper.update(db, 'subscribers', clone, { slack_user_id: slackId }, callback);
 }
 
 function deleteSubscriberById(db, id, callback) {
@@ -87,6 +98,7 @@ module.exports = {
   getSubscriberById: getSubscriberById,
   getSubscriberBySlackUserId: getSubscriberBySlackUserId,
   getSubscriberBySlackUsername: getSubscriberBySlackUsername,
+  updateSubscriberBySlackUserId: updateSubscriberBySlackUserId,
   deleteSubscriberById: deleteSubscriberById,
   deleteSubscriberBySlackUserId: deleteSubscriberBySlackUserId,
   deleteSubscriberBySlackUsername: deleteSubscriberBySlackUsername

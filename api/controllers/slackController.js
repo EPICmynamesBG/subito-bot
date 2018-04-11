@@ -52,6 +52,11 @@ function handleSlack(req, res) {
     utils.processResponse(null,
       { text: 'Submit feedback <https://github.com/EPICmynamesBG/subito-bot/issues|here>!' }, res);
     break;
+  case 'settings':
+    lodash.set(req, 'swagger.params.body.value.slackUserId', action.params.user.id);
+    lodash.set(req, 'swagger.params.body.value.notificationTime', lodash.get(action, 'params.notify.time'));
+    subscriberController.updateSettings(req, res);
+    break;
   default: {
     logger.warn('Unsupported command', action.command);
     let message = "Whoops, I don't recognize that command. Try one of these instead!";

@@ -38,6 +38,24 @@ function messageUserAsBot(userId, message, botToken, callback) {
   });
 }
 
+function fetchUserInfo(userId, token, callback) {
+  const slack = new Slack(token);
+  slack.api('users.info', {
+    user: userId
+  }, (err, res) => {
+    if (err) {
+      logger.error(err);
+      callback(new Error('An unexpected error occurred'));
+      return;
+    } else if (!res.ok) {
+      logger.info(res);
+      callback(new Error(res.error));
+      return;
+    }
+    callback(null, res.user);
+  });
+}
+
 function parseRequestCommand(params) {
   const snakeParams = utils.snakeCase(params);
   let template = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
@@ -87,7 +105,22 @@ function _parseRequestParams(command, givenParams) {
   const paramObj = {};
   const supportedParams = SLACK_CONSTS.CMD_PARAM_MAP[command];
 
-  if (supportedParams.length === 1) {
+  if (lodash.isPlainObject(supportedParams)) {
+    const subCommand = givenParams[0];
+    if (supportedParams[subCommand]) {
+      const supportedSubParams = SLACK_CONSTS.CMD_PARAM_MAP[command][subCommand];
+      const remParams = lodash.clone(givenParams);
+      remParams.splice(0, 1);
+      supportedSubParams.forEach((param, index) => {
+        let value = remParams[index];
+        if (typeof value === 'string' && value.length === 0) value = null;
+        lodash.set(paramObj, [subCommand, param], value);
+      });
+    } else {
+      logger.warn('Slack sub-command mapping failed. ', supportedParams, givenParams);
+      return paramObj;
+    }
+  } else if (supportedParams.length === 1) {
     let value = givenParams.join(' ');
     if (typeof value === 'string' && value.length === 0) value = null;
     paramObj[supportedParams[0]] = value;
@@ -106,6 +139,7 @@ function _parseRequestParams(command, givenParams) {
 
 module.exports = {
   messageUserAsBot: messageUserAsBot,
+  fetchUserInfo: fetchUserInfo,
   utils: {
     parseRequestCommand: parseRequestCommand
   }

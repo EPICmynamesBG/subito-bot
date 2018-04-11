@@ -1,11 +1,9 @@
 'use strict';
 
 const should = require('should');
-const request = require('supertest');
-const server = require('../../../app');
 const testHelper = require('../../helper/testHelper');
-
 const subscriberService = require('../../../api/services/subscriberService');
+const slack = require('../../../api/helpers/slack');
 
 describe('subscriberController', () => {
   before(testHelper.resetData);
@@ -18,6 +16,9 @@ describe('subscriberController', () => {
   };
   describe('POST /subito/subscribe', () => {
     it('should add a subscriber', (done) => {
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/New_York'
+      });
       request(server)
         .post('/subito/subscribe')
         .type('form')
@@ -32,6 +33,7 @@ describe('subscriberController', () => {
           res.body.should.have.property('slackUsername', 'test_user');
           res.body.should.have.property('slackTeamId', 'ABCDEF123');
           res.body.should.have.property('text', "You're subscribed! :tada:");
+          slack.fetchUserInfo.restore();
           done();
         });
     });
@@ -98,6 +100,32 @@ describe('subscriberController', () => {
         .end((err, res) => {
           should.not.exist(err);
           res.body.should.have.property('text', '1 subscribers DELETED');
+          done();
+        });
+    });
+  });
+
+  describe('PUT /subito/subscription', () => {
+    it('should update the notification time', (done) => {
+      const userId = 'ABC_123';
+      sinon.stub(slack, 'fetchUserInfo').yields(null, {
+        tz: 'America/New_York'
+      });
+      request(server)
+        .put('/subito/subscription')
+        .type('form')
+        .send({
+          slackUserId: userId,
+          notificationTime: '8:00'
+        })
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          res.body.should.have.property('text', '1 subscribers UPDATED');
+          slack.fetchUserInfo.restore();
           done();
         });
     });

@@ -3,18 +3,21 @@
     "id": 1001,
     "slack_user_id": "ABC_123",
     "slack_username": "benjamin",
-    "slack_team_id": "ABCDEF123"
+    "slack_team_id": "ABCDEF123",
+    "notify_time": "10:00:00"
   },
   {
     "id": 1002,
     "slack_user_id": "ABC_XYZ",
     "slack_username": "bennyboy",
-    "slack_team_id": "ABCDEF123"
+    "slack_team_id": "ABCDEF123",
+    "notify_time": "14:00:00"
   },
   {
     "id": 1003,
     "slack_user_id": "BBQHJZ",
     "slack_username": "bobbarker",
-    "slack_team_id": "XYZDEF123"
+    "slack_team_id": "XYZDEF123",
+    "notify_time": "8:00:00"
   }
 ]

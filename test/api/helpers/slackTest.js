@@ -1,9 +1,6 @@
 'use strict';
 
-const assert = require('assert');
-const lodash = require('lodash');
 const SlackNode = require('slack-node');
-const sinon = require('sinon');
 
 const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;
@@ -193,6 +190,15 @@ describe('slack helper', () => {
         const output = slack.utils.parseRequestCommand(text);
         const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
         expected.command = 'feedback';
+        assert.deepEqual(output, expected);
+      });
+
+      it('should support "settings" command', () => {
+        const text = 'settings notify 8:00';
+        const output = slack.utils.parseRequestCommand(text);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'settings';
+        expected.params.notify = { time: '8:00' };
         assert.deepEqual(output, expected);
       });
 
