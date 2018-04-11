@@ -377,5 +377,17 @@ describe('slackController', () => {
           done();
         });
     });
+
+    it('should handle error query param', (done) => {
+      request(server)
+        .get(url.concat('?error=test_error'))
+        .expect(400)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.equal(res.body.text, 'Slack Error: test_error');
+          done();
+        });
+    });
   })
 });

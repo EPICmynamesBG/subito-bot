@@ -87,7 +87,12 @@ paths:
         - name: code
           in: query
           description: a temporary Slack oauth code
-          required: true
+          required: false
+          type: string
+        - name: error
+          in: query
+          description: a Slack oauth error message
+          required: false
           type: string
       responses:
         "200":
