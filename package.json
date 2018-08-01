@@ -24,6 +24,7 @@
     "mysql": "^2.16.0",
     "node-cron": "^1.2.1",
     "node-html-parser": "^1.1.8",
+    "pdf2json": "^1.1.7",
     "request": "^2.87.0",
     "slack-node": "^0.1.8",
     "swagger-express-mw": "^0.1.0",
