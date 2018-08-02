@@ -24,5 +24,4 @@ before_script:
   - npm run migrate-up:test
 script:
   - npm run eslint
-  - npm run test
   - npm run coverage
