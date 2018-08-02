@@ -1,16 +1,15 @@
 'use strict';
 
 const _ = require('lodash');
-const async = require('async');
 const moment = require('moment');
 const request = require('request');
 const PDFParser = require('pdf2json');
 const { HttpStatusError} = require('common-errors');
 
 const logger = require('./logger');
-const soupCalendarService = require('../services/soupCalendarService');
 
 function loadAndConvertPdf(url, callback) {
+  logger.debug('Loading PDF', url);
   const pdfParser = new PDFParser();
 
   pdfParser.on("pdfParser_dataError", (err) => {
@@ -46,7 +45,7 @@ function loadAndConvertPdf(url, callback) {
 }
 
 function extractFromPdf(pdfJson) {
-  const textValues = _.chain(pdfJson)
+  return _.chain(pdfJson)
     .get('formImage.Pages[0].Texts', [])
     .map(({ R }) =>
       R.map(({ T }) => T)
@@ -54,7 +53,6 @@ function extractFromPdf(pdfJson) {
     .flatten()
     .map(decodeURIComponent)
     .value();
-  return textValues;
 }
 
 /**
@@ -67,7 +65,10 @@ function aggregateRows(textArr) {
   const endFlagText = 'Soup Calendar';
 
   // Determine if end of soup name. If last char is char, num, or ), end the current soup.
-  const soupEndCheck = s => /[a-z]|\d|\)/i.test(_.last(s));
+  // Secondary, validate that next sample is not a hyphen
+  const soupEndCheck = (s, lookahead) => {
+    return /[a-z]|\d|\)/i.test(_.last(s)) && ![s, lookahead].includes('-');
+  };
 
   const dateTest = s => /(\d{1,2}\/\d{1,2}\/\d{4})\s*/i.test(s) && moment(s, 'M/D/YYYY').isValid()
 
@@ -78,7 +79,7 @@ function aggregateRows(textArr) {
   let startReading = false;
   let stopReading = false;
   const aggregates = [];
-  textArr.forEach((sample) => {
+  textArr.forEach((sample, index) => {
     const isDate = dateTest(sample);
     if (isDate) {
       // At sight of first date, enable soup reading
@@ -96,7 +97,8 @@ function aggregateRows(textArr) {
 
       if (!stopReading) {
         soupStr += sample;
-        if (soupEndCheck(sample)) {
+        const nextSample = _.get(textArr, index + 1);
+        if (soupEndCheck(sample, nextSample)) {
           builderObj.soups.push(_.clone(soupStr));
           soupStr = '';
         }
@@ -106,17 +108,8 @@ function aggregateRows(textArr) {
   return aggregates;
 }
 
-function importPdf(db, url, callback) {
-  async.autoInject({
-    pdfJson: cb => loadAndConvertPdf(url, cb),
-    calendarRows: (pdfJson, cb) => {
-      const plainTextArr = extractFromPdf(pdfJson);
-      const rows = aggregateRows(plainTextArr);
-      soupCalendarService.massUpdate(db, rows, cb);
-    }
-  }, callback);
-}
-
 module.exports = {
-  importPdf: importPdf
+  loadAndConvertPdf: loadAndConvertPdf,
+  extractFromPdf: extractFromPdf,
+  aggregateRows: aggregateRows
 };

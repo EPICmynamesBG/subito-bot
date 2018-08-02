@@ -5,26 +5,29 @@ const moment = require('moment');
 const { CRON_NOTIFICATION_CHECK } = require('../../config/config');
 
 const logger = require('./logger');
-const parseSubito = require('./parseSubito');
 const utils = require('./utils');
 const slack = require('./slack');
 const soupCalendarService = require('../services/soupCalendarService');
 const soupCalendarViewService = require('../services/soupCalendarViewService');
 const integrationSubscriberViewService = require('../services/integrationSubscriberViewService');
+const importerService = require('../services/importerService');
 
 const importCalendar = (db) => {
   return (cb) => {
-    logger.info('Running importCalendar:: ', moment().format());
-    parseSubito.fetchCalendar((err, data) => {
+    const now = moment();
+    logger.info('Running importCalendar:: ', now.format());
+    // sample 'https://www.subitosoups.com/s/2018-August-Menu.pdf'
+    const url = `https://www.subitosoups.com/s/${now.format('YYYY')}-${now.format('MMMM')}-Menu.pdf`
+    importerService.processUrl(db, url, {
+      user: 'cron'
+    }, (err, updated) => {
       if (err) {
-        logger.error(err);
+        logger.error('importCalendar errored:: ', err);
         if (typeof cb === 'function') cb(err);
         return;
       }
-      soupCalendarService.massUpdate(db, data, (err2, updated) => {
-        logger.info('importCalendar complete:: ', updated);
-        if (typeof cb === 'function') cb(err2, updated);
-      });
+      logger.info('importCalendar complete:: ', updated);
+      if (typeof cb === 'function') cb(null, updated);
     });
   };
 };

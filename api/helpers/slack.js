@@ -1,6 +1,7 @@
 'use strict';
 
 const async = require('async');
+const request = require('request');
 const Slack = require('slack-node');
 const lodash = require('lodash');
 const moment = require('moment');
@@ -71,7 +72,8 @@ function parseRequestCommand(params) {
       id: lodash.get(snakeParams, 'user_id', null),
       username: lodash.get(snakeParams, 'user_name', null),
       teamId: lodash.get(snakeParams, 'team_id', null),
-      teamDomain: lodash.get(snakeParams, 'team_domain', null)
+      teamDomain: lodash.get(snakeParams, 'team_domain', null),
+      responseUrl: lodash.get(snakeParams, 'response_url', null)
     };
     return template;
   }
@@ -96,7 +98,8 @@ function parseRequestCommand(params) {
     id: lodash.get(snakeParams, 'user_id', null),
     username: lodash.get(snakeParams, 'user_name', null),
     teamId: lodash.get(snakeParams, 'team_id', null),
-    teamDomain: lodash.get(snakeParams, 'team_domain', null)
+    teamDomain: lodash.get(snakeParams, 'team_domain', null),
+    responseUrl: lodash.get(snakeParams, 'response_url', null)
   };
   return template;
 }
@@ -137,9 +140,28 @@ function _parseRequestParams(command, givenParams) {
   return paramObj;
 }
 
+function messageResponseUrl(url, message, callback) {
+  if (!callback) {
+    // eslint-disable-next-line no-param-reassign
+    callback = (err, res) => {
+      if (err) logger.error('messageResponseUrl', err);
+      else logger.info('messageResponseUrl', res);
+    };
+  }
+  request.post({
+    url: url,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: { text: message },
+    json: true
+  })
+}
+
 module.exports = {
   messageUserAsBot: messageUserAsBot,
   fetchUserInfo: fetchUserInfo,
+  messageResponseUrl: messageResponseUrl,
   utils: {
     parseRequestCommand: parseRequestCommand
   }
