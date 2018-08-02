@@ -4,7 +4,9 @@ const lodash = require('lodash');
 
 module.exports = {
   SLACK_CONSTS: {
-    SUPPORTED_COMMANDS: lodash.clone(['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'week', 'settings', 'import']),
+    SUPPORTED_COMMANDS: lodash.clone(
+      ['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'week', 'settings', 'import']
+    ),
 
     CMD_USAGE: {
       day: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
