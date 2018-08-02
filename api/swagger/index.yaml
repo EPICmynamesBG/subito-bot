@@ -349,7 +349,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
   /search:
     x-swagger-router-controller: soupCalendarController
-    post:
+    get:
       description: Search for soup availability
       operationId: search
       tags:

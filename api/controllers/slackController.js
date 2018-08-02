@@ -23,7 +23,7 @@ function handleSlack(req, res) {
 
   const action = slackUtils.parseRequestCommand(params);
   lodash.set(req, 'fromSlack', true);
-  console.log(req.body);
+
   switch (action.command) {
   case 'subscribe':
     lodash.set(req, 'body.slackUserId', action.params.user.id);

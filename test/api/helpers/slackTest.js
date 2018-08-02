@@ -59,7 +59,8 @@ describe('slack helper', () => {
           id: 'ABC123',
           username: 'bobbyboy',
           teamId: '123XYZ',
-          teamDomain: 'testteam'
+          teamDomain: 'testteam',
+          responseUrl: null
         };
         assert.deepEqual(output, expected);
 
@@ -69,7 +70,8 @@ describe('slack helper', () => {
           id: null,
           username: null,
           teamId: null,
-          teamDomain: null
+          teamDomain: null,
+          responseUrl: null
         };
         assert.deepEqual(output, expected);
       });
@@ -129,7 +131,8 @@ describe('slack helper', () => {
           id: 'ABC123',
           username: 'bobbyboy',
           teamId: '123XYZ',
-          teamDomain: 'test'
+          teamDomain: 'test',
+          responseUrl: null
         };
         expected.params.search = null;
         assert.deepEqual(output, expected);
@@ -150,7 +153,8 @@ describe('slack helper', () => {
           id: 'ABC123',
           username: 'bobbyboy',
           teamId: '123XYZ',
-          teamDomain: 'test'
+          teamDomain: 'test',
+          responseUrl: null
         };
         expected.params.search = 'corn';
         assert.deepEqual(output, expected);
@@ -171,7 +175,30 @@ describe('slack helper', () => {
           id: 'ABC123',
           username: 'bobbyboy',
           teamId: '123XYZ',
-          teamDomain: 'test'
+          teamDomain: 'test',
+          responseUrl: null
+        };
+        assert.deepEqual(output, expected);
+      });
+
+      it('should support "import" command', () => {
+        let input = {
+          text: 'import url',
+          user_id: 'ABC123',
+          user_name: 'bobbyboy',
+          team_id: '123XYZ',
+          team_domain: 'test'
+        };
+        const output = slack.utils.parseRequestCommand(input);
+        const expected = lodash.cloneDeep(SLACK_CONSTS.CMD_TEMPLATE);
+        expected.command = 'import';
+        expected.params.url = 'url';
+        expected.params.user = {
+          id: 'ABC123',
+          username: 'bobbyboy',
+          teamId: '123XYZ',
+          teamDomain: 'test',
+          responseUrl: null
         };
         assert.deepEqual(output, expected);
       });

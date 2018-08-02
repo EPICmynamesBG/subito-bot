@@ -6,6 +6,7 @@ const should = require('should');
 
 const testHelper = require('../../helper/testHelper');
 const oauthService = require('../../../api/services/oauthService');
+const importerService = require('../../../api/services/importerService');
 const slack = require('../../../api/helpers/slack');
 
 const { SLACK_VERIFICATION_TOKEN } = require('../../../config/config');
@@ -309,6 +310,34 @@ describe('slackController', () => {
           should.not.exist(err);
           assert.equal(res.body.text, 'Your subscription notification time has been updated to 8:00');
           slack.fetchUserInfo.restore();
+          done();
+        });
+    });
+
+    it('should forward "import" to /subito/import', (done) => {
+      sinon.stub(importerService, 'processUrl').yields(null, {
+        text: 'PDF Processing'
+      });
+
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: validAuth.token,
+          text: 'import ',
+          user_id: 'ABC123',
+          user_name: 'testuser',
+          team_id: validAuth.team_id,
+          response_url: 'https://test.org'
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          res.body.should.have.property('text');
+          assert(importerService.processUrl.calledOnce);
+          importerService.processUrl.restore();
           done();
         });
     });
