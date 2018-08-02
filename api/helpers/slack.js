@@ -155,7 +155,9 @@ function messageResponseUrl(url, message, callback) {
     },
     body: { text: message },
     json: true
-  })
+  }, (err, response, body) => {
+    callback(err, body || response);
+  });
 }
 
 module.exports = {

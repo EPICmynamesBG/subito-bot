@@ -1,6 +1,7 @@
 'use strict';
 
 const SlackNode = require('slack-node');
+const request = require('request');
 
 const slack = require('../../../api/helpers/slack');
 const SLACK_CONSTS = require('../../../config/constants').SLACK_CONSTS;
@@ -236,6 +237,31 @@ describe('slack helper', () => {
         expected.command = 'hello';
         expected.params.unknown = 'bob barker';
         assert.deepEqual(output, expected);
+      });
+    });
+  });
+
+  describe('messageResponseUrl', () => {
+    before(() => {
+      sinon.stub(request, 'post').yields(null, { statusCode: 200 }, {});
+    });
+
+    after(() => {
+      request.post.restore();
+    });
+
+    it('should post to url', (done) => {
+      slack.messageResponseUrl('http://example.org', 'some message', (err) => {
+        assert(!err, err);
+        assert.deepEqual(request.post.firstCall.args[0], {
+          url: 'http://example.org',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: { text: 'some message' },
+          json: true
+        });
+        done();
       });
     });
   });

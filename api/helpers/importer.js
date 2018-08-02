@@ -9,15 +9,28 @@ const { HttpStatusError} = require('common-errors');
 const logger = require('./logger');
 
 function loadAndConvertPdf(url, callback) {
+  if (!url) {
+    callback(new HttpStatusError(400, 'Missing URL'));
+    return;
+  }
+  const callbackOnce = _.once(callback);
   logger.debug('Loading PDF', url);
   const pdfParser = new PDFParser();
 
+  const tryAbort = (stream) => {
+    try {
+      stream.abort();
+    }  catch (e) {
+      logger.warn(e);
+    }
+  };
+
   pdfParser.on("pdfParser_dataError", (err) => {
     logger.error('PDF Parse Error', err);
-    callback(err);
-    pdfParser.abort();
+    callbackOnce(err);
+    tryAbort(pdfParser);
   });
-  pdfParser.on("pdfParser_dataReady", pdfData => callback(null, pdfData));
+  pdfParser.on("pdfParser_dataReady", pdfData => callbackOnce(null, pdfData));
 
   /* eslint-disable max-len */
   const reqStream = request.get({
@@ -32,14 +45,14 @@ function loadAndConvertPdf(url, callback) {
   reqStream.on('response', (res) => {
     if (res.statusCode !== 200) {
       logger.warn('loadAndConvertPdf failed with status code', res.statusCode, res.body);
-      callback(new HttpStatusError(res.statusCode, `Failed to load ${url}`));
-      reqStream.abort();
+      callbackOnce(new HttpStatusError(res.statusCode, `Failed to load ${url}`));
+      tryAbort(reqStream);
     }
   });
   reqStream.on('error', (err) => {
     logger.error(err);
-    callback(err);
-    reqStream.abort();
+    callbackOnce(err);
+    tryAbort(reqStream);
   });
   reqStream.pipe(pdfParser);
 }
@@ -47,9 +60,9 @@ function loadAndConvertPdf(url, callback) {
 function extractFromPdf(pdfJson) {
   return _.chain(pdfJson)
     .get('formImage.Pages[0].Texts', [])
-    .map(({ R }) =>
-      R.map(({ T }) => T)
-    )
+    .map(({ R }) => R)
+    .flatten()
+    .map(({ T }) => T)
     .flatten()
     .map(decodeURIComponent)
     .value();
