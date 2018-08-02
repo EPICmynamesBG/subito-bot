@@ -372,6 +372,43 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /import:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: importController
+    put:
+      description: import a new/updated soup calendar
+      # used as the method name of the controller
+      operationId: importSoups
+      tags:
+        - Imports
+      parameters:
+        - name: body
+          in: body
+          description: import settings request body
+          required: true
+          schema:
+            required:
+              - url
+            properties:
+              url:
+                type: string
+                description: url to the PDF to be imported and processed
+              responseUrl:
+                type: string
+                description: url to post a response to when the import has finished
+              userName:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SlackResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions

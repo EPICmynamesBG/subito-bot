@@ -44,7 +44,7 @@ function searchForSoupOnDay(db, searchStr, day, callback) {
   });
 }
 
-function massUpdate(db, soupDays, callback) {
+function massUpdate(db, soupDays, user, callback) {
   let updatedCount = 0;
   let updatedRange = { start: null, end: null };
   async.each(soupDays, (soupDay, eachCb) => {
@@ -60,7 +60,8 @@ function massUpdate(db, soupDays, callback) {
     const insertArr = soupDay.soups.map((soup) => {
       return {
         day: day,
-        soup: soup
+        soup: soup,
+        created_by: user || null
       };
     });
     async.autoInject({

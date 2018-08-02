@@ -10,6 +10,7 @@ const { CMD_USAGE, SUPPORTED_COMMANDS } = require('../../config/constants').SLAC
 const oauthService = require('../services/oauthService');
 const soupCalendarController = require('./soupCalendarController');
 const subscriberController = require('./subscriberController');
+const importController = require('./importController');
 
 function handleSlack(req, res) {
   const params = utils.camelCase(req.body);
@@ -22,6 +23,7 @@ function handleSlack(req, res) {
 
   const action = slackUtils.parseRequestCommand(params);
   lodash.set(req, 'fromSlack', true);
+
   switch (action.command) {
   case 'subscribe':
     lodash.set(req, 'body.slackUserId', action.params.user.id);
@@ -56,6 +58,12 @@ function handleSlack(req, res) {
     lodash.set(req, 'swagger.params.body.value.slackUserId', action.params.user.id);
     lodash.set(req, 'swagger.params.body.value.notificationTime', lodash.get(action, 'params.notify.time'));
     subscriberController.updateSettings(req, res);
+    break;
+  case 'import':
+    lodash.set(req, 'swagger.params.body.value.url', action.params.url);
+    lodash.set(req, 'swagger.params.body.value.responseUrl', action.params.user.responseUrl);
+    lodash.set(req, 'swagger.params.body.value.userName', action.params.user.username);
+    importController.importSoups(req, res);
     break;
   default: {
     logger.warn('Unsupported command', action.command);

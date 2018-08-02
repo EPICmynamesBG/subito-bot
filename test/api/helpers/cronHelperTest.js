@@ -1,22 +1,19 @@
 'use strict';
 
 const should = require('should');
-const fs = require('fs');
-const path = require('path');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');
 const cronHelper = require('../../../api/helpers/cronHelper');
-const parseSubito = require('../../../api/helpers/parseSubito');
 const slack = require('../../../api/helpers/slack');
 const logger = require('../../../api/helpers/logger');
 const utils = require('../../../api/helpers/utils');
 const subscriberService = require('../../../api/services/subscriberService');
 const soupCalendarViewService = require('../../../api/services/soupCalendarViewService');
 const integrationSubscriberViewService = require('../../../api/services/integrationSubscriberViewService');
+const importerService = require('../../../api/services/importerService');
 
 const testSubscribers = require('../../data/Subscribers.json');
 const testIntegrations = require('../../data/OauthIntegrations.json');
-const testHtml = fs.readFileSync(path.join(__dirname, '../../data') + '/test-calendar.html', 'utf-8');
 
 const subscriberIds = testSubscribers.map(sub => sub.slack_user_id);
 const integrationBotTokens = testIntegrations.map(integration => integration.bot_token);
@@ -26,17 +23,12 @@ describe('cronHelper', () => {
   after(testHelper.clearData);
   describe('importCalendar', () => {
     it('should not error', (done) => {
-      const loggerSpy = sinon.spy(logger, 'info');
-      sinon.stub(parseSubito.private, 'fetchSoupPage').yields(null, null);
-      sinon.stub(fs, 'readFile').yields(null, testHtml);
-      cronHelper.importCalendar(testHelper.db)((err, result) => {
+      sinon.stub(importerService, 'processUrl').yields(null, null);
+      cronHelper.importCalendar(testHelper.db)((err) => {
         should.not.exist(err);
-        assert(result.rows > 0);
-        assert(loggerSpy.calledWith('importCalendar complete:: '));
 
-        parseSubito.private.fetchSoupPage.restore();
-        fs.readFile.restore();
-        loggerSpy.restore();
+        assert(importerService.processUrl.calledOnce);
+        importerService.processUrl.restore();
         done();
       });
     });
