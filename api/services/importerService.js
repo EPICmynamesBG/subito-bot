@@ -11,7 +11,7 @@ const soupCalendarService = require('./soupCalendarService');
 
 function processUrl(db, url, options, callback) {
   const callbackOnce = _.once(callback);
-  if (options.responseUrl) {
+  if (options.webhookUrl) {
     // Callback now, continue processing
     callbackOnce(null, { text: 'Processing PDF' });
   }
@@ -28,8 +28,8 @@ function processUrl(db, url, options, callback) {
       `PDF Imported ${stats.rows} soups for ${stats.startDate} - ${stats.endDate}` :
       'PDF Imported';
     const message = err ? err.message : successMessage;
-    if (options.responseUrl) {
-      slack.messageResponseUrl(options.responseUrl, message);
+    if (options.webhookUrl) {
+      slack.messageResponseUrl(options.webhookUrl, message);
     } else {
       logger.analytics('Imported from url', url, results.calendarRows);
       callbackOnce(err, { text: message });
