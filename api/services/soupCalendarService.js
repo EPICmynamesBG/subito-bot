@@ -99,9 +99,7 @@ function validateSoupsForRange(db, startDate, endDate, callback) {
     GROUP BY day
     HAVING soup_count != 2
     ORDER BY \`day\`;`;
-  queryHelper.custom(db, queryStr, [start, end], (err, rows) => {
-    callback(err, rows);
-  });
+  queryHelper.custom(db, queryStr, [start, end], callback);
 }
 
 module.exports = {

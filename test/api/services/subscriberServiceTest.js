@@ -100,6 +100,21 @@ describe('subscriberService', () => {
     });
   });
 
+  describe('getAdmins', () => {
+    it('should return all subscribers on a slack team', (done) => {
+      subscriberService.getAdmins(testHelper.db, (err, admins) => {
+        should.not.exist(err);
+        assert.strictEqual(admins.length, 1, 'should 1 admin');
+        /* eslint-disable max-nested-callbacks */
+        admins.forEach((subscriber) => {
+          subscriber.should.have.property('is_admin', 1); // 1 = true
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+  });
+
   describe('getSubscriberById', () => {
     it('should get a subscriber by id', (done) => {
       const expected = {
@@ -108,7 +123,8 @@ describe('subscriberService', () => {
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
         search_term: null,
-        notify_time: '10:00:00'
+        notify_time: '10:00:00',
+        is_admin: 1
       };
       subscriberService.getSubscriberById(testHelper.db, expected.id, (err, subscriber) => {
         should.not.exist(err);
@@ -126,7 +142,8 @@ describe('subscriberService', () => {
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
         search_term: null,
-        notify_time: '10:00:00'
+        notify_time: '10:00:00',
+        is_admin: 1
       };
       subscriberService.getSubscriberBySlackUserId(testHelper.db, expected.slack_user_id, (err, subscriber) => {
         should.not.exist(err);
@@ -144,7 +161,8 @@ describe('subscriberService', () => {
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
         search_term: null,
-        notify_time: '10:00:00'
+        notify_time: '10:00:00',
+        is_admin: 1
       };
       subscriberService.getSubscriberBySlackUsername(testHelper.db, expected.slack_username, expected.slack_team_id,
         (err, subscriber) => {
@@ -163,7 +181,8 @@ describe('subscriberService', () => {
         slack_username: 'benjamin',
         slack_team_id: 'ABCDEF123',
         search_term: null,
-        notify_time: '10:00:00'
+        notify_time: '10:00:00',
+        is_admin: 1
       };
       subscriberService.deleteSubscriberById(testHelper.db, subscriber.id, (err, subscriber) => {
         should.not.exist(err);
