@@ -2,11 +2,14 @@
 
 const _ = require('lodash');
 const async = require('async');
+const moment = require('moment');
 
 const logger = require('../helpers/logger');
 const importHelper = require('../helpers/importer');
 const slack = require('../helpers/slack');
 const soupCalendarService = require('./soupCalendarService');
+const subscriberService = require('./subscriberService');
+const { SafeError } = require('../helpers/utils');
 
 
 function processUrl(db, url, options, callback) {
@@ -28,6 +31,10 @@ function processUrl(db, url, options, callback) {
       `PDF Imported ${stats.rows} soups for ${stats.startDate} - ${stats.endDate}` :
       'PDF Imported';
     const message = err ? err.message : successMessage;
+
+    if (stats) {
+      module.exports.postImportValidation(db, [stats.startDate, stats.endDate]);
+    }
     if (options.webhookUrl) {
       slack.messageResponseUrl(options.webhookUrl, message);
     } else {
@@ -37,6 +44,54 @@ function processUrl(db, url, options, callback) {
   });
 }
 
+function _buildInvalidDatesMessage(invalidDates) {
+  let message = '*Warning*: The following dates do not have 2 soup records:';
+  return _.reduce(invalidDates, ({ day, soup_count }) => {
+    return message += `\n> ${moment(day).format('dddd, MMM D')} - ${soup_count}`
+  }, message);
+}
+
+/**
+ * Validates that each day in the date range has 2 rows
+ * @param db {object}           Database object
+ * @param dateRange {text[]}    date range to validate. example: [startDate, endDate]
+ * @param callback {function}   callback. invoked with nothing
+ */
+function postImportValidation(db, dateRange, callback = _.noop) {
+  const [startDate, endDate] = dateRange;
+  async.autoInject({
+    invalidDates: (cb) => {
+      soupCalendarService.validateSoupsForRange(db, startDate, endDate, (err, rows) => {
+        if (err) cb(err);
+        else if (_.isEmpty(rows)) cb(new SafeError(`No rows breaking validation for ${startDate} - ${endDate}`));
+        else cb(err, rows);
+      });
+    },
+    admins: (invalidDates, cb) => subscriberService.getAdmins(db, cb),
+    sendMessages: (invalidDates, admins, cb) => {
+      const message = _buildInvalidDatesMessage(invalidDates);
+      logger.warn(message);
+      async.each(admins, (admin, ecb) => {
+        slack.messageUserAsBot(admin.slack_user_id, message, admin.slack_slash_token, (e, res) => {
+          if (e) logger.error('Validation message error', e);
+          else if (res) logger.debug('Validation message sent', res);
+          ecb();
+        });
+      }, cb);
+    }
+  }, (err, { invalidDates, admins }) => {
+    if (err && err.safe) {
+      logger.debug(err);
+    } else if (err) {
+      logger.error(err);
+    } else {
+      logger.info(`${admins.length} admins notified of ${invalidDates.length} days without 2 soups`);
+    }
+    callback(err);
+  });
+}
+
 module.exports = {
-  processUrl: processUrl
+  processUrl: processUrl,
+  postImportValidation: postImportValidation
 };

@@ -58,6 +58,10 @@ function getSubscribersForTeam(db, teamId, callback) {
   queryHelper.select(db, 'subscribers', { slack_team_id: teamId }, callback);
 }
 
+function getAdmins(db, callback) {
+  queryHelper.select(db, 'subscribers', { is_admin: true }, callback);
+}
+
 function getSubscriberById(db, id, callback) {
   queryHelper.selectOne(db, 'subscribers', { id: id }, callback);
 }
@@ -91,10 +95,12 @@ function deleteSubscriberBySlackUsername(db, slackName, slackTeamId, callback) {
   queryHelper.deleteOne(db, 'subscribers', { slack_username: slackName, slack_team_id: slackTeamId }, callback);
 }
 
+
 module.exports = {
   addSubscriber: addSubscriber,
   getSubscribers: getSubscribers,
   getSubscribersForTeam: getSubscribersForTeam,
+  getAdmins: getAdmins,
   getSubscriberById: getSubscriberById,
   getSubscriberBySlackUserId: getSubscriberBySlackUserId,
   getSubscriberBySlackUsername: getSubscriberBySlackUsername,
