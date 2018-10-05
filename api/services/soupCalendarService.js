@@ -91,8 +91,20 @@ function massUpdate(db, soupDays, user, callback) {
   });
 }
 
+function validateSoupsForRange(db, startDate, endDate, callback) {
+  const start = moment(startDate).format('YYYY/MM/DD');
+  const end = moment(endDate).format('YYYY/MM/DD');
+  const queryStr = `SELECT COUNT(id) AS soup_count, day FROM soup_calendar
+    WHERE \`day\` >= DATE(?) AND \`day\` <= DATE(?)
+    GROUP BY day
+    HAVING soup_count != 2
+    ORDER BY \`day\`;`;
+  queryHelper.custom(db, queryStr, [start, end], callback);
+}
+
 module.exports = {
   searchForSoup: searchForSoup,
   searchForSoupOnDay: searchForSoupOnDay,
-  massUpdate: massUpdate
+  massUpdate: massUpdate,
+  validateSoupsForRange: validateSoupsForRange
 };

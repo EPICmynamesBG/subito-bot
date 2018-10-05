@@ -5,7 +5,7 @@ const lodash = require('lodash');
 module.exports = {
   SLACK_CONSTS: {
     SUPPORTED_COMMANDS: lodash.clone(
-      ['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'week', 'settings', 'import']
+      ['day', 'search', 'subscribe', 'unsubscribe', 'feedback', 'week', 'settings', 'import', 'version']
     ),
 
     CMD_USAGE: {
@@ -16,7 +16,8 @@ module.exports = {
       feedback: '<https://github.com/EPICmynamesBG/subito-bot/issues|Submit feedback on GitHub>',
       week: '[today | tomorrow | yesterday | [YYYY-MM-DD]]',
       settings: '[notify (example: 8:00 am)]',
-      import: '[PDF url]'
+      import: '[PDF url]',
+      version: ''
     },
 
     CMD_PARAM_MAP: lodash.cloneDeep({
@@ -29,7 +30,8 @@ module.exports = {
       settings: {
         notify: ['time']
       },
-      import: ['url']
+      import: ['url'],
+      version: []
     }),
 
     CMD_TEMPLATE: lodash.cloneDeep({

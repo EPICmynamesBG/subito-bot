@@ -201,4 +201,42 @@ describe('soupCalendarService', () => {
       });
     });
   });
+
+  describe('validateSoupsForRange', () => {
+    const startRange = moment().add(1, 'month').format();
+    const endRange = moment().add(2, 'month').format();
+    before((done) => {
+      const samples = [{
+        date: startRange,
+        soups: ['Soup 1', 'Soup 2']
+      }, {
+        date: moment(startRange).add(1, 'd').format(),
+        soups: ['Soup 3', 'Soup 4']
+      }, {
+        date: moment(startRange).add(4, 'd').format(),
+        soups: ['Soup 5', 'Soup 6', 'Bad Soup']
+      }, {
+        date: moment(startRange).add(5, 'd').format(),
+        soups: ['Oh no']
+      }, {
+        date: endRange,
+        soups: ['Soup 8', 'Soup 9']
+      }];
+      soupCalendarService.massUpdate(testHelper.db, samples, null, done);
+    });
+
+    it('should get days without 2 soups in the given range', (done) => {
+      soupCalendarService.validateSoupsForRange(testHelper.db, startRange, endRange, (err, rows) => {
+        should.not.exist(err);
+        assert.equal(rows.length, 2, 'should return 2 rows');
+        /* eslint-disable max-nested-callbacks */
+        rows.forEach((row) => {
+          row.should.have.property('day');
+          row.should.have.property('soup_count');
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+  });
 });

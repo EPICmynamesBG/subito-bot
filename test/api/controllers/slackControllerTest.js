@@ -9,7 +9,7 @@ const oauthService = require('../../../api/services/oauthService');
 const importerService = require('../../../api/services/importerService');
 const slack = require('../../../api/helpers/slack');
 
-const { SLACK_VERIFICATION_TOKEN } = require('../../../config/config');
+const { SLACK_VERIFICATION_TOKEN, SWAGGER } = require('../../../config/config');
 
 const validAuth = {
   team_id: 'ABCDEF123',
@@ -338,6 +338,27 @@ describe('slackController', () => {
           res.body.should.have.property('text');
           assert(importerService.processUrl.calledOnce);
           importerService.processUrl.restore();
+          done();
+        });
+    });
+
+    it('should 200 and return text for "version"', (done) => {
+      request(server)
+        .post(url)
+        .type('form')
+        .send({
+          token: validAuth.token,
+          text: 'version',
+          user_id: 'ABC123',
+          user_name: 'testuser',
+          team_id: validAuth.team_id
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          should.not.exist(err);
+          assert.strictEqual(res.body.text, `subito-bot version ${SWAGGER.APP_VERSION}`);
           done();
         });
     });

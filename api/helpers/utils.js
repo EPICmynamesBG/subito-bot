@@ -158,6 +158,14 @@ function parseTime (text) {
   return time.format('HH:mm:ss');
 }
 
+class SafeError extends Error {
+  constructor(...args) {
+    super(...args);
+    this.safe = true;
+    this.name = 'SafeError';
+  }
+}
+
 module.exports = {
   trimChar: trimChar,
   textForDate: textForDate,
@@ -172,5 +180,6 @@ module.exports = {
   textCleaner: textCleaner,
   encrypt: encrypt,
   decrypt: decrypt,
-  parseTime: parseTime
+  parseTime: parseTime,
+  SafeError: SafeError
 };
