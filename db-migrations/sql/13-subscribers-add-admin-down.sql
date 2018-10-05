@@ -1,5 +1,3 @@
-ALTER TABLE subscribers DROP COLUMN is_admin;
-
 CREATE OR REPLACE VIEW integration_subscriber_view AS (
   SELECT subscribers.id,
     subscribers.slack_user_id,
@@ -13,3 +11,5 @@ CREATE OR REPLACE VIEW integration_subscriber_view AS (
   FROM subscribers
   INNER JOIN oauth_integrations ON (subscribers.slack_team_id = oauth_integrations.team_id)
 );
+
+ALTER TABLE subscribers DROP COLUMN is_admin;
