@@ -80,7 +80,7 @@ function updateSubscriberBySlackUserId(db, slackId, updateObj, callback) {
   if (clone.notify_time) {
     clone.notify_time = utils.parseTime(clone.notify_time);
   }
-  lodash.unset(updateObj, 'is_admin');
+  lodash.unset(clone, 'is_admin');
   queryHelper.update(db, 'subscribers', clone, { slack_user_id: slackId }, callback);
 }
 
