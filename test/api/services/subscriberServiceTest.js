@@ -4,6 +4,7 @@ const should = require('should');
 const async = require('async');
 const testHelper = require('../../helper/testHelper');
 const subscriberService = require('../../../api/services/subscriberService');
+const queryHelper = require('../../../api/helpers/queryHelper');
 
 describe('subscriberService', () => {
   before(testHelper.resetData);
@@ -113,6 +114,16 @@ describe('subscriberService', () => {
         done();
       });
     });
+
+    it('should always return an array', (done) => {
+      sinon.stub(queryHelper, 'select').yields(undefined, null);
+      subscriberService.getAdmins(testHelper.db, (err, admins) => {
+        should.not.exist(err);
+        assert.deepEqual(admins, []);
+        queryHelper.select.restore();
+        done();
+      });
+    })
   });
 
   describe('getSubscriberById', () => {

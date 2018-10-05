@@ -59,7 +59,7 @@ function getSubscribersForTeam(db, teamId, callback) {
 }
 
 function getAdmins(db, callback) {
-  queryHelper.select(db, 'subscribers', { is_admin: true }, callback);
+  queryHelper.select(db, 'subscribers', { is_admin: true }, (e, res) => callback(e, res || []));
 }
 
 function getSubscriberById(db, id, callback) {
