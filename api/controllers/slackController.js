@@ -5,6 +5,7 @@ const errors = require('common-errors');
 const logger = require('../helpers/logger');
 const utils = require('../helpers/utils');
 const slackUtils = require('../helpers/slack').utils;
+const config = require('../../config/config');
 const { CMD_USAGE, SUPPORTED_COMMANDS } = require('../../config/constants').SLACK_CONSTS;
 
 const oauthService = require('../services/oauthService');
@@ -64,6 +65,11 @@ function handleSlack(req, res) {
     lodash.set(req, 'swagger.params.body.value.responseUrl', action.params.user.responseUrl);
     lodash.set(req, 'swagger.params.body.value.userName', action.params.user.username);
     importController.importSoups(req, res);
+    break;
+  case 'version':
+    utils.processResponse(null,
+      { text: `subito-bot version ${lodash.get(config, 'SWAGGER.APP_VERSION', 'unknown')}` },
+      res);
     break;
   default: {
     logger.warn('Unsupported command', action.command);
