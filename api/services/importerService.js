@@ -33,7 +33,7 @@ function processUrl(db, url, options, callback) {
     const message = err ? err.message : successMessage;
 
     if (stats) {
-      module.exports.postImportValidation(db, [stats.startDate, stats.endDate]);
+      module.exports.performDateValidation(db, [stats.startDate, stats.endDate]);
     }
     if (options.webhookUrl) {
       slack.messageResponseUrl(options.webhookUrl, message);
@@ -45,9 +45,9 @@ function processUrl(db, url, options, callback) {
 }
 
 function _buildInvalidDatesMessage(invalidDates) {
-  let message = '*Warning*: The following dates do not have 2 soup records:';
-  return _.reduce(invalidDates, ({ day, soup_count }) => {
-    return message += `\n> ${moment(day).format('dddd, MMM D')} - ${soup_count}`
+  const message = '*Warning*: The following dates do not have 2 soup records:';
+  return _.reduce(invalidDates, (str, { day, soup_count }) => {
+    return str + `\n> ${moment(day).format('dddd, MMM D')} - ${soup_count}`;
   }, message);
 }
 
@@ -57,7 +57,7 @@ function _buildInvalidDatesMessage(invalidDates) {
  * @param dateRange {text[]}    date range to validate. example: [startDate, endDate]
  * @param callback {function}   callback. invoked with nothing
  */
-function postImportValidation(db, dateRange, callback = _.noop) {
+function performDateValidation(db, dateRange, callback = _.noop) {
   const [startDate, endDate] = dateRange;
   async.autoInject({
     invalidDates: (cb) => {
@@ -73,8 +73,8 @@ function postImportValidation(db, dateRange, callback = _.noop) {
       logger.warn(message);
       async.each(admins, (admin, ecb) => {
         slack.messageUserAsBot(admin.slack_user_id, message, admin.slack_slash_token, (e, res) => {
-          if (e) logger.error('Validation message error', e);
-          else if (res) logger.debug('Validation message sent', res);
+          if (e) logger.error('Validation message error for admin', admin.id, e);
+          else if (res) logger.debug('Validation message sent for admin', admin.id, res);
           ecb();
         });
       }, cb);
@@ -93,5 +93,5 @@ function postImportValidation(db, dateRange, callback = _.noop) {
 
 module.exports = {
   processUrl: processUrl,
-  postImportValidation: postImportValidation
+  performDateValidation: performDateValidation
 };
