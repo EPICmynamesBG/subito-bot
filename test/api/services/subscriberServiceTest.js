@@ -173,6 +173,45 @@ describe('subscriberService', () => {
     });
   });
 
+  describe('updateSubscriberBySlackUserId', () => {
+    beforeEach(testHelper.resetData);
+    it('should update a subscriber', (done) => {
+      const slackUserId = 'ABC_123';
+      const updateObj = { notify_time: '08:00:00' };
+
+      async.autoInject({
+        update: cb => subscriberService.updateSubscriberBySlackUserId(testHelper.db, slackUserId, updateObj, cb),
+        updatedRow: (update, cb) => subscriberService.getSubscriberBySlackUserId(testHelper.db, slackUserId, cb)
+      }, (err, { update, updatedRow }) => {
+        should.not.exist(err);
+        assert.strictEqual(update.changedRows, 1);
+
+        assert.strictEqual(updatedRow.slack_user_id, slackUserId);
+        assert.strictEqual(updatedRow.notify_time, updateObj.notify_time);
+        done();
+      });
+    });
+
+    it('should not allow is_admin to be updated', (done) => {
+      const slackUserId = 'ABC_123';
+      async.autoInject({
+        preUpdate: cb => subscriberService.getSubscriberBySlackUserId(testHelper.db, slackUserId, cb),
+        update: (preUpdate, cb) => {
+          const update = { notify_time: '08:00:00', is_admin: !preUpdate.isAdmin };
+          subscriberService.updateSubscriberBySlackUserId(testHelper.db, slackUserId, update, cb)
+        },
+        updatedRow: (update, cb) => subscriberService.getSubscriberBySlackUserId(testHelper.db, slackUserId, cb)
+      }, (err, { preUpdate, update, updatedRow }) => {
+        should.not.exist(err);
+        assert.strictEqual(update.changedRows, 1);
+
+        const expected = Object.assign({}, preUpdate, { notify_time: '08:00:00' });
+        assert.deepStrictEqual(updatedRow, expected);
+        done();
+      });
+    });
+  });
+
   describe('deleteSubscriberById', () => {
     it('should delete a subscriber by id', (done) => {
       const subscriber = {
