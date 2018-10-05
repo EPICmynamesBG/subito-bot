@@ -8,7 +8,7 @@ const logger = require('../helpers/logger');
 const importHelper = require('../helpers/importer');
 const slack = require('../helpers/slack');
 const soupCalendarService = require('./soupCalendarService');
-const subscriberService = require('./subscriberService');
+const integrationSubscriberViewService = require('./integrationSubscriberViewService');
 const { SafeError } = require('../helpers/utils');
 
 
@@ -67,7 +67,7 @@ function performDateValidation(db, dateRange, callback = _.noop) {
         else cb(err, rows);
       });
     },
-    admins: (invalidDates, cb) => subscriberService.getAdmins(db, cb),
+    admins: (invalidDates, cb) => integrationSubscriberViewService.getAdmins(db, true, cb),
     sendMessages: (invalidDates, admins, cb) => {
       const message = _buildInvalidDatesMessage(invalidDates);
       logger.warn(message);

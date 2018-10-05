@@ -21,6 +21,18 @@ function getAll(db, decrypt = false, callback) {
   });
 }
 
+function getAdmins(db, decrypt = false, callback) {
+  if (typeof decrypt === 'function') {
+    callback = decrypt; // eslint-disable-line no-param-reassign
+    decrypt = false; // eslint-disable-line no-param-reassign
+  }
+  queryHelper.select(db, 'integration_subscriber_view', { is_admin: 1 }, (err, rows) => {
+    if (decrypt) callback(err, rows ? rows.map(_mapDecrypt) : []);
+    else callback(err, rows ? rows : []);
+  });
+}
+
 module.exports = {
-  getAll: getAll
+  getAll: getAll,
+  getAdmins: getAdmins
 }

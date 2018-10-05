@@ -5,7 +5,7 @@ const importerService = require('../../../api/services/importerService');
 const logger = require('../../../api/helpers/logger');
 const slack = require('../../../api/helpers/slack');
 const soupCalendarService = require('../../../api/services/soupCalendarService');
-const subscriberService = require('../../../api/services/subscriberService');
+const integrationSubscriberViewService = require('../../../api/services/integrationSubscriberViewService');
 
 describe('importerService', () => {
   describe('performDateValidation', () => {
@@ -20,12 +20,12 @@ describe('importerService', () => {
 
     it('should SafeError when no soups returned from validateSoupsForRange', (done) => {
       sandbox.stub(soupCalendarService, 'validateSoupsForRange').yields(undefined, []);
-      sandbox.spy(subscriberService, 'getAdmins');
+      sandbox.spy(integrationSubscriberViewService, 'getAdmins');
       sandbox.stub(slack, 'messageUserAsBot').yields();
 
       importerService.performDateValidation(testHelper.db, range, (err) => {
         assert.equal(err.name, 'SafeError');
-        assert(subscriberService.getAdmins.notCalled);
+        assert(integrationSubscriberViewService.getAdmins.notCalled);
         assert(slack.messageUserAsBot.notCalled);
         done();
       });
@@ -34,13 +34,13 @@ describe('importerService', () => {
     it('should logger.warn when soups returned', (done) => {
       sandbox.stub(soupCalendarService, 'validateSoupsForRange')
         .yields(undefined, [{ day: moment().format(), soup_count: 3 }]);
-      sandbox.stub(subscriberService, 'getAdmins').yields(undefined, []);
+      sandbox.stub(integrationSubscriberViewService, 'getAdmins').yields(undefined, []);
       sandbox.stub(slack, 'messageUserAsBot').yields();
       sandbox.spy(logger, 'warn');
 
       importerService.performDateValidation(testHelper.db, range, (err) => {
         if (err) throw err;
-        assert(subscriberService.getAdmins.calledOnce);
+        assert(integrationSubscriberViewService.getAdmins.calledOnce);
         assert(slack.messageUserAsBot.notCalled);
         assert(logger.warn.calledOnce);
         done();
@@ -51,7 +51,7 @@ describe('importerService', () => {
       const day = moment().format();
       sandbox.stub(soupCalendarService, 'validateSoupsForRange')
         .yields(undefined, [{ day: day, soup_count: 3 }]);
-      sandbox.stub(subscriberService, 'getAdmins').yields(undefined, []);
+      sandbox.stub(integrationSubscriberViewService, 'getAdmins').yields(undefined, []);
       sandbox.stub(slack, 'messageUserAsBot').yields();
       sandbox.spy(logger, 'warn');
 
@@ -69,13 +69,13 @@ describe('importerService', () => {
     it('should message admins when soups are returned', (done) => {
       sandbox.stub(soupCalendarService, 'validateSoupsForRange')
         .yields(undefined, [{ day: moment().format(), soup_count: 3 }]);
-      sandbox.stub(subscriberService, 'getAdmins').yields(undefined,
+      sandbox.stub(integrationSubscriberViewService, 'getAdmins').yields(undefined,
         [testHelper.testSubscriber, testHelper.testSubscriber]);
       sandbox.stub(slack, 'messageUserAsBot').yields();
 
       importerService.performDateValidation(testHelper.db, range, (err) => {
         if (err) throw err;
-        assert(subscriberService.getAdmins.calledOnce);
+        assert(integrationSubscriberViewService.getAdmins.calledOnce);
         assert(slack.messageUserAsBot.calledTwice);
         done();
       });
@@ -84,7 +84,7 @@ describe('importerService', () => {
     it('should not error when messaging an admin errors', (done) => {
       sandbox.stub(soupCalendarService, 'validateSoupsForRange')
         .yields(undefined, [{ day: moment().format(), soup_count: 3 }]);
-      sandbox.stub(subscriberService, 'getAdmins').yields(undefined,
+      sandbox.stub(integrationSubscriberViewService, 'getAdmins').yields(undefined,
         [testHelper.testSubscriber, testHelper.testSubscriber]);
       sandbox.stub(slack, 'messageUserAsBot')
         .onFirstCall().yields(new Error('FAUX'))
@@ -92,7 +92,7 @@ describe('importerService', () => {
 
       importerService.performDateValidation(testHelper.db, range, (err) => {
         if (err) throw err;
-        assert(subscriberService.getAdmins.calledOnce);
+        assert(integrationSubscriberViewService.getAdmins.calledOnce);
         assert(slack.messageUserAsBot.calledTwice);
         done();
       });

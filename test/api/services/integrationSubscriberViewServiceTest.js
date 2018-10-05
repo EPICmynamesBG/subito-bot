@@ -25,6 +25,7 @@ describe('integrationSubscriberViewService', () => {
           entry.should.have.property('slack_webhook_url');
           entry.should.have.property('search_term');
           entry.should.have.property('notify_time');
+          entry.should.have.property('is_admin');
         });
         /* eslint-enable max-nested-callbacks */
         done();
@@ -47,6 +48,55 @@ describe('integrationSubscriberViewService', () => {
           entry.should.have.property('slack_webhook_url');
           entry.should.have.property('search_term');
           entry.should.have.property('notify_time');
+          entry.should.have.property('is_admin');
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+  });
+
+  describe('getAdmins', () => {
+    it('should get all admin integration subscriber entries', (done) => {
+      integrationSubscriberViewService.getAdmins(testHelper.db, (err, entries) => {
+        should.not.exist(err);
+        assert(entries.length > 0, 'there should be entries');
+        /* eslint-disable max-nested-callbacks */
+        entries.forEach((entry) => {
+          entry.should.have.property('id');
+          entry.should.have.property('slack_user_id');
+          entry.should.have.property('slack_username');
+          entry.should.have.property('slack_team_id');
+          entry.should.have.property('slack_team_domain');
+          entry.should.have.property('slack_slash_token');
+          assert.notEqual(entry.slack_slash_token, 'helloworld');
+          entry.should.have.property('slack_webhook_url');
+          entry.should.have.property('search_term');
+          entry.should.have.property('notify_time');
+          entry.should.have.property('is_admin', 1);
+        });
+        /* eslint-enable max-nested-callbacks */
+        done();
+      });
+    });
+
+    it('should get all admin integration subscriber entries with encrypted fields decrypted', (done) => {
+      integrationSubscriberViewService.getAdmins(testHelper.db, true, (err, entries) => {
+        should.not.exist(err);
+        assert(entries.length > 0, 'there should be entries');
+        /* eslint-disable max-nested-callbacks */
+        entries.forEach((entry) => {
+          entry.should.have.property('id');
+          entry.should.have.property('slack_user_id');
+          entry.should.have.property('slack_username');
+          entry.should.have.property('slack_team_id');
+          entry.should.have.property('slack_team_domain');
+          entry.should.have.property('slack_slash_token');
+          assert.equal(entry.slack_slash_token, 'helloworld');
+          entry.should.have.property('slack_webhook_url');
+          entry.should.have.property('search_term');
+          entry.should.have.property('notify_time');
+          entry.should.have.property('is_admin', 1);
         });
         /* eslint-enable max-nested-callbacks */
         done();
