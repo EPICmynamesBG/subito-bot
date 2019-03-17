@@ -44,7 +44,11 @@ function searchForSoupOnDay(db, searchStr, day, callback) {
   });
 }
 
-function massUpdate(db, soupDays, user, callback) {
+function massUpdate(db, soupDays = [], user, callback) {
+  if (soupDays.length === 0) {
+    callback(new Error('No soups to import'))
+    return;
+  }
   let updatedCount = 0;
   let updatedRange = { start: null, end: null };
   async.each(soupDays, (soupDay, eachCb) => {
