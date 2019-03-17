@@ -21,8 +21,7 @@ function processUrl(db, url, options, callback) {
   async.autoInject({
     pdfJson: cb => importHelper.loadAndConvertPdf(url, cb),
     calendarRows: (pdfJson, cb) => {
-      const plainTextArr = importHelper.extractFromPdf(pdfJson);
-      const rows = importHelper.aggregateRows(plainTextArr);
+      const rows = importHelper.tryExtractRows(pdfJson);
       soupCalendarService.massUpdate(db, rows, options.user, cb);
     }
   }, (err, results) => {

@@ -169,6 +169,14 @@ describe('soupCalendarService', () => {
   });
 
   describe('massUpdate', () => {
+    it('should error when no soups are given', (done) => {
+      soupCalendarService.massUpdate(testHelper.db, [], null, (err) => {
+        should.exist(err);
+        err.should.have.property('message', 'No soups to import');
+        done();
+      });
+    });
+
     it('should get soup calendar entry for day', (done) => {
       const updates = [];
       const soupOptions = ['Chicken Noodle', 'Beef Stew',

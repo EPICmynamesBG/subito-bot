@@ -57,9 +57,9 @@ function loadAndConvertPdf(url, callback) {
   reqStream.pipe(pdfParser);
 }
 
-function extractFromPdf(pdfJson) {
+function extractFromPdf(pdfJson, pageNum = 0) {
   return _.chain(pdfJson)
-    .get('formImage.Pages[0].Texts', [])
+    .get(`formImage.Pages[${pageNum}].Texts`, [])
     .map(({ R }) => R)
     .flatten()
     .map(({ T }) => T)
@@ -121,8 +121,22 @@ function aggregateRows(textArr) {
   return aggregates;
 }
 
+function tryExtractRows(pdfJson) {
+  const pageCount = _.get(pdfJson, 'formImage.Pages', []).length;
+  let currentPage = 0;
+  let rows = [];
+  while (_.isEmpty(rows) && currentPage < pageCount) {
+    const plainTextArr = module.exports.extractFromPdf(pdfJson, currentPage);
+    rows = module.exports.aggregateRows(plainTextArr);
+    logger.debug(rows.length, 'rows extracted from page', currentPage);
+    currentPage++;
+  }
+  return rows;
+}
+
 module.exports = {
   loadAndConvertPdf: loadAndConvertPdf,
   extractFromPdf: extractFromPdf,
-  aggregateRows: aggregateRows
+  aggregateRows: aggregateRows,
+  tryExtractRows: tryExtractRows
 };
