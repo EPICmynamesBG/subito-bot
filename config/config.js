@@ -53,7 +53,7 @@ const config = {
 
   SWAGGER: {
 
-    APP_VERSION: '8.1.2',
+    APP_VERSION: '8.1.3',
 
     HOSTNAME: process.env.HOST || 'localhost',
 
